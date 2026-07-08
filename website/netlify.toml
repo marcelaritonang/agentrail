@@ -1,0 +1,15 @@
+# Konfigurasi deploy Netlify (opsional, untuk deploy via connect-repo).
+# Untuk deploy tercepat: cukup drag-drop folder `website/` ke Netlify —
+# tidak butuh file ini. File ini berguna kalau kamu connect repo Git.
+
+[build]
+  publish = "."
+  command = ""
+
+# Header keamanan dasar (sinyal profesional untuk reviewer).
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
