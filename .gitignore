@@ -1,0 +1,20 @@
+# Python (legacy — removed after Next.js migration)
+.venv/
+__pycache__/
+*.pyc
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+next-env.d.ts
+
+# Data / secrets
+data/
+*.db
+.env
+.env*.local
+
+# Editor / OS
+.DS_Store
+*.log

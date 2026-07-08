@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ApplyMate — AI Application Workspace</title>
+  <meta name="description" content="Write and tailor CVs, cover letters, and scholarship essays. Polish English. Track applications. One AI workspace." />
+  <link rel="preload" href="assets/fonts/inter.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="tokens.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- ================= LANDING ================= -->
+  <div id="landing" class="landing">
+    <header class="lp-top">
+      <div class="brand">
+        <span class="brand-mark">A</span>
+        <span class="brand-name">Apply<span>Mate</span></span>
+      </div>
+      <button class="btn btn-ghost btn-sm" data-enter="cover_letter">Open workspace</button>
+    </header>
+
+    <section class="lp-hero">
+      <div class="lp-glow" aria-hidden="true"></div>
+      <p class="lp-eyebrow">AI application workspace</p>
+      <h1 class="lp-title">Applications, tailored to the opportunity.</h1>
+      <p class="lp-sub">
+        Write cover letters, CV bullets, and scholarship essays matched to a specific role —
+        in strong English, from a profile you fill in once. Draft in any language; ship in English.
+      </p>
+      <div class="lp-cta">
+        <button class="btn btn-primary" data-enter="cover_letter">Start writing</button>
+        <a class="btn btn-ghost" href="#lp-example">See an example</a>
+      </div>
+    </section>
+
+    <section class="lp-section">
+      <h2 class="lp-h2">What do you want to create?</h2>
+      <p class="lp-lead">Pick one — you'll land in the workspace already set up for it.</p>
+      <div class="lp-picker">
+        <button class="pick-card" data-enter="cover_letter">
+          <span class="pick-ic">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+          </span>
+          <span class="pick-title">Cover letter</span>
+          <span class="pick-desc">A focused letter that ties your background to the role.</span>
+        </button>
+        <button class="pick-card" data-enter="cv_bullets">
+          <span class="pick-ic">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>
+          </span>
+          <span class="pick-title">CV bullets</span>
+          <span class="pick-desc">Achievement-driven resume bullets, tuned to the requirements.</span>
+        </button>
+        <button class="pick-card" data-enter="scholarship_essay">
+          <span class="pick-ic">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+          </span>
+          <span class="pick-title">Scholarship essay</span>
+          <span class="pick-desc">A personal statement built around the prompt and your story.</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="lp-section" id="lp-example">
+      <h2 class="lp-h2">A real example</h2>
+      <p class="lp-lead">This is actual output — the kind of draft you'd get and then refine.</p>
+      <div class="lp-example-card card">
+        <div class="lp-example-meta">
+          <span class="badge badge-soft">Example · Cover letter</span>
+          <span class="lp-example-for">Backend Engineer · Northwind Labs</span>
+        </div>
+        <div class="lp-example-body">
+          <p>Dear Hiring Team,</p>
+          <p>I'm writing to apply for the Backend Engineer role at Northwind Labs. Over the past two years I've built and shipped production Python services — most recently an order-processing API that handles 40k requests a day and holds 99.9% uptime, which taught me to design for failure rather than around it.</p>
+          <p>Your posting emphasizes distributed systems and observability. At my last role I introduced structured logging and traced a latency regression to an N+1 query, cutting p95 response time from 800ms to 210ms. I care about the same things you do: systems that stay legible under load.</p>
+          <p>I'd welcome the chance to bring that same rigor to your team.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="lp-section">
+      <h2 class="lp-h2">Why ApplyMate</h2>
+      <div class="lp-why">
+        <div class="why-item">
+          <span class="why-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></span>
+          <h3>Tailored, not templated</h3>
+          <p>Every draft is written against the specific opportunity you paste in — not a fill-in-the-blank form.</p>
+        </div>
+        <div class="why-item">
+          <span class="why-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg></span>
+          <h3>Any language in, English out</h3>
+          <p>Write your profile in Indonesian or rough English. ApplyMate turns it into clean, professional English.</p>
+        </div>
+        <div class="why-item">
+          <span class="why-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span>
+          <h3>You stay in control</h3>
+          <p>Set the tone, length, and emphasis. The draft is a starting point you own, not a black box.</p>
+        </div>
+      </div>
+      <div class="lp-foot-cta">
+        <button class="btn btn-primary" data-enter="cover_letter">Open the workspace</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- ================= APP ================= -->
+  <div class="app" hidden>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-mark">A</span>
+        <span class="brand-name">Apply<span>Mate</span></span>
+      </div>
+
+      <nav class="nav" role="tablist" aria-label="Sections">
+        <button class="nav-item active" data-view="write" role="tab" aria-selected="true">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+          <span>Write</span>
+        </button>
+        <button class="nav-item" data-view="polish" role="tab" aria-selected="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+          <span>Polish &amp; Translate</span>
+        </button>
+        <button class="nav-item" data-view="tracker" role="tab" aria-selected="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="m9 16 2 2 4-4"/></svg>
+          <span>Tracker</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-foot">
+        <div class="status" id="provider-status" title="Active AI engine">
+          <span class="status-dot"></span>
+          <span id="provider-label">Checking…</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+      <!-- WRITE -->
+      <section id="view-write" class="view active" role="tabpanel" aria-label="Write">
+        <header class="view-head">
+          <h1>Write a tailored document</h1>
+          <p>Generate a CV, cover letter, or scholarship essay matched to a specific opportunity.</p>
+        </header>
+
+        <div class="split">
+          <!-- inputs -->
+          <div class="pane pane-input">
+            <div class="field">
+              <label for="gen-kind">Document type</label>
+              <div class="segmented" role="radiogroup" aria-label="Document type">
+                <button type="button" class="seg active" data-kind="cover_letter" role="radio" aria-checked="true">Cover letter</button>
+                <button type="button" class="seg" data-kind="cv_bullets" role="radio" aria-checked="false">CV bullets</button>
+                <button type="button" class="seg" data-kind="scholarship_essay" role="radio" aria-checked="false">Essay</button>
+              </div>
+              <input type="hidden" id="gen-kind" value="cover_letter" />
+            </div>
+
+            <div class="field">
+              <label for="gen-profile">Your profile &amp; portfolio</label>
+              <textarea id="gen-profile" rows="6" placeholder="Background, skills, projects — any language. e.g. Informatics student, 2y Python & React, led a campus startup, github.com/you"></textarea>
+              <span class="help">The AI writes from this. Be specific — real projects and numbers win.</span>
+            </div>
+
+            <div class="field">
+              <label for="gen-url">Opportunity link <span class="opt">optional</span></label>
+              <div class="input-row">
+                <input id="gen-url" type="url" placeholder="https://… paste a job or scholarship link" />
+                <button id="gen-fetch" class="btn btn-ghost" type="button">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg>
+                  Read link
+                </button>
+              </div>
+              <span class="help" id="gen-fetch-status">LinkedIn/login-only sites may block reading — paste the text below instead.</span>
+            </div>
+
+            <div class="field">
+              <label for="gen-opportunity">The opportunity</label>
+              <textarea id="gen-opportunity" rows="5" placeholder="Role/scholarship, organization, requirements. Or use 'Read link' to fill automatically."></textarea>
+            </div>
+
+            <details class="disclosure">
+              <summary>Extra instructions</summary>
+              <div class="field" style="margin-top:12px">
+                <input id="gen-notes" type="text" placeholder="e.g. confident tone, max 200 words" />
+              </div>
+            </details>
+
+            <button id="gen-run" class="btn btn-primary btn-block">
+              <span class="btn-label">Generate</span>
+            </button>
+          </div>
+
+          <!-- output -->
+          <div class="pane pane-output">
+            <div class="output-head">
+              <span class="output-title">Result</span>
+              <div class="output-actions">
+                <span id="gen-provider" class="badge" hidden></span>
+                <button id="gen-copy" class="btn btn-ghost btn-sm" hidden>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                  Copy
+                </button>
+              </div>
+            </div>
+
+            <!-- Staged progress: each label maps to one real backend call. -->
+            <div id="gen-stage" class="stage" hidden>
+              <span class="stage-spinner" aria-hidden="true"></span>
+              <span id="gen-stage-label"></span>
+            </div>
+
+            <!-- Job match: real keyword analysis from /api/analyze. -->
+            <div id="gen-match" class="match" hidden>
+              <div class="match-head">Job match</div>
+              <div id="match-groups" class="match-groups">
+                <div class="match-group">
+                  <span class="match-label match-label-ok">In your profile</span>
+                  <div id="match-matched" class="chips"></div>
+                </div>
+                <div class="match-group">
+                  <span class="match-label match-label-gap">Not shown yet</span>
+                  <div id="match-missing" class="chips"></div>
+                </div>
+              </div>
+              <p id="match-note" class="match-note" hidden></p>
+            </div>
+
+            <div id="gen-output" class="output" data-empty="true">
+              <div class="empty">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+                <p>Your tailored document appears here.</p>
+                <span>Fill your profile and the opportunity, then hit Generate.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- POLISH -->
+      <section id="view-polish" class="view" role="tabpanel" aria-label="Polish and translate" hidden>
+        <header class="view-head">
+          <h1>Polish &amp; translate</h1>
+          <p>Turn an Indonesian draft into natural English, or sharpen your existing English.</p>
+        </header>
+
+        <div class="split">
+          <div class="pane pane-input">
+            <div class="field">
+              <label>Mode</label>
+              <div class="segmented" role="radiogroup" aria-label="Mode">
+                <button type="button" class="seg active" data-mode="translate" role="radio" aria-checked="true">ID → English</button>
+                <button type="button" class="seg" data-mode="improve" role="radio" aria-checked="false">Improve English</button>
+              </div>
+              <input type="hidden" id="pol-mode" value="translate" />
+            </div>
+            <div class="field">
+              <label for="pol-text">Your text</label>
+              <textarea id="pol-text" rows="12" placeholder="Paste your draft here…"></textarea>
+            </div>
+            <button id="pol-run" class="btn btn-primary btn-block">
+              <span class="btn-label">Polish</span>
+            </button>
+          </div>
+
+          <div class="pane pane-output">
+            <div class="output-head">
+              <span class="output-title">Result</span>
+              <div class="output-actions">
+                <span id="pol-provider" class="badge" hidden></span>
+                <button id="pol-copy" class="btn btn-ghost btn-sm" hidden>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                  Copy
+                </button>
+              </div>
+            </div>
+            <div id="pol-output" class="output" data-empty="true">
+              <div class="empty">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+                <p>Polished text appears here.</p>
+                <span>Paste a draft on the left and hit Polish.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TRACKER -->
+      <section id="view-tracker" class="view" role="tabpanel" aria-label="Tracker" hidden>
+        <header class="view-head">
+          <h1>Application tracker</h1>
+          <p>Every application, deadline, and status in one place.</p>
+        </header>
+
+        <form id="app-form" class="tracker-form card">
+          <div class="tracker-form-grid">
+            <input id="app-org" type="text" placeholder="Organization *" required aria-label="Organization" />
+            <input id="app-role" type="text" placeholder="Role / scholarship" aria-label="Role" />
+            <select id="app-kind" aria-label="Type">
+              <option value="job">Job</option>
+              <option value="scholarship">Scholarship</option>
+              <option value="internship">Internship</option>
+            </select>
+            <input id="app-deadline" type="date" aria-label="Deadline" />
+            <input id="app-link" type="url" placeholder="Link" aria-label="Link" />
+          </div>
+          <button type="submit" class="btn btn-primary">Add application</button>
+        </form>
+
+        <div class="table-wrap card">
+          <table class="tracker-table">
+            <thead>
+              <tr><th>Organization</th><th>Role</th><th>Type</th><th>Deadline</th><th>Status</th><th></th></tr>
+            </thead>
+            <tbody id="app-rows"></tbody>
+          </table>
+          <div id="app-empty" class="empty empty-inline">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
+            <p>No applications yet.</p>
+            <span>Add your first one above.</span>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast-host" class="toast-host" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>
