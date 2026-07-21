@@ -1,0 +1,31 @@
+{
+  "name": "@agentrail/web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "next build",
+    "dev": "next dev --turbopack",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "start": "next start",
+    "test": "vitest run --root ../.. apps/web"
+  },
+  "dependencies": {
+    "@agentrail/blob": "workspace:*",
+    "@agentrail/config": "workspace:*",
+    "@agentrail/db": "workspace:*",
+    "@aws-sdk/client-s3": "^3.1091.0",
+    "@phosphor-icons/react": "^2.1.10",
+    "next": "16.2.10",
+    "react": "19.2.7",
+    "react-dom": "19.2.7"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@testing-library/jest-dom": "^7.0.0",
+    "@testing-library/react": "^16.3.2",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "jsdom": "^29.1.1",
+    "tailwindcss": "^4.3.3"
+  }
+}
