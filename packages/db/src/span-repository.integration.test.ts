@@ -121,6 +121,27 @@ describe("SpanRepository", () => {
     );
   });
 
+  it("resolves evidence only by the complete project, trace, and span scope", async () => {
+    await repository.insertSpan(
+      fixtureSpan({
+        payloadRef: `payload/${PROJECT_ID}/${TRACE_ID}/${SPAN_A}.json`,
+        payloadTruncated: true,
+      }),
+    );
+
+    await expect(
+      repository.getSpanForTrace(PROJECT_ID, "f".repeat(32), SPAN_A),
+    ).resolves.toBeNull();
+    await expect(
+      repository.getSpanForTrace(PROJECT_ID, TRACE_ID, SPAN_A),
+    ).resolves.toMatchObject({
+      projectId: PROJECT_ID,
+      traceId: TRACE_ID,
+      spanId: SPAN_A,
+      payloadTruncated: true,
+    });
+  });
+
   it("marks an open trace incomplete at an inclusive cutoff", async () => {
     await repository.insertSpan(
       fixtureSpan({ kind: "llm", startedAt: new Date("2026-07-21T10:00:00Z") }),
