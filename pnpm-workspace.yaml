@@ -3,3 +3,6 @@ packages:
   - "packages/*"
 allowBuilds:
   esbuild: true
+minimumReleaseAgeExclude:
+  - "@aws-sdk/client-s3@3.1091.0"
+  - "@aws-sdk/client-sqs@3.1091.0"
