@@ -1,4 +1,4 @@
-import { and, count, eq, sql } from "drizzle-orm";
+import { and, count, eq, isNull, lte, sql } from "drizzle-orm";
 
 import type { AgentRailDatabase } from "./client.js";
 import {
@@ -126,6 +126,26 @@ export function createSpanRepository(db: AgentRailDatabase) {
       return result?.value ?? 0;
     },
 
+    async getProject(projectId: string) {
+      const [project] = await db
+        .select()
+        .from(projects)
+        .where(eq(projects.projectId, projectId))
+        .limit(1);
+
+      return project ?? null;
+    },
+
+    async getSpan(projectId: string, spanId: string) {
+      const [span] = await db
+        .select()
+        .from(spans)
+        .where(and(eq(spans.projectId, projectId), eq(spans.spanId, spanId)))
+        .limit(1);
+
+      return span ?? null;
+    },
+
     async recomputeTrace(projectId: string, traceId: string): Promise<void> {
       const [aggregate] = await db
         .select({
@@ -163,6 +183,22 @@ export function createSpanRepository(db: AgentRailDatabase) {
         .limit(1);
 
       return trace ?? null;
+    },
+
+    async markIncompleteBefore(cutoff: Date): Promise<number> {
+      const updated = await db
+        .update(traces)
+        .set({ completionState: "incomplete", updatedAt: new Date() })
+        .where(
+          and(
+            isNull(traces.completionState),
+            isNull(traces.endedAt),
+            lte(traces.startedAt, cutoff),
+          ),
+        )
+        .returning({ traceId: traces.traceId });
+
+      return updated.length;
     },
   };
 }

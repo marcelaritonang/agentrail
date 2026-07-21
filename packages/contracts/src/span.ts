@@ -27,7 +27,15 @@ export const IngestSpanBatchSchema = z.object({
   spans: z.array(SpanEnvelopeSchema).min(1).max(100),
 });
 
+export const CanonicalSpanEnvelopeSchema = SpanEnvelopeSchema.extend({
+  project_id: z.uuid(),
+});
+
+export const CanonicalSpanBatchSchema = z.object({
+  spans: z.array(CanonicalSpanEnvelopeSchema).min(1).max(100),
+});
+
 export type SpanEnvelope = z.infer<typeof SpanEnvelopeSchema>;
 export type IngestSpanBatch = z.infer<typeof IngestSpanBatchSchema>;
-export type CanonicalSpanEnvelope = SpanEnvelope & { project_id: string };
-export type CanonicalSpanBatch = { spans: CanonicalSpanEnvelope[] };
+export type CanonicalSpanEnvelope = z.infer<typeof CanonicalSpanEnvelopeSchema>;
+export type CanonicalSpanBatch = z.infer<typeof CanonicalSpanBatchSchema>;
