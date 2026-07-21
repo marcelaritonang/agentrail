@@ -387,6 +387,7 @@ Run: `rtk git add packages/db && rtk git commit -m "feat: persist idempotent spa
 - Create: `packages/blob/src/s3.ts`
 - Create: `packages/blob/src/s3.integration.test.ts`
 - Create: `packages/blob/src/index.ts`
+- Modify: `docker-compose.yml` with Redis, MinIO, and MinIO bucket initialization
 
 **Interfaces:**
 - Produces: `SpanQueue.enqueue`, `SpanQueue.read`, `SpanQueue.ack`, `SpanQueue.fail`, `BlobStore.put`, and `BlobStore.get`.
