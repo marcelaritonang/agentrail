@@ -1,0 +1,17 @@
+import { FileX } from "@phosphor-icons/react/ssr";
+import Link from "next/link";
+
+export default function TraceNotFound() {
+  return (
+    <section className="trace-not-found" aria-labelledby="not-found-title">
+      <FileX aria-hidden="true" size={24} weight="regular" />
+      <span className="empty-code">RECORDER / 404</span>
+      <h1 id="not-found-title">Trace evidence not found</h1>
+      <p>
+        The trace does not exist in this project scope or is no longer
+        available.
+      </p>
+      <Link href="/traces">Return to trace archive</Link>
+    </section>
+  );
+}
