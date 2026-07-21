@@ -105,4 +105,34 @@ describe("SpanRepository", () => {
       pricingUnknown: true,
     });
   });
+
+  it("reads project policy and persisted spans within project scope", async () => {
+    await repository.insertSpan(fixtureSpan());
+
+    await expect(repository.getProject(PROJECT_ID)).resolves.toMatchObject({
+      projectId: PROJECT_ID,
+      payloadMode: "redacted",
+    });
+    await expect(repository.getSpan(PROJECT_ID, SPAN_A)).resolves.toMatchObject(
+      {
+        projectId: PROJECT_ID,
+        spanId: SPAN_A,
+      },
+    );
+  });
+
+  it("marks an open trace incomplete at an inclusive cutoff", async () => {
+    await repository.insertSpan(
+      fixtureSpan({ kind: "llm", startedAt: new Date("2026-07-21T10:00:00Z") }),
+    );
+
+    await expect(
+      repository.markIncompleteBefore(new Date("2026-07-21T10:00:00Z")),
+    ).resolves.toBe(1);
+    await expect(
+      repository.getTrace(PROJECT_ID, TRACE_ID),
+    ).resolves.toMatchObject({
+      completionState: "incomplete",
+    });
+  });
 });

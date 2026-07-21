@@ -1,4 +1,6 @@
 export {
+  CanonicalSpanBatchSchema,
+  CanonicalSpanEnvelopeSchema,
   IngestSpanBatchSchema,
   SpanEnvelopeSchema,
   SpanIdSchema,
