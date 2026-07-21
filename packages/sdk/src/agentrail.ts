@@ -2,7 +2,12 @@ import type { SpanEnvelope } from "@agentrail/contracts";
 import { resolveActor, rootActor, type Actor } from "./actor.js";
 import { secureIds, type IdGenerator } from "./ids.js";
 import { completedSpan, type TraceOptions } from "./span-builder.js";
-import { TraceContext, type SpanSink } from "./trace-context.js";
+import {
+  TraceContext,
+  type DeliverySummary,
+  type ShutdownOptions,
+  type SpanSink,
+} from "./trace-context.js";
 
 export type AgentRailOptions = {
   actor: Actor;
@@ -22,6 +27,15 @@ export class AgentRail {
     this.sink = options.sink;
     this.clock = options.clock ?? (() => new Date());
     this.ids = options.ids ?? secureIds;
+  }
+
+  shutdown(
+    options: ShutdownOptions = { timeoutMs: 5_000 },
+  ): Promise<DeliverySummary> {
+    return (
+      this.sink.shutdown?.(options) ??
+      Promise.resolve({ delivered: 0, dropped: 0, pending: 0 })
+    );
   }
 
   async trace<T>(

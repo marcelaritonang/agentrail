@@ -3,8 +3,19 @@ import { resolveActor, type ResolvedActor } from "./actor.js";
 import type { IdGenerator } from "./ids.js";
 import { completedSpan, type SpanOptions } from "./span-builder.js";
 
+export type DeliverySummary = {
+  delivered: number;
+  dropped: number;
+  pending: number;
+};
+
+export type ShutdownOptions = {
+  timeoutMs: number;
+};
+
 export type SpanSink = {
   add(span: SpanEnvelope): void | Promise<void>;
+  shutdown?(options: ShutdownOptions): Promise<DeliverySummary>;
 };
 
 export class SpanContext {
