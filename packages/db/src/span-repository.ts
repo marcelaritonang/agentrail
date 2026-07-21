@@ -1,4 +1,14 @@
-import { and, count, eq, isNull, lte, sql } from "drizzle-orm";
+import {
+  and,
+  count,
+  desc,
+  eq,
+  ilike,
+  isNull,
+  lte,
+  sql,
+  type SQL,
+} from "drizzle-orm";
 
 import type { AgentRailDatabase } from "./client.js";
 import {
@@ -213,6 +223,48 @@ export function createSpanRepository(db: AgentRailDatabase) {
         .limit(1);
 
       return trace ?? null;
+    },
+
+    async listTraces(input: {
+      projectId: string;
+      page: number;
+      pageSize: number;
+      query?: string;
+      outcome?: SpanOutcome;
+      actor?: string;
+    }) {
+      const predicates: SQL[] = [eq(traces.projectId, input.projectId)];
+      if (input.query !== undefined) {
+        predicates.push(ilike(traces.name, `%${input.query}%`));
+      }
+      if (input.outcome !== undefined) {
+        predicates.push(eq(traces.outcome, input.outcome));
+      }
+      if (input.actor !== undefined) {
+        predicates.push(eq(traces.agentId, input.actor));
+      }
+      const where = and(...predicates);
+
+      const [items, totals] = await Promise.all([
+        db
+          .select()
+          .from(traces)
+          .where(where)
+          .orderBy(desc(traces.startedAt), desc(traces.traceId))
+          .limit(input.pageSize)
+          .offset((input.page - 1) * input.pageSize),
+        db.select({ value: count() }).from(traces).where(where),
+      ]);
+
+      return { items, total: totals[0]?.value ?? 0 };
+    },
+
+    async listSpansForTrace(projectId: string, traceId: string) {
+      return db
+        .select()
+        .from(spans)
+        .where(and(eq(spans.projectId, projectId), eq(spans.traceId, traceId)))
+        .orderBy(spans.startedAt, spans.spanId);
     },
 
     async markIncompleteBefore(cutoff: Date): Promise<number> {

@@ -28,6 +28,7 @@ export default defineConfig({
     },
   },
   test: {
+    fileParallelism: false,
     projects: [
       {
         extends: true,
