@@ -2,6 +2,7 @@ import { and, count, eq, isNull, lte, sql } from "drizzle-orm";
 
 import type { AgentRailDatabase } from "./client.js";
 import {
+  apiKeys,
   projects,
   spans,
   traces,
@@ -42,6 +43,35 @@ export function createSpanRepository(db: AgentRailDatabase) {
       payloadMode: PayloadMode;
     }): Promise<void> {
       await db.insert(projects).values(input).onConflictDoNothing();
+    },
+
+    async createApiKey(input: {
+      apiKeyId: string;
+      projectId: string;
+      keyPrefix: string;
+      keyDigest: string;
+    }): Promise<void> {
+      await db.insert(apiKeys).values(input);
+    },
+
+    async findActiveByPrefix(keyPrefix: string) {
+      const [record] = await db
+        .select({
+          projectId: apiKeys.projectId,
+          keyDigest: apiKeys.keyDigest,
+        })
+        .from(apiKeys)
+        .where(and(eq(apiKeys.keyPrefix, keyPrefix), isNull(apiKeys.revokedAt)))
+        .limit(1);
+
+      return record ?? null;
+    },
+
+    async revokeApiKey(apiKeyId: string): Promise<void> {
+      await db
+        .update(apiKeys)
+        .set({ revokedAt: new Date() })
+        .where(eq(apiKeys.apiKeyId, apiKeyId));
     },
 
     async insertSpan(input: SpanWrite): Promise<"inserted" | "duplicate"> {

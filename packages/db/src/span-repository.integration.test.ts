@@ -135,4 +135,25 @@ describe("SpanRepository", () => {
       completionState: "incomplete",
     });
   });
+
+  it("resolves only active API keys by their non-secret prefix", async () => {
+    const apiKeyId = "00000000-0000-4000-8000-000000000002";
+    await repository.createApiKey({
+      apiKeyId,
+      projectId: PROJECT_ID,
+      keyPrefix: "ar_local_abcdefg",
+      keyDigest: "a".repeat(64),
+    });
+
+    await expect(
+      repository.findActiveByPrefix("ar_local_abcdefg"),
+    ).resolves.toMatchObject({
+      projectId: PROJECT_ID,
+      keyDigest: "a".repeat(64),
+    });
+    await repository.revokeApiKey(apiKeyId);
+    await expect(
+      repository.findActiveByPrefix("ar_local_abcdefg"),
+    ).resolves.toBeNull();
+  });
 });

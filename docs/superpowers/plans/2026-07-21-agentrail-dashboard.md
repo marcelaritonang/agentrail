@@ -52,6 +52,7 @@ The trace table remains semantic HTML with server-side pagination. TanStack Tabl
 ### Task 1: Web Application, Tokens, Fonts, and Icon Contract
 
 **Files:**
+
 - Create: `apps/web/package.json`
 - Create: `apps/web/next.config.ts`
 - Create: `apps/web/postcss.config.mjs`
@@ -66,6 +67,7 @@ The trace table remains semantic HTML with server-side pagination. TanStack Tabl
 - Modify: `docker-compose.yml`
 
 **Interfaces:**
+
 - Consumes: root workspace tooling.
 - Produces: semantic CSS tokens, font variables, dashboard shell, and one-icon-family contract.
 
@@ -76,7 +78,10 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 
 describe("dashboard design contract", () => {
-  const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
+  const css = readFileSync(
+    new URL("../app/globals.css", import.meta.url),
+    "utf8",
+  );
 
   it("defines semantic forensic tokens", () => {
     expect(css).toContain("--surface-canvas:");
@@ -110,7 +115,9 @@ import { IconContext } from "@phosphor-icons/react";
 
 export function IconProvider({ children }: { children: React.ReactNode }) {
   return (
-    <IconContext.Provider value={{ color: "currentColor", weight: "regular", mirrored: false }}>
+    <IconContext.Provider
+      value={{ color: "currentColor", weight: "regular", mirrored: false }}
+    >
       {children}
     </IconContext.Provider>
   );
@@ -137,6 +144,7 @@ Run: `rtk git add apps/web docker-compose.yml && rtk git commit -m "feat: establ
 ### Task 2: Project-Scoped Trace Read Models and Formatting
 
 **Files:**
+
 - Create: `apps/web/lib/project-context.ts`
 - Create: `apps/web/lib/trace-read-model.ts`
 - Create: `apps/web/lib/trace-read-model.integration.test.ts`
@@ -146,6 +154,7 @@ Run: `rtk git add apps/web docker-compose.yml && rtk git commit -m "feat: establ
 - Modify: `packages/db/src/index.ts`
 
 **Interfaces:**
+
 - Consumes: Drizzle schema and configured demo/local project ID.
 - Produces: `listTraces(input): TracePage`, `getTraceDetail(projectId, traceId): TraceDetail | null`, `formatCost`, `formatDuration`, and `shortId`.
 
@@ -155,12 +164,18 @@ Run: `rtk git add apps/web docker-compose.yml && rtk git commit -m "feat: establ
 it("never returns traces from another project", async () => {
   await seedTrace({ projectId: PROJECT_A, traceId: TRACE_A });
   await seedTrace({ projectId: PROJECT_B, traceId: TRACE_B });
-  const result = await listTraces({ projectId: PROJECT_A, page: 1, pageSize: 25 });
+  const result = await listTraces({
+    projectId: PROJECT_A,
+    page: 1,
+    pageSize: 25,
+  });
   expect(result.items.map((item) => item.traceId)).toEqual([TRACE_A]);
 });
 
 it("formats unknown cost as UNPRICED", () => {
-  expect(formatCost({ totalCostUsd: null, pricingUnknown: true })).toBe("UNPRICED");
+  expect(formatCost({ totalCostUsd: null, pricingUnknown: true })).toBe(
+    "UNPRICED",
+  );
 });
 ```
 
@@ -184,6 +199,7 @@ Run: `rtk git add apps/web/lib packages/db && rtk git commit -m "feat: expose sc
 ### Task 3: Dense Trace Index
 
 **Files:**
+
 - Create: `apps/web/app/(dashboard)/traces/page.tsx`
 - Create: `apps/web/app/(dashboard)/traces/loading.tsx`
 - Create: `apps/web/app/(dashboard)/traces/error.tsx`
@@ -194,6 +210,7 @@ Run: `rtk git add apps/web/lib packages/db && rtk git commit -m "feat: expose sc
 - Create: `tests/e2e/traces-index.spec.ts`
 
 **Interfaces:**
+
 - Consumes: `TracePage` from Task 2 and URL search params.
 - Produces: accessible `/traces` index with search, filters, pagination, and complete states.
 
@@ -202,8 +219,12 @@ Run: `rtk git add apps/web/lib packages/db && rtk git commit -m "feat: expose sc
 ```tsx
 it("renders an accessible trace table with UNPRICED state", () => {
   render(<TraceTable page={tracePageFixture({ pricingUnknown: true })} />);
-  expect(screen.getByRole("table", { name: /agent traces/i })).toBeInTheDocument();
-  expect(screen.getByRole("columnheader", { name: /actor/i })).toBeInTheDocument();
+  expect(
+    screen.getByRole("table", { name: /agent traces/i }),
+  ).toBeInTheDocument();
+  expect(
+    screen.getByRole("columnheader", { name: /actor/i }),
+  ).toBeInTheDocument();
   expect(screen.getByText("UNPRICED")).toBeInTheDocument();
   expect(screen.queryByText(/running/i)).not.toBeInTheDocument();
 });
@@ -236,6 +257,7 @@ Run: `rtk git add apps/web tests/e2e/traces-index.spec.ts && rtk git commit -m "
 ### Task 4: Deterministic Trace Rail Geometry
 
 **Files:**
+
 - Create: `apps/web/lib/trace-rail.ts`
 - Create: `apps/web/lib/trace-rail.test.ts`
 - Create: `apps/web/components/trace-rail.tsx`
@@ -243,6 +265,7 @@ Run: `rtk git add apps/web tests/e2e/traces-index.spec.ts && rtk git commit -m "
 - Create: `apps/web/tests/trace-rail.test.tsx`
 
 **Interfaces:**
+
 - Consumes: persisted `TraceDetail.spans`.
 - Produces: `buildTraceRail(spans): TraceRailRow[]` with `offsetPercent`, `widthPercent`, `depth`, and semantic signal.
 
@@ -262,7 +285,10 @@ it("maps child timing into stable bounded percentages", () => {
 });
 
 it("uses a visible minimum width without exceeding the rail", () => {
-  const [row] = buildTraceRail([span({ startMs: 999, endMs: 1_000 })], { traceStartMs: 0, traceEndMs: 1_000 });
+  const [row] = buildTraceRail([span({ startMs: 999, endMs: 1_000 })], {
+    traceStartMs: 0,
+    traceEndMs: 1_000,
+  });
   expect(row.widthPercent).toBeGreaterThanOrEqual(0.6);
   expect(row.offsetPercent + row.widthPercent).toBeLessThanOrEqual(100);
 });
@@ -293,6 +319,7 @@ Run: `rtk git add apps/web/lib/trace-rail* apps/web/components/trace-rail.tsx ap
 ### Task 5: Trace Detail Header and Route Composition
 
 **Files:**
+
 - Create: `apps/web/app/(dashboard)/traces/[traceId]/page.tsx`
 - Create: `apps/web/app/(dashboard)/traces/[traceId]/loading.tsx`
 - Create: `apps/web/app/(dashboard)/traces/[traceId]/not-found.tsx`
@@ -301,6 +328,7 @@ Run: `rtk git add apps/web/lib/trace-rail* apps/web/components/trace-rail.tsx ap
 - Create: `tests/e2e/trace-detail.spec.ts`
 
 **Interfaces:**
+
 - Consumes: `getTraceDetail`, `TraceRail`, and async Next.js route params.
 - Produces: `/traces/[traceId]` with compact trace header and rail.
 
@@ -313,7 +341,9 @@ it("renders no running synonym before the incomplete timeout", () => {
 });
 
 it("renders INCOMPLETE only for timed-out traces", () => {
-  render(<TraceHeader trace={traceFixture({ completionState: "incomplete" })} />);
+  render(
+    <TraceHeader trace={traceFixture({ completionState: "incomplete" })} />,
+  );
   expect(screen.getByText("INCOMPLETE")).toBeInTheDocument();
 });
 ```
@@ -337,11 +367,13 @@ Run: `rtk git add apps/web tests/e2e/trace-detail.spec.ts && rtk git commit -m "
 ### Task 6: Project-Scoped Evidence Backend Route
 
 **Files:**
+
 - Create: `apps/web/lib/evidence.ts`
 - Create: `apps/web/app/api/traces/[traceId]/payload/[spanId]/route.ts`
 - Create: `apps/web/tests/evidence-route.test.ts`
 
 **Interfaces:**
+
 - Consumes: configured project ID, `SpanRepository`, and `BlobStore` on the server.
 - Produces: `createEvidenceHandler(deps)` and an authorized JSON Route Handler with no storage URL leakage.
 
@@ -349,7 +381,9 @@ Run: `rtk git add apps/web tests/e2e/trace-detail.spec.ts && rtk git commit -m "
 
 ```ts
 it("returns 404 for a span owned by another project", async () => {
-  const handler = createEvidenceHandler(testDeps({ configuredProjectId: PROJECT_A }));
+  const handler = createEvidenceHandler(
+    testDeps({ configuredProjectId: PROJECT_A }),
+  );
   const response = await handler(request, {
     params: Promise.resolve({ traceId: TRACE_B, spanId: SPAN_B }),
   });
@@ -383,6 +417,7 @@ Run: `rtk git add apps/web/lib/evidence.ts apps/web/app/api apps/web/tests/evide
 ### Task 7: Evidence Drawer and Action Ledger
 
 **Files:**
+
 - Create: `apps/web/components/evidence-drawer.tsx`
 - Create: `apps/web/components/evidence-content.tsx`
 - Create: `apps/web/components/action-ledger.tsx`
@@ -393,6 +428,7 @@ Run: `rtk git add apps/web/lib/evidence.ts apps/web/app/api apps/web/tests/evide
 - Create: `tests/e2e/evidence-drawer.spec.ts`
 
 **Interfaces:**
+
 - Consumes: selected span from `?span=<spanId>`, backend payload route, and action/tool projection.
 - Produces: URL-stable drawer, keyboard close/focus behavior, evidence states, and chronological ledger.
 
@@ -415,7 +451,12 @@ it.each([
 ```tsx
 it("shows only action and tool spans in chronological order", () => {
   render(<ActionLedger spans={mixedSpanFixture()} />);
-  expect(screen.getAllByRole("row").slice(1).map((row) => row.textContent)).toEqual([
+  expect(
+    screen
+      .getAllByRole("row")
+      .slice(1)
+      .map((row) => row.textContent),
+  ).toEqual([
     expect.stringContaining("web.search"),
     expect.stringContaining("filesystem.read"),
   ]);
@@ -445,6 +486,7 @@ Run: `rtk git add apps/web tests/e2e/evidence-drawer.spec.ts && rtk git commit -
 ### Task 8: AgentRail Anti-Slop and Accessibility Gates
 
 **Files:**
+
 - Create: `apps/web/scripts/anti-slop.ts`
 - Create: `apps/web/scripts/anti-slop.test.ts`
 - Create: `apps/web/scripts/rules.ts`
@@ -452,6 +494,7 @@ Run: `rtk git add apps/web tests/e2e/evidence-drawer.spec.ts && rtk git commit -
 - Create: `docs/engineering/dashboard-design-contract.md`
 
 **Interfaces:**
+
 - Consumes: AgentRail TSX and CSS files.
 - Produces: `pnpm --filter @agentrail/web anti-slop` with advisory findings and blocking brand/accessibility findings.
 
@@ -460,7 +503,10 @@ Run: `rtk git add apps/web tests/e2e/evidence-drawer.spec.ts && rtk git commit -
 ```ts
 it.each([
   ["transition-all", '<button className="transition-all">Open</button>'],
-  ["gradient text", '<h1 className="bg-clip-text text-transparent bg-gradient-to-r">A</h1>'],
+  [
+    "gradient text",
+    '<h1 className="bg-clip-text text-transparent bg-gradient-to-r">A</h1>',
+  ],
   ["raw component color", '<div className="bg-[#000000]" />'],
   ["second icon family", 'import { Search } from "lucide-react"'],
 ])("flags %s", (_, source) => {
@@ -486,6 +532,7 @@ Run: `rtk git add apps/web/scripts apps/web/package.json docs/engineering && rtk
 ### Task 9: Dashboard Verification and Real Trace Rail Capture
 
 **Files:**
+
 - Create: `playwright.config.ts`
 - Create: `tests/e2e/dashboard-visual.spec.ts`
 - Create: `tests/e2e/dashboard-a11y.spec.ts`
@@ -493,6 +540,7 @@ Run: `rtk git add apps/web/scripts apps/web/package.json docs/engineering && rtk
 - Generate: `artifacts/screenshots/agentrail-trace-rail.png`
 
 **Interfaces:**
+
 - Consumes: running seeded AgentRail stack.
 - Produces: verified desktop/mobile dashboard and real product screenshot for the later landing plan.
 
