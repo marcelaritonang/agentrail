@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "anti-slop": "tsx scripts/anti-slop.ts",
     "build": "next build",
     "dev": "next dev --turbopack",
     "lint": "tsc -p tsconfig.json --noEmit",
