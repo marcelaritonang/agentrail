@@ -30,7 +30,12 @@ export async function runWorker(
   options: { signal: AbortSignal; idleDelayMs?: number },
 ): Promise<void> {
   while (!options.signal.aborted) {
-    const consumed = await consumeOnce(dependencies);
+    let consumed = false;
+    try {
+      consumed = await consumeOnce(dependencies);
+    } catch {
+      // The queue adapter has already made the message retryable.
+    }
     if (!consumed) {
       await new Promise((resolve) =>
         setTimeout(resolve, options.idleDelayMs ?? 100),

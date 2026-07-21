@@ -14,6 +14,7 @@ services:
       retries: 20
     volumes:
       - agentrail-postgres-data:/var/lib/postgresql/data
+      - ./packages/db/migrations/0000_agentrail_m1.sql:/docker-entrypoint-initdb.d/001-agentrail.sql:ro
 
   redis:
     image: redis:8.2-alpine
@@ -44,6 +45,74 @@ services:
       retries: 30
     volumes:
       - agentrail-minio-data:/data
+
+  minio-init:
+    image: quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z
+    entrypoint: ["/bin/sh", "/opt/agentrail/create-bucket.sh"]
+    environment:
+      S3_ENDPOINT: http://minio:9000
+      S3_BUCKET: agentrail-evidence
+      S3_ACCESS_KEY_ID: agentrail-local
+      S3_SECRET_ACCESS_KEY: agentrail-local-secret
+    depends_on:
+      minio:
+        condition: service_healthy
+    volumes:
+      - ./infra/docker/minio/create-bucket.sh:/opt/agentrail/create-bucket.sh:ro
+
+  ingest:
+    build:
+      context: .
+      dockerfile: apps/ingest/Dockerfile
+    environment:
+      DATABASE_URL: postgresql://agentrail:agentrail@postgres:5432/agentrail_test
+      REDIS_URL: redis://redis:6379
+      AGENTRAIL_STREAM: agentrail:spans
+      AGENTRAIL_CONSUMER_GROUP: agentrail-workers
+      API_KEY_PEPPER: agentrail-local-development-pepper
+      INGEST_PORT: "3001"
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://localhost:3001/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: .
+      dockerfile: apps/worker/Dockerfile
+    environment:
+      DATABASE_URL: postgresql://agentrail:agentrail@postgres:5432/agentrail_test
+      REDIS_URL: redis://redis:6379
+      AGENTRAIL_STREAM: agentrail:spans
+      AGENTRAIL_CONSUMER_GROUP: agentrail-workers
+      S3_ENDPOINT: http://minio:9000
+      S3_REGION: us-east-1
+      S3_BUCKET: agentrail-evidence
+      S3_ACCESS_KEY_ID: agentrail-local
+      S3_SECRET_ACCESS_KEY: agentrail-local-secret
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
 
 volumes:
   agentrail-postgres-data:

@@ -55,6 +55,7 @@ scripts/bootstrap-local.ts          creates project/key and synthetic trace
 ### Task 1: Monorepo Foundation and Canonical Contracts
 
 **Files:**
+
 - Create: `package.json`
 - Create: `pnpm-workspace.yaml`
 - Create: `turbo.json`
@@ -74,6 +75,7 @@ scripts/bootstrap-local.ts          creates project/key and synthetic trace
 - Remove: legacy ApplyMate files already shown as deleted by `git status`
 
 **Interfaces:**
+
 - Produces: `SpanEnvelopeSchema`, `IngestSpanBatchSchema`, `CanonicalSpanEnvelope`, `TRACE_INCOMPLETE_AFTER_MS`, `MAX_INGEST_BODY_BYTES`, `MAX_SPANS_PER_BATCH`.
 - Consumes: no earlier tasks.
 
@@ -120,27 +122,31 @@ import { IngestSpanBatchSchema } from "./span.js";
 describe("IngestSpanBatchSchema", () => {
   it("accepts one immutable completed span", () => {
     const result = IngestSpanBatchSchema.safeParse({
-      spans: [{
-        schema_version: 1,
-        trace_id: "0af7651916cd43dd8448eb211c80319c",
-        span_id: "b7ad6b7169203331",
-        parent_span_id: null,
-        trace_name: "research.answer",
-        kind: "llm",
-        name: "plan",
-        agent_id: "research-agent",
-        on_behalf_of: "user_42",
-        started_at: "2026-07-21T10:00:00.000Z",
-        ended_at: "2026-07-21T10:00:01.000Z",
-        outcome: "ok",
-        attributes: {},
-      }],
+      spans: [
+        {
+          schema_version: 1,
+          trace_id: "0af7651916cd43dd8448eb211c80319c",
+          span_id: "b7ad6b7169203331",
+          parent_span_id: null,
+          trace_name: "research.answer",
+          kind: "llm",
+          name: "plan",
+          agent_id: "research-agent",
+          on_behalf_of: "user_42",
+          started_at: "2026-07-21T10:00:00.000Z",
+          ended_at: "2026-07-21T10:00:01.000Z",
+          outcome: "ok",
+          attributes: {},
+        },
+      ],
     });
     expect(result.success).toBe(true);
   });
 
   it("rejects more than 100 spans", () => {
-    const result = IngestSpanBatchSchema.safeParse({ spans: Array(101).fill({}) });
+    const result = IngestSpanBatchSchema.safeParse({
+      spans: Array(101).fill({}),
+    });
     expect(result.success).toBe(false);
   });
 });
@@ -230,6 +236,7 @@ Expected: the legacy ApplyMate deletion and AgentRail foundation are committed t
 ### Task 2: Versioned Worker-Side Pricing
 
 **Files:**
+
 - Create: `packages/pricing/package.json`
 - Create: `packages/pricing/src/catalog.ts`
 - Create: `packages/pricing/src/calculate-cost.ts`
@@ -237,6 +244,7 @@ Expected: the legacy ApplyMate deletion and AgentRail foundation are committed t
 - Create: `packages/pricing/src/index.ts`
 
 **Interfaces:**
+
 - Consumes: token usage and model strings from `@agentrail/contracts`.
 - Produces: `calculateCost(input): PricingResult` and `PRICING_CATALOG_VERSION`.
 
@@ -248,13 +256,31 @@ import { calculateCost } from "./calculate-cost.js";
 
 describe("calculateCost", () => {
   it("calculates known-model input and output cost", () => {
-    expect(calculateCost({ model: "test.known", inputTokens: 1_000, outputTokens: 500 }))
-      .toEqual({ costUsd: "0.00400000", pricingUnknown: false, catalogVersion: "2026-07-21" });
+    expect(
+      calculateCost({
+        model: "test.known",
+        inputTokens: 1_000,
+        outputTokens: 500,
+      }),
+    ).toEqual({
+      costUsd: "0.00400000",
+      pricingUnknown: false,
+      catalogVersion: "2026-07-21",
+    });
   });
 
   it("keeps unknown pricing nullable", () => {
-    expect(calculateCost({ model: "vendor.unknown", inputTokens: 50, outputTokens: 20 }))
-      .toEqual({ costUsd: null, pricingUnknown: true, catalogVersion: "2026-07-21" });
+    expect(
+      calculateCost({
+        model: "vendor.unknown",
+        inputTokens: 50,
+        outputTokens: 20,
+      }),
+    ).toEqual({
+      costUsd: null,
+      pricingUnknown: true,
+      catalogVersion: "2026-07-21",
+    });
   });
 });
 ```
@@ -295,6 +321,7 @@ Run: `rtk git add packages/pricing && rtk git commit -m "feat: add nullable work
 ### Task 3: PostgreSQL Schema and Idempotent Span Repository
 
 **Files:**
+
 - Create: `packages/db/package.json`
 - Create: `packages/db/drizzle.config.ts`
 - Create: `packages/db/src/schema.ts`
@@ -306,6 +333,7 @@ Run: `rtk git add packages/pricing && rtk git commit -m "feat: add nullable work
 - Create: `docker-compose.yml` with the PostgreSQL service and health check
 
 **Interfaces:**
+
 - Consumes: `CanonicalSpanEnvelope`, `PricingResult`, and opaque payload refs.
 - Produces: `SpanRepository.insertSpan(input): Promise<"inserted" | "duplicate">`, `recomputeTrace(traceId, projectId)`, and project/key lookup methods.
 
@@ -351,8 +379,12 @@ The migration defines `projects`, `api_keys`, `traces`, and `spans`. `api_keys` 
 
 ```ts
 it("sets trace total to null when any priced span is unknown", async () => {
-  await repository.insertSpan(fixtureSpan({ spanId: SPAN_A, costUsd: "0.00200000" }));
-  await repository.insertSpan(fixtureSpan({ spanId: SPAN_B, pricingUnknown: true, costUsd: null }));
+  await repository.insertSpan(
+    fixtureSpan({ spanId: SPAN_A, costUsd: "0.00200000" }),
+  );
+  await repository.insertSpan(
+    fixtureSpan({ spanId: SPAN_B, pricingUnknown: true, costUsd: null }),
+  );
   await repository.recomputeTrace(PROJECT_ID, TRACE_ID);
   expect(await repository.getTrace(PROJECT_ID, TRACE_ID)).toMatchObject({
     totalCostUsd: null,
@@ -373,6 +405,7 @@ Run: `rtk git add packages/db && rtk git commit -m "feat: persist idempotent spa
 ### Task 4: Queue and Blob Ports with Local Adapters
 
 **Files:**
+
 - Create: `packages/queue/package.json`
 - Create: `packages/queue/src/types.ts`
 - Create: `packages/queue/src/memory.ts`
@@ -390,6 +423,7 @@ Run: `rtk git add packages/db && rtk git commit -m "feat: persist idempotent spa
 - Modify: `docker-compose.yml` with Redis, MinIO, and MinIO bucket initialization
 
 **Interfaces:**
+
 - Produces: `SpanQueue.enqueue`, `SpanQueue.read`, `SpanQueue.ack`, `SpanQueue.fail`, `BlobStore.put`, and `BlobStore.get`.
 - Consumes: `CanonicalSpanBatch`.
 
@@ -444,6 +478,7 @@ Run: `rtk git add packages/queue packages/blob && rtk git commit -m "feat: add q
 ### Task 5: SDK Trace API and Actor Inheritance
 
 **Files:**
+
 - Create: `packages/sdk/package.json`
 - Create: `packages/sdk/src/ids.ts`
 - Create: `packages/sdk/src/actor.ts`
@@ -454,6 +489,7 @@ Run: `rtk git add packages/queue packages/blob && rtk git commit -m "feat: add q
 - Create: `packages/sdk/src/index.ts`
 
 **Interfaces:**
+
 - Consumes: `SpanEnvelope` from contracts and a delivery sink supplied in Task 6.
 - Produces: public `AgentRail`, `TraceContext`, `SpanContext`, `rail.trace()`, `trace.span()`, and `trace.action()`.
 
@@ -462,7 +498,10 @@ Run: `rtk git add packages/queue packages/blob && rtk git commit -m "feat: add q
 ```ts
 it("inherits trace actor and allows a per-span override", async () => {
   const delivered: SpanEnvelope[] = [];
-  const rail = testRail(delivered, { agentId: "planner", onBehalfOf: "user_42" });
+  const rail = testRail(delivered, {
+    agentId: "planner",
+    onBehalfOf: "user_42",
+  });
 
   await rail.trace({ name: "answer" }, async (trace) => {
     await trace.span({ kind: "llm", name: "plan" }, async () => undefined);
@@ -490,10 +529,15 @@ it("records an error span and rethrows the original error", async () => {
   const failure = new Error("tool failed");
   await expect(
     rail.trace({ name: "answer" }, (trace) =>
-      trace.action({ name: "filesystem.read" }, async () => { throw failure; }),
+      trace.action({ name: "filesystem.read" }, async () => {
+        throw failure;
+      }),
     ),
   ).rejects.toBe(failure);
-  expect(delivered.at(-2)).toMatchObject({ name: "filesystem.read", outcome: "error" });
+  expect(delivered.at(-2)).toMatchObject({
+    name: "filesystem.read",
+    outcome: "error",
+  });
   expect(delivered.at(-1)).toMatchObject({ name: "answer", outcome: "error" });
 });
 ```
@@ -516,12 +560,14 @@ Run: `rtk git add packages/sdk && rtk git commit -m "feat: add traced actor-awar
 ### Task 6: SDK Buffer, Retry, and Shutdown
 
 **Files:**
+
 - Create: `packages/sdk/src/delivery.ts`
 - Create: `packages/sdk/src/delivery.test.ts`
 - Modify: `packages/sdk/src/agentrail.ts`
 - Modify: `packages/sdk/src/index.ts`
 
 **Interfaces:**
+
 - Produces: `HttpSpanDelivery`, `DeliverySummary`, bounded buffer, retry policy, `onDrop`, and `shutdown()`.
 - Consumes: immutable envelopes from Task 5 and `POST /v1/spans` from Task 7.
 
@@ -530,7 +576,11 @@ Run: `rtk git add packages/sdk && rtk git commit -m "feat: add traced actor-awar
 ```ts
 it("flushes pending spans during shutdown", async () => {
   const transport = new RecordingTransport();
-  const delivery = new BufferedDelivery({ transport, batchSize: 10, maxBuffer: 100 });
+  const delivery = new BufferedDelivery({
+    transport,
+    batchSize: 10,
+    maxBuffer: 100,
+  });
   delivery.add(spanFixture());
   await expect(delivery.shutdown({ timeoutMs: 1_000 })).resolves.toEqual({
     delivered: 1,
@@ -542,7 +592,10 @@ it("flushes pending spans during shutdown", async () => {
 
 it("drops the newest span through onDrop when the bounded buffer is full", () => {
   const dropped: SpanEnvelope[] = [];
-  const delivery = new BufferedDelivery({ maxBuffer: 1, onDrop: (span) => dropped.push(span) });
+  const delivery = new BufferedDelivery({
+    maxBuffer: 1,
+    onDrop: (span) => dropped.push(span),
+  });
   delivery.add(spanFixture({ span_id: SPAN_A }));
   delivery.add(spanFixture({ span_id: SPAN_B }));
   expect(dropped.map((span) => span.span_id)).toEqual([SPAN_B]);
@@ -565,6 +618,7 @@ Run: `rtk git add packages/sdk && rtk git commit -m "feat: deliver spans with bo
 ### Task 7: Fast Authenticated Hono Ingestion API
 
 **Files:**
+
 - Create: `apps/ingest/package.json`
 - Create: `apps/ingest/src/api-key.ts`
 - Create: `apps/ingest/src/api-key.test.ts`
@@ -575,6 +629,7 @@ Run: `rtk git add packages/sdk && rtk git commit -m "feat: deliver spans with bo
 - Create: `apps/ingest/src/index.ts`
 
 **Interfaces:**
+
 - Consumes: `IngestSpanBatchSchema`, `MAX_INGEST_BODY_BYTES`, `SpanQueue`, and project/key repository.
 - Produces: `createIngestApp(deps)` and Node server entry point.
 
@@ -583,8 +638,12 @@ Run: `rtk git add packages/sdk && rtk git commit -m "feat: deliver spans with bo
 ```ts
 it("derives a stable digest without storing the raw key", () => {
   const key = "ar_live_" + "a".repeat(64);
-  expect(digestApiKey(key, "test-pepper")).toBe(digestApiKey(key, "test-pepper"));
-  expect(digestApiKey(key, "different-pepper")).not.toBe(digestApiKey(key, "test-pepper"));
+  expect(digestApiKey(key, "test-pepper")).toBe(
+    digestApiKey(key, "test-pepper"),
+  );
+  expect(digestApiKey(key, "different-pepper")).not.toBe(
+    digestApiKey(key, "test-pepper"),
+  );
 });
 ```
 
@@ -597,14 +656,22 @@ it("returns 202 only after enqueue resolves", async () => {
   const gate = Promise.withResolvers<{ messageId: string }>();
   const app = createIngestApp(testDeps({ enqueue: () => gate.promise }));
   const pending = app.request("/v1/spans", validRequest());
-  await expect(Promise.race([pending, Promise.resolve("still-pending")])).resolves.toBe("still-pending");
+  await expect(
+    Promise.race([pending, Promise.resolve("still-pending")]),
+  ).resolves.toBe("still-pending");
   gate.resolve({ messageId: "msg_1" });
   const response = await pending;
   expect(response.status).toBe(202);
 });
 
 it("returns 503 when enqueue fails", async () => {
-  const app = createIngestApp(testDeps({ enqueue: async () => { throw new Error("redis down"); } }));
+  const app = createIngestApp(
+    testDeps({
+      enqueue: async () => {
+        throw new Error("redis down");
+      },
+    }),
+  );
   expect((await app.request("/v1/spans", validRequest())).status).toBe(503);
 });
 ```
@@ -634,6 +701,7 @@ Run: `rtk git add apps/ingest && rtk git commit -m "feat: accept spans after fas
 ### Task 8: Worker Processing, Redaction, and Reconciliation
 
 **Files:**
+
 - Create: `apps/worker/package.json`
 - Create: `apps/worker/src/redact.ts`
 - Create: `apps/worker/src/redact.test.ts`
@@ -644,6 +712,7 @@ Run: `rtk git add apps/ingest && rtk git commit -m "feat: accept spans after fas
 - Create: `apps/worker/src/main.ts`
 
 **Interfaces:**
+
 - Consumes: queue messages, pricing, `SpanRepository`, `BlobStore`, and shared config.
 - Produces: `processBatch`, `reconcileIncompleteTraces`, consumer loop, ack/fail behavior.
 
@@ -651,9 +720,15 @@ Run: `rtk git add apps/ingest && rtk git commit -m "feat: accept spans after fas
 
 ```ts
 it("redacts secrets recursively without mutating the source", () => {
-  const source = { authorization: "Bearer secret", nested: { password: "secret", query: "safe" } };
+  const source = {
+    authorization: "Bearer secret",
+    nested: { password: "secret", query: "safe" },
+  };
   expect(redactPayload(source, { maxBytes: 64_000 })).toMatchObject({
-    value: { authorization: "[REDACTED]", nested: { password: "[REDACTED]", query: "safe" } },
+    value: {
+      authorization: "[REDACTED]",
+      nested: { password: "[REDACTED]", query: "safe" },
+    },
     truncated: false,
   });
   expect(source.nested.password).toBe("secret");
@@ -690,8 +765,14 @@ Implement validate, redact, calculate price, store blob, insert-or-ignore span, 
 ```ts
 it("marks a trace incomplete at the shared 15 minute boundary", async () => {
   const now = new Date("2026-07-21T10:15:00.000Z");
-  await reconcileIncompleteTraces({ now, timeoutMs: TRACE_INCOMPLETE_AFTER_MS, repository });
-  expect(await repository.getTrace(PROJECT_ID, TRACE_ID)).toMatchObject({ completionState: "incomplete" });
+  await reconcileIncompleteTraces({
+    now,
+    timeoutMs: TRACE_INCOMPLETE_AFTER_MS,
+    repository,
+  });
+  expect(await repository.getTrace(PROJECT_ID, TRACE_ID)).toMatchObject({
+    completionState: "incomplete",
+  });
 });
 ```
 
@@ -706,6 +787,7 @@ Run: `rtk git add apps/worker && rtk git commit -m "feat: process and reconcile 
 ### Task 9: Local Docker Topology and Bootstrap
 
 **Files:**
+
 - Modify: `docker-compose.yml`
 - Create: `infra/docker/postgres/init.sql`
 - Create: `infra/docker/minio/create-bucket.sh`
@@ -718,6 +800,7 @@ Run: `rtk git add apps/worker && rtk git commit -m "feat: process and reconcile 
 - Create: `tests/smoke/core-pipeline.test.ts`
 
 **Interfaces:**
+
 - Consumes: all core applications and adapters.
 - Produces: one-command local stack, one project, one raw API key printed once, and one synthetic trace.
 
@@ -752,6 +835,7 @@ Run: `rtk git add docker-compose.yml infra apps/ingest/Dockerfile apps/worker/Do
 ### Task 10: Open-Source, AWS, and Continuous Integration Baseline
 
 **Files:**
+
 - Create: `README.md`
 - Create: `CONTRIBUTING.md`
 - Create: `SECURITY.md`
@@ -762,6 +846,7 @@ Run: `rtk git add docker-compose.yml infra apps/ingest/Dockerfile apps/worker/Do
 - Create: `tests/docs/documentation.test.ts`
 
 **Interfaces:**
+
 - Consumes: verified local core commands, SQS/S3 adapter configuration, and Apache-2.0 license.
 - Produces: reproducible contributor onboarding, honest AWS reference mapping, security contact process, and CI gate.
 

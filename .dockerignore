@@ -1,0 +1,12 @@
+.git
+.github
+.agentrail
+.next
+.turbo
+artifacts
+coverage
+node_modules
+**/dist
+playwright-report
+test-results
+*.log

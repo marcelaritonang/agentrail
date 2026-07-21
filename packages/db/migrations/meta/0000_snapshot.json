@@ -68,12 +68,8 @@
           "name": "api_keys_project_id_projects_project_id_fk",
           "tableFrom": "api_keys",
           "tableTo": "projects",
-          "columnsFrom": [
-            "project_id"
-          ],
-          "columnsTo": [
-            "project_id"
-          ],
+          "columnsFrom": ["project_id"],
+          "columnsTo": ["project_id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -339,14 +335,8 @@
           "name": "spans_trace_fk",
           "tableFrom": "spans",
           "tableTo": "traces",
-          "columnsFrom": [
-            "project_id",
-            "trace_id"
-          ],
-          "columnsTo": [
-            "project_id",
-            "trace_id"
-          ],
+          "columnsFrom": ["project_id", "trace_id"],
+          "columnsTo": ["project_id", "trace_id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -484,12 +474,8 @@
           "name": "traces_project_id_projects_project_id_fk",
           "tableFrom": "traces",
           "tableTo": "projects",
-          "columnsFrom": [
-            "project_id"
-          ],
-          "columnsTo": [
-            "project_id"
-          ],
+          "columnsFrom": ["project_id"],
+          "columnsTo": ["project_id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -497,10 +483,7 @@
       "compositePrimaryKeys": {
         "traces_project_id_trace_id_pk": {
           "name": "traces_project_id_trace_id_pk",
-          "columns": [
-            "project_id",
-            "trace_id"
-          ]
+          "columns": ["project_id", "trace_id"]
         }
       },
       "uniqueConstraints": {},
