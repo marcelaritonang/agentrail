@@ -68,6 +68,12 @@ importers:
         specifier: ^6.1.0
         version: 6.1.0
 
+  packages/sdk:
+    dependencies:
+      '@agentrail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+
 packages:
 
   '@aws-sdk/checksums@3.1000.18':
