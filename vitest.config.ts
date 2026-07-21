@@ -1,7 +1,9 @@
 import { fileURLToPath } from "node:url";
+import react from "@vitejs/plugin-react";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
+  plugins: [react()],
   resolve: {
     alias: {
       "@agentrail/blob": fileURLToPath(
@@ -37,8 +39,11 @@ export default defineConfig({
           environment: "node",
           include: [
             "packages/**/*.test.ts",
+            "packages/**/*.test.tsx",
             "apps/**/*.test.ts",
+            "apps/**/*.test.tsx",
             "tests/**/*.test.ts",
+            "tests/**/*.test.tsx",
           ],
         },
       },
