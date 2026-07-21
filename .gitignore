@@ -1,20 +1,19 @@
-# Python (legacy — removed after Next.js migration)
-.venv/
-__pycache__/
-*.pyc
-
-# Node / Next.js
 node_modules/
+dist/
+.turbo/
 .next/
-out/
-next-env.d.ts
+coverage/
+playwright-report/
+test-results/
 
-# Data / secrets
-data/
-*.db
 .env
-.env*.local
+.env.*
+!.env.example
 
-# Editor / OS
-.DS_Store
 *.log
+*.tsbuildinfo
+.DS_Store
+Thumbs.db
+
+artifacts/benchmarks/*.json
+artifacts/benchmarks/*.txt
