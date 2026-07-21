@@ -303,6 +303,7 @@ Run: `rtk git add packages/pricing && rtk git commit -m "feat: add nullable work
 - Create: `packages/db/src/span-repository.integration.test.ts`
 - Create: `packages/db/src/index.ts`
 - Create: `packages/db/migrations/0000_agentrail_m1.sql`
+- Create: `docker-compose.yml` with the PostgreSQL service and health check
 
 **Interfaces:**
 - Consumes: `CanonicalSpanEnvelope`, `PricingResult`, and opaque payload refs.
@@ -704,7 +705,7 @@ Run: `rtk git add apps/worker && rtk git commit -m "feat: process and reconcile 
 ### Task 9: Local Docker Topology and Bootstrap
 
 **Files:**
-- Create: `docker-compose.yml`
+- Modify: `docker-compose.yml`
 - Create: `infra/docker/postgres/init.sql`
 - Create: `infra/docker/minio/create-bucket.sh`
 - Create: `apps/ingest/Dockerfile`
