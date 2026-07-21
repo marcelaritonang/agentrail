@@ -1,11 +1,13 @@
 // @vitest-environment jsdom
 
 import "@testing-library/jest-dom/vitest";
-import { render, screen, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { cleanup, render, screen, within } from "@testing-library/react";
+import { afterEach, describe, expect, it } from "vitest";
 
 import { TraceTable } from "../components/trace-table";
 import type { TracePage } from "../lib/trace-read-model";
+
+afterEach(cleanup);
 
 function tracePageFixture(pricingUnknown = true): TracePage {
   return {
