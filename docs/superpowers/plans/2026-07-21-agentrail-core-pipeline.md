@@ -6,7 +6,7 @@
 
 **Architecture:** A pnpm monorepo separates contracts, configuration, pricing, database, queue, blob storage, SDK, ingestion API, and worker. The ingestion API performs only authentication, bounds checking, schema validation, canonicalization, and one durable enqueue before returning `202`; the worker owns redaction, pricing, blob writes, trace aggregation, and `(project_id, span_id)` idempotency.
 
-**Tech Stack:** Node.js 24 LTS, TypeScript, pnpm, Vitest, Zod 4, Hono, Drizzle ORM, PostgreSQL, Redis Streams, MinIO/S3, AWS SQS SDK, AWS S3 SDK, Docker Compose.
+**Tech Stack:** Node.js 24 LTS, TypeScript, pnpm 11, Vitest 4, Zod 4, Hono, Drizzle ORM, PostgreSQL, Redis Streams, MinIO/S3, AWS SQS SDK, AWS S3 SDK, Docker Compose.
 
 ## Global Constraints
 
@@ -31,7 +31,7 @@ package.json                         workspace scripts and tool versions
 pnpm-workspace.yaml                 workspace package discovery
 turbo.json                          build/test dependency graph
 tsconfig.base.json                  strict shared TypeScript settings
-vitest.workspace.ts                 workspace test discovery
+vitest.config.ts                    Vitest 4 project discovery
 .env.example                        documented local variables
 .gitignore                          Node, Docker, test, and local secret outputs
 LICENSE                             Apache-2.0 text
@@ -59,7 +59,7 @@ scripts/bootstrap-local.ts          creates project/key and synthetic trace
 - Create: `pnpm-workspace.yaml`
 - Create: `turbo.json`
 - Create: `tsconfig.base.json`
-- Create: `vitest.workspace.ts`
+- Create: `vitest.config.ts`
 - Create: `.editorconfig`
 - Create: `.gitignore`
 - Create: `.env.example`
@@ -85,7 +85,7 @@ Create root scripts with these exact responsibilities:
 {
   "name": "agentrail",
   "private": true,
-  "packageManager": "pnpm@10.14.0",
+  "packageManager": "pnpm@11.9.0",
   "engines": { "node": ">=24 <25" },
   "scripts": {
     "build": "turbo run build",
@@ -101,12 +101,12 @@ Create root scripts with these exact responsibilities:
     "tsx": "^4.20.0",
     "turbo": "^2.5.0",
     "typescript": "^5.9.0",
-    "vitest": "^4.0.0"
+    "vitest": "^4.1.6"
   }
 }
 ```
 
-Set `pnpm-workspace.yaml` packages to `apps/*` and `packages/*`. Set TypeScript to `strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `module: ESNext`, `moduleResolution: Bundler`, and `target: ES2024`.
+Set `pnpm-workspace.yaml` packages to `apps/*` and `packages/*`. Configure Vitest 4 through `vitest.config.ts` with `test.projects`, not the removed `vitest.workspace.ts` or `defineWorkspace` API. Set TypeScript to `strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `module: ESNext`, `moduleResolution: Bundler`, and `target: ES2024`.
 
 Run: `rtk corepack enable` then `rtk pnpm install`
 Expected: lockfile created and install exits 0.
@@ -803,7 +803,7 @@ Expected: FAIL because public documentation does not yet exist.
 
 - [ ] **Step 4: Add CI with service containers and immutable gates**
 
-The workflow uses Node 24 and pnpm 10, starts PostgreSQL and Redis service containers, runs install with frozen lockfile, formatting check, typecheck, unit/integration tests, and production builds. Docker and browser E2E remain a separate job with uploaded failure artifacts.
+The workflow uses Node 24 and pnpm 11, starts PostgreSQL and Redis service containers, runs install with frozen lockfile, formatting check, typecheck, unit/integration tests, and production builds. Docker and browser E2E remain a separate job with uploaded failure artifacts.
 
 - [ ] **Step 5: Verify docs and CI configuration, then commit**
 
