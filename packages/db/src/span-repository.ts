@@ -186,6 +186,22 @@ export function createSpanRepository(db: AgentRailDatabase) {
       return span ?? null;
     },
 
+    async getSpanForTrace(projectId: string, traceId: string, spanId: string) {
+      const [span] = await db
+        .select()
+        .from(spans)
+        .where(
+          and(
+            eq(spans.projectId, projectId),
+            eq(spans.traceId, traceId),
+            eq(spans.spanId, spanId),
+          ),
+        )
+        .limit(1);
+
+      return span ?? null;
+    },
+
     async recomputeTrace(projectId: string, traceId: string): Promise<void> {
       const [aggregate] = await db
         .select({
