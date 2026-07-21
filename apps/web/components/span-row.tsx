@@ -30,6 +30,7 @@ export function SpanRow({ row }: { row: TraceRailRow }) {
       <Link
         className="span-row-link"
         href={href}
+        data-span-id={row.spanId}
         aria-label={`${row.span.name}, ${row.span.kind}, ${duration}, actor ${row.span.agentId}`}
       >
         <span className="span-identity">
