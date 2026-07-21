@@ -32,7 +32,8 @@ async function main(): Promise<void> {
   const rawKey = `ar_local_${randomBytes(32).toString("hex")}`;
   const keyPrefix = rawKey.slice(0, 16);
   const keyDigest = createHmac("sha256", pepper).update(rawKey).digest("hex");
-  const projectId = randomUUID();
+  const projectId =
+    process.env.AGENTRAIL_PROJECT_ID ?? "00000000-0000-4000-8000-000000000101";
   const apiKeyId = randomUUID();
   const traceId = randomBytes(16).toString("hex");
   const rootSpanId = randomBytes(8).toString("hex");
