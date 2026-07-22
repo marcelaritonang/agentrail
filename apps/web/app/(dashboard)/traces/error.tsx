@@ -8,7 +8,10 @@ export default function TracesError({ reset }: { reset: () => void }) {
       <WarningCircle aria-hidden="true" size={22} weight="regular" />
       <div>
         <h1 id="trace-error-title">Trace archive unavailable</h1>
-        <p>The project-scoped read failed. Verify PostgreSQL, then retry this view.</p>
+        <p>
+          The project-scoped read failed. Verify PostgreSQL, then retry this
+          view.
+        </p>
       </div>
       <button type="button" onClick={reset}>
         Try again
