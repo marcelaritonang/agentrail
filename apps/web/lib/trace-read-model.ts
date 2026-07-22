@@ -6,6 +6,8 @@ import {
   type SpanOutcome,
   type TraceCompletionState,
 } from "@agentrail/db";
+import { createDemoTraceReadRepository } from "./demo-read-model";
+import { demoModeEnabled } from "./demo-mode";
 
 type StoredTrace = {
   projectId: string;
@@ -204,9 +206,20 @@ export function createTraceReadModel(repository: TraceReadRepository) {
 }
 
 let productionModel: ReturnType<typeof createTraceReadModel> | undefined;
+let productionModelMode: "database" | "demo" | undefined;
 
 function model() {
-  if (productionModel !== undefined) return productionModel;
+  const mode = demoModeEnabled() ? "demo" : "database";
+  if (productionModel !== undefined && productionModelMode === mode) {
+    return productionModel;
+  }
+
+  productionModelMode = mode;
+  if (mode === "demo") {
+    productionModel = createTraceReadModel(createDemoTraceReadRepository());
+    return productionModel;
+  }
+
   const databaseUrl = process.env.DATABASE_URL;
   if (databaseUrl === undefined) throw new Error("DATABASE_URL is required");
   const database = createDatabase(databaseUrl);
