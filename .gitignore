@@ -18,3 +18,5 @@ Thumbs.db
 
 artifacts/benchmarks/*.json
 artifacts/benchmarks/*.txt
+
+.vercel/

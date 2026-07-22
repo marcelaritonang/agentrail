@@ -2,6 +2,14 @@ import { S3Client } from "@aws-sdk/client-s3";
 
 import { createS3BlobStore } from "@agentrail/blob";
 import { createDatabase, createSpanRepository } from "@agentrail/db";
+import {
+  createDemoBlobStore,
+  createDemoEvidenceRepository,
+} from "../../../../../../lib/demo-read-model";
+import {
+  DEMO_PROJECT_ID,
+  demoModeEnabled,
+} from "../../../../../../lib/demo-mode";
 import { createEvidenceHandler } from "../../../../../../lib/evidence";
 
 export const dynamic = "force-dynamic";
@@ -18,6 +26,15 @@ let productionHandler: ReturnType<typeof createEvidenceHandler> | undefined;
 
 function handler(): ReturnType<typeof createEvidenceHandler> {
   if (productionHandler !== undefined) return productionHandler;
+
+  if (demoModeEnabled()) {
+    productionHandler = createEvidenceHandler({
+      configuredProjectId: DEMO_PROJECT_ID,
+      repository: createDemoEvidenceRepository(),
+      blob: createDemoBlobStore(),
+    });
+    return productionHandler;
+  }
 
   const endpoint = process.env.S3_ENDPOINT;
   const accessKeyId = process.env.S3_ACCESS_KEY_ID;
