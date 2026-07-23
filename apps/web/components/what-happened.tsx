@@ -26,9 +26,9 @@ export function WhatHappened({
           <li className="run-boundary">
             <span>Run boundary</span>
             <strong>
-              {presentation.completionLabel === "Incomplete recording"
-                ? "Recorded the run boundary"
-                : presentation.rootBoundary.categoryLabel}
+              {trace.completionState === "complete"
+                ? presentation.rootBoundary.categoryLabel
+                : "Recorded the run boundary"}
             </strong>
           </li>
         )}

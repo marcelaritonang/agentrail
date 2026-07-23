@@ -128,6 +128,28 @@ describe("WhatHappened", () => {
       within(list).queryByText("Recorded the complete run"),
     ).not.toBeInTheDocument();
   });
+
+  it("uses a neutral root-boundary label before completion is recorded", () => {
+    const trace = {
+      ...traceFixture(),
+      completionState: null,
+      endedAt: null,
+      durationMs: null,
+      outcome: null,
+    };
+    render(
+      <WhatHappened
+        trace={trace}
+        presentation={presentTraceDetail(trace)}
+      />,
+    );
+
+    const list = screen.getByRole("list", { name: "What happened" });
+    expect(within(list).getByText("Recorded the run boundary")).toBeVisible();
+    expect(
+      within(list).queryByText("Recorded the complete run"),
+    ).not.toBeInTheDocument();
+  });
 });
 
 describe("trace detail route states", () => {
