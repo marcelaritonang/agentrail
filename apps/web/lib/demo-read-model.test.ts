@@ -6,7 +6,12 @@ import {
   createDemoEvidenceRepository,
   createDemoTraceReadRepository,
 } from "./demo-read-model";
-import { DEMO_LLM_SPAN_ID, DEMO_PROJECT_ID, DEMO_TRACE_ID } from "./demo-mode";
+import {
+  DEMO_LLM_SPAN_ID,
+  DEMO_PROJECT_ID,
+  DEMO_ROOT_SPAN_ID,
+  DEMO_TRACE_ID,
+} from "./demo-mode";
 import { createTraceReadModel } from "./trace-read-model";
 
 describe("demo read model", () => {
@@ -32,6 +37,11 @@ describe("demo read model", () => {
         }),
       ],
     });
+    expect(page.items[0]).toMatchObject({
+      traceId: DEMO_TRACE_ID,
+      rootSpanId: DEMO_ROOT_SPAN_ID,
+      spanCount: 4,
+    });
     expect(detail?.spans).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -42,6 +52,27 @@ describe("demo read model", () => {
         }),
       ]),
     );
+  });
+
+  it("matches an actor filter only against the agent ID", async () => {
+    const model = createTraceReadModel(createDemoTraceReadRepository());
+
+    await expect(
+      model.listTraces({
+        projectId: DEMO_PROJECT_ID,
+        page: 1,
+        pageSize: 25,
+        actor: "research-agent",
+      }),
+    ).resolves.toMatchObject({ total: 1 });
+    await expect(
+      model.listTraces({
+        projectId: DEMO_PROJECT_ID,
+        page: 1,
+        pageSize: 25,
+        actor: "founder-review",
+      }),
+    ).resolves.toMatchObject({ total: 0, items: [] });
   });
 
   it("serves redacted evidence through the backend only", async () => {

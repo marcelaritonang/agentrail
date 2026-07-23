@@ -106,6 +106,29 @@ describe("trace read model", () => {
     expect(result.total).toBe(1);
   });
 
+  it("searches trace names and IDs within the requested project", async () => {
+    const model = createTraceReadModel(createSpanRepository(database.db));
+
+    await expect(
+      model.listTraces({
+        projectId: PROJECT_A,
+        page: 1,
+        query: TRACE_A.slice(0, 12),
+      }),
+    ).resolves.toMatchObject({
+      total: 1,
+      items: [expect.objectContaining({ traceId: TRACE_A })],
+    });
+
+    await expect(
+      model.listTraces({
+        projectId: PROJECT_B,
+        page: 1,
+        query: TRACE_A,
+      }),
+    ).resolves.toMatchObject({ total: 0, items: [] });
+  });
+
   it("scopes detail spans by both project and trace", async () => {
     const model = createTraceReadModel(createSpanRepository(database.db));
 

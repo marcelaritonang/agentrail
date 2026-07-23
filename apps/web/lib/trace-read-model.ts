@@ -27,6 +27,7 @@ type StoredTrace = {
 
 export type TraceListItem = {
   traceId: string;
+  rootSpanId: string | null;
   name: string;
   agentId: string;
   onBehalfOf: string | null;
@@ -64,7 +65,6 @@ export type TraceSpan = {
 };
 
 export type TraceDetail = TraceListItem & {
-  rootSpanId: string | null;
   spans: TraceSpan[];
 };
 
@@ -128,6 +128,7 @@ type StoredSpan = {
 function traceItem(trace: StoredTrace): TraceListItem {
   return {
     traceId: trace.traceId,
+    rootSpanId: trace.rootSpanId,
     name: trace.name,
     agentId: trace.agentId,
     onBehalfOf: trace.onBehalfOf,
@@ -177,7 +178,6 @@ export function createTraceReadModel(repository: TraceReadRepository) {
       const spans = await repository.listSpansForTrace(projectId, traceId);
       return {
         ...traceItem(trace),
-        rootSpanId: trace.rootSpanId,
         spans: spans.map((span) => ({
           projectId: span.projectId,
           traceId: span.traceId,

@@ -6,6 +6,7 @@ import {
   ilike,
   isNull,
   lte,
+  or,
   sql,
   type SQL,
 } from "drizzle-orm";
@@ -251,7 +252,12 @@ export function createSpanRepository(db: AgentRailDatabase) {
     }) {
       const predicates: SQL[] = [eq(traces.projectId, input.projectId)];
       if (input.query !== undefined) {
-        predicates.push(ilike(traces.name, `%${input.query}%`));
+        predicates.push(
+          or(
+            ilike(traces.name, `%${input.query}%`),
+            ilike(traces.traceId, `%${input.query}%`),
+          )!,
+        );
       }
       if (input.outcome !== undefined) {
         predicates.push(eq(traces.outcome, input.outcome));
