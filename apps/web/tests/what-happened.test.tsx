@@ -1,7 +1,13 @@
 // @vitest-environment jsdom
 
 import "@testing-library/jest-dom/vitest";
-import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  within,
+} from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import TraceDetailError from "../app/(dashboard)/traces/[traceId]/error";
@@ -73,6 +79,7 @@ function traceFixture(): TraceDetail {
         name: "draft.answer",
         kind: "llm",
         startedAt: "2026-07-21T10:00:00.300Z",
+        hasPayload: true,
       }),
       spanFixture({
         spanId: "action",
@@ -88,10 +95,7 @@ describe("WhatHappened", () => {
   it("renders the root boundary once and every operational step once", () => {
     const trace = traceFixture();
     render(
-      <WhatHappened
-        trace={trace}
-        presentation={presentTraceDetail(trace)}
-      />,
+      <WhatHappened trace={trace} presentation={presentTraceDetail(trace)} />,
     );
 
     const list = screen.getByRole("list", { name: "What happened" });
@@ -105,6 +109,10 @@ describe("WhatHappened", () => {
     expect(within(list).getAllByText("find.sources")).toHaveLength(1);
     expect(within(list).getAllByText("draft.answer")).toHaveLength(1);
     expect(within(list).getAllByText("publish.answer")).toHaveLength(1);
+    expect(
+      within(list).getByRole("link", { name: "Inspect recorded data" }),
+    ).toHaveAttribute("href", "/traces/trace-a?span=model");
+    expect(within(list).getAllByText("Metadata only")).toHaveLength(2);
   });
 
   it("uses a neutral root-boundary label for an incomplete recording", () => {
@@ -116,10 +124,7 @@ describe("WhatHappened", () => {
       outcome: null,
     };
     render(
-      <WhatHappened
-        trace={trace}
-        presentation={presentTraceDetail(trace)}
-      />,
+      <WhatHappened trace={trace} presentation={presentTraceDetail(trace)} />,
     );
 
     const list = screen.getByRole("list", { name: "What happened" });
@@ -138,10 +143,7 @@ describe("WhatHappened", () => {
       outcome: null,
     };
     render(
-      <WhatHappened
-        trace={trace}
-        presentation={presentTraceDetail(trace)}
-      />,
+      <WhatHappened trace={trace} presentation={presentTraceDetail(trace)} />,
     );
 
     const list = screen.getByRole("list", { name: "What happened" });

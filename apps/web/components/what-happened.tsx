@@ -1,5 +1,6 @@
 import type { RunDetailPresentation } from "../lib/trace-presentation";
 import type { TraceDetail } from "../lib/trace-read-model";
+import { RecordedDataAction } from "./recorded-data-action";
 
 export function WhatHappened({
   trace,
@@ -41,6 +42,12 @@ export function WhatHappened({
             </div>
             <span>{step.outcomeLabel}</span>
             <span>{step.durationLabel}</span>
+            <RecordedDataAction
+              traceId={step.traceId}
+              spanId={step.spanId}
+              hasPayload={step.hasPayload}
+              origin="steps"
+            />
           </li>
         ))}
       </ol>

@@ -28,6 +28,7 @@ export function TraceRail({ trace }: { trace: TraceDetail }) {
         <span>Actor</span>
         <span>Duration</span>
         <span>Waterfall</span>
+        <span>Recorded data</span>
       </div>
       <ol>
         {rows.map((row) => (

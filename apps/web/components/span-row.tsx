@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 
 import { formatDuration } from "../lib/format";
 import type { TraceRailRow } from "../lib/trace-rail";
+import { RecordedDataAction } from "./recorded-data-action";
 
 type RailStyle = CSSProperties & {
   "--rail-depth": number;
@@ -23,10 +24,7 @@ export function SpanRow({ row }: { row: TraceRailRow }) {
 
   return (
     <li className={`span-row signal-${row.signal}`} style={style}>
-      <div
-        className="span-row-content"
-        data-span-id={row.spanId}
-      >
+      <div className="span-row-content">
         <span className="span-identity">
           <strong>{row.span.name}</strong>
           <code>{row.span.kind.toUpperCase()}</code>
@@ -36,6 +34,12 @@ export function SpanRow({ row }: { row: TraceRailRow }) {
         <span className="span-rail-visual" aria-hidden="true">
           <i />
         </span>
+        <RecordedDataAction
+          traceId={row.span.traceId}
+          spanId={row.spanId}
+          hasPayload={row.span.hasPayload}
+          origin="timeline"
+        />
       </div>
     </li>
   );

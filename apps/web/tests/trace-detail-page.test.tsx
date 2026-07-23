@@ -9,6 +9,7 @@ import type { TraceDetail, TraceSpan } from "../lib/trace-read-model";
 const state = vi.hoisted(() => ({
   trace: null as TraceDetail | null,
 }));
+const routerPush = vi.hoisted(() => vi.fn());
 
 vi.mock("../lib/demo-mode", () => ({
   DEMO_TRACE_ID: "demo-trace",
@@ -24,6 +25,10 @@ vi.mock("../lib/trace-read-model", () => {
     getTraceDetail: vi.fn(async () => state.trace),
   };
 });
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: routerPush }),
+}));
 
 vi.mock("../components/read-only-example", () => ({
   ReadOnlyExampleBanner: () => <aside>Read-only example</aside>,
@@ -61,15 +66,13 @@ vi.mock("../components/action-ledger", () => ({
   ),
 }));
 
-vi.mock("../components/evidence-drawer", () => ({
-  EvidenceDrawer: ({ span }: { span: TraceSpan }) => (
-    <aside aria-label="Evidence drawer">{span.spanId}</aside>
-  ),
-}));
-
 import TraceDetailPage from "../app/(dashboard)/traces/[traceId]/page";
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  routerPush.mockReset();
+  vi.unstubAllGlobals();
+});
 
 function spanFixture(
   input: Partial<TraceSpan> & Pick<TraceSpan, "spanId" | "name">,
@@ -157,21 +160,30 @@ describe("TraceDetailPage", () => {
   });
 
   it("mounts evidence only for a selected span with payload", async () => {
+    const fetchSpy = vi.fn(async () => new Response(null, { status: 204 }));
+    vi.stubGlobal("fetch", fetchSpy);
     await renderPage("with-payload");
 
     expect(
-      screen.getByRole("complementary", { name: "Evidence drawer" }),
-    ).toHaveTextContent("with-payload");
+      screen.getByRole("dialog", {
+        name: "Recorded data for publish.answer",
+      }),
+    ).toBeVisible();
+    expect(fetchSpy).toHaveBeenCalledWith(
+      "/api/traces/trace-a/payload/with-payload",
+      expect.objectContaining({ cache: "no-store" }),
+    );
   });
 
   it.each(["without-payload", "missing-span"])(
-    "does not mount evidence for selection %s",
+    "does not mount evidence or fetch recorded data for selection %s",
     async (spanId) => {
+      const fetchSpy = vi.fn();
+      vi.stubGlobal("fetch", fetchSpy);
       await renderPage(spanId);
 
-      expect(
-        screen.queryByRole("complementary", { name: "Evidence drawer" }),
-      ).not.toBeInTheDocument();
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+      expect(fetchSpy).not.toHaveBeenCalled();
     },
   );
 });

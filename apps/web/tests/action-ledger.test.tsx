@@ -8,7 +8,8 @@ import { ActionLedger } from "../components/action-ledger";
 import type { TraceSpan } from "../lib/trace-read-model";
 
 function span(
-  input: Pick<TraceSpan, "spanId" | "kind" | "name" | "startedAt">,
+  input: Pick<TraceSpan, "spanId" | "kind" | "name" | "startedAt"> &
+    Partial<Pick<TraceSpan, "hasPayload">>,
 ): TraceSpan {
   return {
     projectId: "project-a",
@@ -67,9 +68,51 @@ describe("ActionLedger", () => {
         .slice(1)
         .map((row) => row.textContent),
     ).toEqual([
-      expect.stringContaining("web.search"),
-      expect.stringContaining("filesystem.read"),
+      expect.stringContaining("Web search"),
+      expect.stringContaining("Filesystem read"),
     ]);
-    expect(screen.queryByText("model.plan")).not.toBeInTheDocument();
+    expect(screen.queryByText("Model plan")).not.toBeInTheDocument();
+  });
+
+  it("uses payload-aware recorded data actions on desktop and mobile rows", () => {
+    render(
+      <ActionLedger
+        traceId="trace-a"
+        spans={[
+          span({
+            spanId: "action-without-payload",
+            kind: "action",
+            name: "publish.metadata",
+            startedAt: "2026-07-21T10:00:00.200Z",
+            hasPayload: false,
+          }),
+          span({
+            spanId: "tool-with-payload",
+            kind: "tool",
+            name: "filesystem.write",
+            startedAt: "2026-07-21T10:00:00.300Z",
+            hasPayload: true,
+          }),
+        ]}
+      />,
+    );
+
+    expect(
+      screen.getByRole("heading", { name: "External actions" }),
+    ).toBeVisible();
+    expect(
+      screen.getByText(
+        "Action Ledger · tools or systems the agent called or changed",
+      ),
+    ).toBeVisible();
+    expect(
+      screen.getAllByText("Metadata only", { selector: "span" }),
+    ).toHaveLength(2);
+    expect(
+      screen.getAllByRole("link", { name: "Inspect recorded data" }),
+    ).toHaveLength(2);
+    expect(
+      screen.queryByRole("link", { name: /publish metadata/i }),
+    ).not.toBeInTheDocument();
   });
 });

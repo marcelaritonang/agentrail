@@ -1126,6 +1126,25 @@ select {
   text-transform: none;
 }
 
+.span-row-content > a,
+.what-happened li > a,
+.action-table td a,
+.action-mobile-list > li > a {
+  color: var(--signal-action);
+  font-family: var(--font-jetbrains), monospace;
+  font-size: 9px;
+}
+
+.span-row-content > a {
+  grid-column: 1 / -1;
+}
+
+.metadata-only {
+  color: var(--text-muted);
+  font-family: var(--font-jetbrains), monospace;
+  font-size: 9px;
+}
+
 .span-rail-visual {
   background: var(--surface-inset);
   border-left: 1px solid var(--line-subtle);
@@ -1304,6 +1323,11 @@ select {
   grid-column: 3;
 }
 
+.what-happened li > a,
+.what-happened li > .metadata-only {
+  grid-column: 2 / -1;
+}
+
 .what-happened li > div {
   min-width: 0;
 }
@@ -1452,7 +1476,7 @@ select {
 .action-mobile-list dl {
   display: grid;
   gap: 10px;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   margin: 14px 0 0;
 }
 
@@ -1477,11 +1501,9 @@ select {
   margin: 4px 0 0;
 }
 
-.action-mobile-list a {
-  color: var(--signal-action);
+.action-mobile-list > li > a,
+.action-mobile-list > li > .metadata-only {
   display: inline-block;
-  font-family: var(--font-jetbrains), monospace;
-  font-size: 9px;
   margin-top: 14px;
 }
 
@@ -1598,6 +1620,33 @@ select {
   padding: 22px 16px 32px;
 }
 
+.advanced-metadata {
+  border-bottom: 1px solid var(--line-subtle);
+  padding: 14px 16px;
+}
+
+.advanced-metadata summary {
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: var(--font-jetbrains), monospace;
+  font-size: 9px;
+}
+
+.advanced-metadata pre {
+  background: var(--surface-inset);
+  border: 1px solid var(--line-subtle);
+  color: var(--text-secondary);
+  font-family: var(--font-jetbrains), monospace;
+  font-size: 9px;
+  line-height: 1.6;
+  margin: 12px 0 0;
+  max-height: 220px;
+  overflow: auto;
+  padding: 12px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 .evidence-body-heading {
   align-items: baseline;
   display: flex;
@@ -1613,6 +1662,13 @@ select {
 
 .evidence-loading {
   margin-top: 14px;
+}
+
+.evidence-loading span {
+  color: var(--text-secondary);
+  display: block;
+  font-size: 11px;
+  margin-bottom: 10px;
 }
 
 .evidence-loading i {
@@ -1941,7 +1997,7 @@ select {
   .span-row-content {
     grid-template-columns:
       minmax(230px, 0.9fr) minmax(120px, 0.45fr)
-      86px minmax(340px, 2fr);
+      86px minmax(260px, 2fr) minmax(130px, 0.55fr);
   }
 
   .trace-rail-columns {
@@ -1973,7 +2029,9 @@ select {
   .span-identity,
   .span-actor,
   .span-duration,
-  .span-rail-visual {
+  .span-rail-visual,
+  .span-row-content > a,
+  .span-row-content > .metadata-only {
     grid-column: auto;
     grid-row: auto;
   }
@@ -2001,7 +2059,10 @@ select {
   }
 
   .what-happened li {
-    grid-template-columns: 42px minmax(240px, 1fr) 120px 86px;
+    grid-template-columns: 42px minmax(240px, 1fr) 120px 86px minmax(
+        130px,
+        auto
+      );
     min-height: 50px;
     padding-left: 10px;
     padding-right: 10px;
@@ -2010,6 +2071,11 @@ select {
   .what-happened li > span:last-child {
     grid-column: auto;
     text-align: right;
+  }
+
+  .what-happened li > a,
+  .what-happened li > .metadata-only {
+    grid-column: auto;
   }
 
   .what-happened .run-boundary {
@@ -2113,7 +2179,8 @@ select {
   }
 
   .evidence-drawer-header,
-  .evidence-body {
+  .evidence-body,
+  .advanced-metadata {
     padding-left: 22px;
     padding-right: 22px;
   }

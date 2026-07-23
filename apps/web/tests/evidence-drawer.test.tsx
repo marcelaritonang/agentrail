@@ -1,7 +1,13 @@
 // @vitest-environment jsdom
 
 import "@testing-library/jest-dom/vitest";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { EvidenceDrawer } from "../components/evidence-drawer";
@@ -31,7 +37,7 @@ const span: TraceSpan = {
   costUsd: "0.00400000",
   pricingUnknown: false,
   pricingCatalogVersion: "2026-07-21",
-  attributes: {},
+  attributes: { provider: "test-provider" },
   payloadTruncated: false,
   hasPayload: true,
 };
@@ -63,10 +69,13 @@ afterEach(() => {
 
 describe("EvidenceDrawer", () => {
   it.each([
-    ["redacted", /sensitive fields were redacted/i],
-    ["truncated", /payload was truncated/i],
-    ["none", /payload capture is disabled/i],
-    ["error", /evidence could not be loaded/i],
+    ["redacted", "Sensitive fields were removed before storage."],
+    [
+      "truncated",
+      "Recorded data was shortened at the configured capture limit.",
+    ],
+    ["none", "No input/output was captured for this step."],
+    ["error", "Recorded data couldn't be loaded."],
   ] as const)("renders the %s evidence state", async (state, text) => {
     vi.stubGlobal(
       "fetch",
@@ -78,25 +87,92 @@ describe("EvidenceDrawer", () => {
     expect(await screen.findByText(text)).toBeInTheDocument();
   });
 
-  it("closes with Escape and restores focus to the selected rail row", async () => {
+  it("uses recorded-data terminology and exposes complete forensic facts", async () => {
     vi.stubGlobal(
       "fetch",
       vi.fn().mockImplementation(() => fetchResult("redacted")),
     );
-    render(
+    render(<EvidenceDrawer traceId="trace-a" span={span} />);
+
+    expect(
+      await screen.findByRole("dialog", {
+        name: "Recorded data for model.generate",
+      }),
+    ).toBeVisible();
+    expect(screen.getByText("Evidence · Span llm-child")).toBeVisible();
+    expect(
+      screen.getByRole("heading", { name: "Model generate" }),
+    ).toBeVisible();
+    expect(
+      screen.getByText(
+        "Input and output captured by the project-scoped AgentRail backend.",
+      ),
+    ).toBeVisible();
+    expect(screen.getByText("Called an AI model")).toBeVisible();
+    expect(screen.getByText("LLM")).toBeVisible();
+    expect(screen.getByText("1,000")).toBeVisible();
+    expect(screen.getByText("500")).toBeVisible();
+    expect(screen.getByText("$0.0040")).toBeVisible();
+    expect(screen.getByText("Advanced metadata")).toBeVisible();
+    expect(screen.getByLabelText("Raw span attributes")).toHaveTextContent(
+      '"provider": "test-provider"',
+    );
+    expect(screen.getByText("Recorded input/output")).toBeVisible();
+  });
+
+  it("closes with Escape and restores focus to the exact active origin", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockImplementation(() => fetchResult("redacted")),
+    );
+    const { rerender } = render(
       <>
-        <button type="button" data-span-id="llm-child">
-          Origin
+        <button
+          type="button"
+          data-span-id="llm-child"
+          data-evidence-origin="steps"
+        >
+          Steps origin
+        </button>
+        <button
+          type="button"
+          data-span-id="llm-child"
+          data-evidence-origin="timeline"
+        >
+          Timeline origin
+        </button>
+      </>,
+    );
+    screen.getByRole("button", { name: "Timeline origin" }).focus();
+    rerender(
+      <>
+        <button
+          type="button"
+          data-span-id="llm-child"
+          data-evidence-origin="steps"
+        >
+          Steps origin
+        </button>
+        <button
+          type="button"
+          data-span-id="llm-child"
+          data-evidence-origin="timeline"
+        >
+          Timeline origin
         </button>
         <EvidenceDrawer traceId="trace-a" span={span} />
       </>,
     );
-    const dialog = await screen.findByRole("dialog", { name: /evidence/i });
+    const dialog = await screen.findByRole("dialog", {
+      name: /recorded data/i,
+    });
 
     fireEvent.keyDown(dialog, { key: "Escape" });
 
     expect(routerPush).toHaveBeenCalledWith("/traces/trace-a");
-    expect(screen.getByRole("button", { name: "Origin" })).toHaveFocus();
+    expect(
+      screen.getByRole("button", { name: "Timeline origin" }),
+    ).toHaveFocus();
   });
 
   it("keeps Tab focus inside the drawer", async () => {
@@ -106,13 +182,33 @@ describe("EvidenceDrawer", () => {
     );
     render(<EvidenceDrawer traceId="trace-a" span={span} />);
     const close = await screen.findByRole("button", {
-      name: /close evidence/i,
+      name: "Close recorded data",
     });
-    const dialog = screen.getByRole("dialog", { name: /evidence/i });
+    const dialog = screen.getByRole("dialog", { name: /recorded data/i });
 
     close.focus();
     fireEvent.keyDown(dialog, { key: "Tab" });
 
     expect(close).toHaveFocus();
+
+    fireEvent.keyDown(dialog, { key: "Tab", shiftKey: true });
+
+    expect(screen.getByText("Advanced metadata")).toHaveFocus();
+  });
+
+  it("shows loading copy while the backend request is pending", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() => new Promise(() => undefined)),
+    );
+
+    render(<EvidenceDrawer traceId="trace-a" span={span} />);
+
+    expect(screen.getByText("Loading recorded data…")).toBeVisible();
+    await waitFor(() =>
+      expect(
+        screen.getByRole("button", { name: "Close recorded data" }),
+      ).toHaveFocus(),
+    );
   });
 });

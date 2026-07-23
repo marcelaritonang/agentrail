@@ -14,11 +14,8 @@ export type EvidenceViewState =
 export function EvidenceContent({ state }: { state: EvidenceViewState }) {
   if (state.status === "loading") {
     return (
-      <div
-        className="evidence-loading"
-        aria-label="Loading evidence"
-        aria-busy="true"
-      >
+      <div className="evidence-loading" aria-busy="true">
+        <span>Loading recorded data…</span>
         <i />
         <i />
         <i />
@@ -31,8 +28,7 @@ export function EvidenceContent({ state }: { state: EvidenceViewState }) {
       <div className="evidence-message">
         <Info aria-hidden="true" size={17} weight="regular" />
         <div>
-          <strong>No captured payload</strong>
-          <p>Payload capture is disabled or this span emitted no payload.</p>
+          <strong>No input/output was captured for this step.</strong>
         </div>
       </div>
     );
@@ -43,10 +39,7 @@ export function EvidenceContent({ state }: { state: EvidenceViewState }) {
       <div className="evidence-message evidence-message-error">
         <Warning aria-hidden="true" size={17} weight="regular" />
         <div>
-          <strong>Evidence unavailable</strong>
-          <p>
-            Evidence could not be loaded through the project-scoped backend.
-          </p>
+          <strong>Recorded data couldn&apos;t be loaded.</strong>
         </div>
       </div>
     );
@@ -57,13 +50,15 @@ export function EvidenceContent({ state }: { state: EvidenceViewState }) {
       {state.captureState === "redacted" ? (
         <div className="evidence-notice">
           <Info aria-hidden="true" size={15} weight="regular" />
-          <span>Sensitive fields were redacted before storage.</span>
+          <span>Sensitive fields were removed before storage.</span>
         </div>
       ) : null}
       {state.truncated ? (
         <div className="evidence-notice evidence-notice-warning">
           <Warning aria-hidden="true" size={15} weight="regular" />
-          <span>Payload was truncated at the configured capture limit.</span>
+          <span>
+            Recorded data was shortened at the configured capture limit.
+          </span>
         </div>
       ) : null}
       <pre aria-label="Captured payload JSON">
