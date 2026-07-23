@@ -45,10 +45,12 @@ const span: TraceSpan = {
 
 function deferred<T>() {
   let resolve!: (value: T) => void;
-  const promise = new Promise<T>((resolvePromise) => {
+  let reject!: (reason?: unknown) => void;
+  const promise = new Promise<T>((resolvePromise, rejectPromise) => {
     resolve = resolvePromise;
+    reject = rejectPromise;
   });
-  return { promise, resolve };
+  return { promise, reject, resolve };
 }
 
 function evidenceResponse(answer: string): Response {
@@ -179,6 +181,95 @@ describe("EvidenceDrawer", () => {
     });
     expect(await screen.findByText(/span B evidence/)).toBeVisible();
     expect(screen.queryByText(/span A evidence/)).not.toBeInTheDocument();
+  });
+
+  it("keeps B evidence when superseded A resolves despite abort", async () => {
+    const responseA = deferred<Response>();
+    const responseB = deferred<Response>();
+    let signalA: AbortSignal | undefined;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((_input: unknown, init?: RequestInit) => {
+        if (signalA === undefined) {
+          signalA = init?.signal ?? undefined;
+          return responseA.promise;
+        }
+        return responseB.promise;
+      }),
+    );
+    const { rerender } = render(
+      <EvidenceDrawer traceId="trace-a" span={span} />,
+    );
+    await waitFor(() => expect(signalA).toBeDefined());
+
+    const spanB: TraceSpan = {
+      ...span,
+      spanId: "llm-second",
+      name: "model.revise",
+    };
+    rerender(<EvidenceDrawer traceId="trace-a" span={spanB} />);
+    expect(signalA).toBeDefined();
+    expect(signalA!.aborted).toBe(true);
+
+    await act(async () => {
+      responseB.resolve(evidenceResponse("span B evidence"));
+      await responseB.promise;
+    });
+    expect(await screen.findByText(/span B evidence/)).toBeVisible();
+
+    await act(async () => {
+      responseA.resolve(evidenceResponse("late span A evidence"));
+      await responseA.promise;
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    expect(screen.getByText(/span B evidence/)).toBeVisible();
+    expect(screen.queryByText(/late span A evidence/)).not.toBeInTheDocument();
+  });
+
+  it("keeps B evidence when superseded A rejects despite abort", async () => {
+    const responseA = deferred<Response>();
+    const responseB = deferred<Response>();
+    let signalA: AbortSignal | undefined;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((_input: unknown, init?: RequestInit) => {
+        if (signalA === undefined) {
+          signalA = init?.signal ?? undefined;
+          return responseA.promise;
+        }
+        return responseB.promise;
+      }),
+    );
+    const { rerender } = render(
+      <EvidenceDrawer traceId="trace-a" span={span} />,
+    );
+    await waitFor(() => expect(signalA).toBeDefined());
+
+    const spanB: TraceSpan = {
+      ...span,
+      spanId: "llm-second",
+      name: "model.revise",
+    };
+    rerender(<EvidenceDrawer traceId="trace-a" span={spanB} />);
+    expect(signalA).toBeDefined();
+    expect(signalA!.aborted).toBe(true);
+
+    await act(async () => {
+      responseB.resolve(evidenceResponse("span B evidence"));
+      await responseB.promise;
+    });
+    expect(await screen.findByText(/span B evidence/)).toBeVisible();
+
+    await act(async () => {
+      responseA.reject(new Error("late span A failure"));
+      await responseA.promise.catch(() => undefined);
+      await Promise.resolve();
+    });
+    expect(screen.getByText(/span B evidence/)).toBeVisible();
+    expect(
+      screen.queryByText("Recorded data couldn't be loaded."),
+    ).not.toBeInTheDocument();
   });
 
   it("closes with Escape and restores focus to the exact active origin", async () => {
