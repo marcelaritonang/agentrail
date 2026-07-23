@@ -1,4 +1,5 @@
 import type { TraceSpan } from "./trace-read-model";
+import { orderTraceSpans } from "./trace-presentation";
 
 export type TraceRailSignal =
   "action" | "error" | "llm" | "neutral" | "retrieval";
@@ -24,13 +25,6 @@ function milliseconds(value: string): number {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
-function compareSpans(left: TraceSpan, right: TraceSpan): number {
-  return (
-    milliseconds(left.startedAt) - milliseconds(right.startedAt) ||
-    left.spanId.localeCompare(right.spanId)
-  );
-}
-
 function depthOf(
   span: TraceSpan,
   byId: ReadonlyMap<string, TraceSpan>,
@@ -49,42 +43,6 @@ function depthOf(
   }
 
   return depth;
-}
-
-function orderedSpans(spans: readonly TraceSpan[]): TraceSpan[] {
-  const byId = new Map(spans.map((span) => [span.spanId, span]));
-  const children = new Map<string, TraceSpan[]>();
-  const roots: TraceSpan[] = [];
-
-  for (const span of spans) {
-    if (
-      span.parentSpanId === null ||
-      span.parentSpanId === span.spanId ||
-      !byId.has(span.parentSpanId)
-    ) {
-      roots.push(span);
-      continue;
-    }
-    const siblings = children.get(span.parentSpanId) ?? [];
-    siblings.push(span);
-    children.set(span.parentSpanId, siblings);
-  }
-
-  roots.sort(compareSpans);
-  for (const siblings of children.values()) siblings.sort(compareSpans);
-
-  const result: TraceSpan[] = [];
-  const visited = new Set<string>();
-  const visit = (span: TraceSpan) => {
-    if (visited.has(span.spanId)) return;
-    visited.add(span.spanId);
-    result.push(span);
-    for (const child of children.get(span.spanId) ?? []) visit(child);
-  };
-
-  for (const root of roots) visit(root);
-  for (const span of [...spans].sort(compareSpans)) visit(span);
-  return result;
 }
 
 function signalFor(span: TraceSpan): TraceRailSignal {
@@ -113,7 +71,7 @@ export function buildTraceRail(
   const traceDurationMs = traceEndMs - traceStartMs;
   const byId = new Map(spans.map((span) => [span.spanId, span]));
 
-  return orderedSpans(spans).map((span) => {
+  return orderTraceSpans(spans).map((span) => {
     const start = Math.min(
       traceEndMs,
       Math.max(traceStartMs, milliseconds(span.startedAt)),

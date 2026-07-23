@@ -110,6 +110,20 @@ describe("buildTraceRail", () => {
     );
   });
 
+  it("uses the shared ordering for orphaned spans", () => {
+    const rows = buildTraceRail([
+      span({
+        spanId: "orphan",
+        parentSpanId: "missing-parent",
+        startMs: 0,
+        endMs: 100,
+      }),
+      span({ spanId: ROOT, kind: "trace", startMs: 100, endMs: 1_000 }),
+    ]);
+
+    expect(rows.map((row) => row.spanId)).toEqual([ROOT, "orphan"]);
+  });
+
   it("uses error as the strongest signal", () => {
     const [row] = buildTraceRail([
       span({
