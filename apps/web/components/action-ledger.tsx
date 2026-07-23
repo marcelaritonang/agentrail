@@ -1,8 +1,7 @@
-import { ArrowSquareOut } from "@phosphor-icons/react/ssr";
-import Link from "next/link";
-
 import { formatDuration, formatTimestamp } from "../lib/format";
+import { humanizeName } from "../lib/trace-presentation";
 import type { TraceSpan } from "../lib/trace-read-model";
+import { RecordedDataAction } from "./recorded-data-action";
 
 function actions(spans: readonly TraceSpan[]): TraceSpan[] {
   return spans
@@ -12,10 +11,6 @@ function actions(spans: readonly TraceSpan[]): TraceSpan[] {
         Date.parse(left.startedAt) - Date.parse(right.startedAt) ||
         left.spanId.localeCompare(right.spanId),
     );
-}
-
-function evidenceHref(traceId: string, spanId: string): string {
-  return `/traces/${encodeURIComponent(traceId)}?span=${encodeURIComponent(spanId)}`;
 }
 
 export function ActionLedger({
@@ -31,8 +26,10 @@ export function ActionLedger({
     <section className="action-ledger" aria-labelledby="action-ledger-title">
       <header className="trace-section-heading">
         <div>
-          <span>Consequential operations</span>
-          <h2 id="action-ledger-title">Action Ledger</h2>
+          <span>
+            Action Ledger · tools or systems the agent called or changed
+          </span>
+          <h2 id="action-ledger-title">External actions</h2>
         </div>
         <p>{ledger.length} action and tool spans / chronological</p>
       </header>
@@ -44,7 +41,7 @@ export function ActionLedger({
       ) : (
         <>
           <div className="action-table-wrap">
-            <table className="action-table" aria-label="Action Ledger">
+            <table className="action-table" aria-label="External actions">
               <thead>
                 <tr>
                   <th scope="col">Time</th>
@@ -52,7 +49,7 @@ export function ActionLedger({
                   <th scope="col">Actor</th>
                   <th scope="col">Outcome</th>
                   <th scope="col">Duration</th>
-                  <th scope="col">Evidence</th>
+                  <th scope="col">Recorded data</th>
                 </tr>
               </thead>
               <tbody>
@@ -60,7 +57,9 @@ export function ActionLedger({
                   <tr key={span.spanId}>
                     <td>{formatTimestamp(span.startedAt)}</td>
                     <td>
-                      <strong>{span.name}</strong>
+                      <strong>
+                        {humanizeName(span.name, "Recorded action")}
+                      </strong>
                       <code>{span.kind.toUpperCase()}</code>
                     </td>
                     <td>{span.agentId}</td>
@@ -76,14 +75,12 @@ export function ActionLedger({
                       )}
                     </td>
                     <td>
-                      <Link href={evidenceHref(traceId, span.spanId)}>
-                        Inspect
-                        <ArrowSquareOut
-                          aria-hidden="true"
-                          size={13}
-                          weight="regular"
-                        />
-                      </Link>
+                      <RecordedDataAction
+                        traceId={traceId}
+                        spanId={span.spanId}
+                        hasPayload={span.hasPayload}
+                        origin="actions"
+                      />
                     </td>
                   </tr>
                 ))}
@@ -93,12 +90,12 @@ export function ActionLedger({
 
           <ol
             className="action-mobile-list"
-            aria-label="Action Ledger mobile view"
+            aria-label="External actions mobile view"
           >
             {ledger.map((span) => (
               <li key={span.spanId}>
                 <div>
-                  <strong>{span.name}</strong>
+                  <strong>{humanizeName(span.name, "Recorded action")}</strong>
                   <span className={`outcome outcome-${span.outcome}`}>
                     <i aria-hidden="true" />
                     {span.outcome.toUpperCase()}
@@ -107,7 +104,11 @@ export function ActionLedger({
                 <code>{span.kind.toUpperCase()}</code>
                 <dl>
                   <div>
-                    <dt>Actor</dt>
+                    <dt>Time</dt>
+                    <dd>{formatTimestamp(span.startedAt)}</dd>
+                  </div>
+                  <div>
+                    <dt>Agent</dt>
                     <dd>{span.agentId}</dd>
                   </div>
                   <div>
@@ -119,9 +120,12 @@ export function ActionLedger({
                     </dd>
                   </div>
                 </dl>
-                <Link href={evidenceHref(traceId, span.spanId)}>
-                  Inspect evidence
-                </Link>
+                <RecordedDataAction
+                  traceId={traceId}
+                  spanId={span.spanId}
+                  hasPayload={span.hasPayload}
+                  origin="actions"
+                />
               </li>
             ))}
           </ol>

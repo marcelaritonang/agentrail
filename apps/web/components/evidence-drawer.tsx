@@ -2,7 +2,13 @@
 
 import { X } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 
 import {
   formatCost,
@@ -11,6 +17,7 @@ import {
   shortId,
 } from "../lib/format";
 import type { TraceSpan } from "../lib/trace-read-model";
+import { humanizeName } from "../lib/trace-presentation";
 import { EvidenceContent, type EvidenceViewState } from "./evidence-content";
 
 type EvidenceResponse = {
@@ -33,10 +40,19 @@ function durationOf(span: TraceSpan): number {
   return Date.parse(span.endedAt) - Date.parse(span.startedAt);
 }
 
-function originFor(spanId: string): HTMLElement | null {
+const plainKind: Record<TraceSpan["kind"], string> = {
+  trace: "Recorded the complete run",
+  retrieval: "Looked up data",
+  llm: "Called an AI model",
+  action: "Performed an external action",
+  tool: "Called a tool",
+  custom: "Recorded a custom step",
+};
+
+function firstConnectedOrigin(spanId: string): HTMLElement | null {
   return (
     Array.from(document.querySelectorAll<HTMLElement>("[data-span-id]")).find(
-      (element) => element.dataset.spanId === spanId,
+      (element) => element.dataset.spanId === spanId && element.isConnected,
     ) ?? null
   );
 }
@@ -51,20 +67,35 @@ export function EvidenceDrawer({
   const router = useRouter();
   const panelRef = useRef<HTMLElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
+  const activeOriginRef = useRef<HTMLElement | null>(null);
   const [evidence, setEvidence] = useState<EvidenceViewState>({
     status: "loading",
   });
   const closeHref = `/traces/${encodeURIComponent(traceId)}`;
 
   const close = useCallback(() => {
-    const origin = originFor(span.spanId);
     router.push(closeHref);
-    origin?.focus();
+    const activeOrigin = activeOriginRef.current;
+    if (activeOrigin?.isConnected) {
+      activeOrigin.focus();
+      return;
+    }
+    firstConnectedOrigin(span.spanId)?.focus();
   }, [closeHref, router, span.spanId]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    const activeElement = document.activeElement;
+    if (
+      activeElement instanceof HTMLElement &&
+      activeElement.dataset.spanId === span.spanId &&
+      (activeElement.dataset.evidenceOrigin === "steps" ||
+        activeElement.dataset.evidenceOrigin === "timeline" ||
+        activeElement.dataset.evidenceOrigin === "actions")
+    ) {
+      activeOriginRef.current = activeElement;
+    }
     closeRef.current?.focus();
-  }, []);
+  }, [span.spanId]);
 
   useEffect(() => {
     if (!span.hasPayload) {
@@ -116,7 +147,7 @@ export function EvidenceDrawer({
     if (panel === null) return;
     const focusable = Array.from(
       panel.querySelectorAll<HTMLElement>(
-        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        'a[href], button:not([disabled]), summary, [tabindex]:not([tabindex="-1"])',
       ),
     );
     if (focusable.length === 0) {
@@ -150,24 +181,26 @@ export function EvidenceDrawer({
         className="evidence-drawer"
         role="dialog"
         aria-modal="true"
-        aria-label={`Evidence for ${span.name}`}
+        aria-label={`Recorded data for ${span.name}`}
         aria-describedby="evidence-description"
         tabIndex={-1}
         onKeyDown={containFocus}
       >
         <header className="evidence-drawer-header">
           <div>
-            <span>Span evidence / {shortId(span.spanId)}</span>
-            <h2 id="evidence-title">{span.name}</h2>
+            <span>Evidence · Span {shortId(span.spanId)}</span>
+            <h2 id="evidence-title">
+              {humanizeName(span.name, "Recorded step")}
+            </h2>
             <p id="evidence-description">
-              Payload resolved through the scoped AgentRail backend.
+              Input and output captured by the project-scoped AgentRail backend.
             </p>
           </div>
           <button
             ref={closeRef}
             type="button"
             onClick={close}
-            aria-label="Close evidence"
+            aria-label="Close recorded data"
           >
             <X aria-hidden="true" size={17} weight="regular" />
           </button>
@@ -176,10 +209,14 @@ export function EvidenceDrawer({
         <dl className="evidence-facts">
           <div>
             <dt>Kind</dt>
-            <dd>{span.kind}</dd>
+            <dd>{plainKind[span.kind]}</dd>
           </div>
           <div>
-            <dt>Actor</dt>
+            <dt>Technical kind</dt>
+            <dd>{span.kind.toUpperCase()}</dd>
+          </div>
+          <div>
+            <dt>Agent</dt>
             <dd>{span.agentId}</dd>
           </div>
           <div>
@@ -196,20 +233,41 @@ export function EvidenceDrawer({
               <dd>{span.model}</dd>
             </div>
           )}
-          <div>
-            <dt>Cost</dt>
-            <dd className={span.pricingUnknown ? "cost-unpriced" : undefined}>
-              {formatCost({
-                totalCostUsd: span.costUsd,
-                pricingUnknown: span.pricingUnknown,
-              })}
-            </dd>
-          </div>
+          {span.inputTokens === null ? null : (
+            <div>
+              <dt>Input tokens</dt>
+              <dd>{span.inputTokens.toLocaleString("en-US")}</dd>
+            </div>
+          )}
+          {span.outputTokens === null ? null : (
+            <div>
+              <dt>Output tokens</dt>
+              <dd>{span.outputTokens.toLocaleString("en-US")}</dd>
+            </div>
+          )}
+          {span.costUsd === null && !span.pricingUnknown ? null : (
+            <div>
+              <dt>Model cost</dt>
+              <dd className={span.pricingUnknown ? "cost-unpriced" : undefined}>
+                {formatCost({
+                  totalCostUsd: span.costUsd,
+                  pricingUnknown: span.pricingUnknown,
+                })}
+              </dd>
+            </div>
+          )}
         </dl>
+
+        <details className="advanced-metadata">
+          <summary>Advanced metadata</summary>
+          <pre aria-label="Raw span attributes">
+            <code>{JSON.stringify(span.attributes, null, 2)}</code>
+          </pre>
+        </details>
 
         <section className="evidence-body" aria-labelledby="payload-title">
           <div className="evidence-body-heading">
-            <h3 id="payload-title">Captured payload</h3>
+            <h3 id="payload-title">Recorded input/output</h3>
             <span>JSON / private no-store</span>
           </div>
           <EvidenceContent state={evidence} />

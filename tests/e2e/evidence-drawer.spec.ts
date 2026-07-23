@@ -2,21 +2,26 @@ import { expect, test } from "@playwright/test";
 
 import { sampleLlmSpanId, sampleTraceId } from "./sample-state";
 
-test("loads private evidence through the backend and restores rail focus", async ({
+test("loads recorded data through the backend and restores exact origin focus", async ({
   page,
 }) => {
   const requests: string[] = [];
   page.on("request", (request) => requests.push(request.url()));
   await page.goto(`/traces/${sampleTraceId}`);
-  const origin = page.getByRole("link", { name: /draft answer, llm/i });
+  const origin = page.locator(
+    `[data-span-id="${sampleLlmSpanId}"][data-evidence-origin="steps"]`,
+  );
+  await expect(origin).toHaveAccessibleName("Inspect recorded data");
 
   await origin.click();
 
   await expect(page).toHaveURL(new RegExp(`span=${sampleLlmSpanId}$`));
   await expect(
-    page.getByRole("dialog", { name: /evidence for draft answer/i }),
+    page.getByRole("dialog", { name: "Recorded data for draft answer" }),
   ).toBeVisible();
-  await expect(page.getByText(/sensitive fields were redacted/i)).toBeVisible();
+  await expect(
+    page.getByText("Sensitive fields were removed before storage."),
+  ).toBeVisible();
   await expect(page.getByLabel("Captured payload JSON")).toContainText(
     "[REDACTED]",
   );
@@ -28,7 +33,13 @@ test("loads private evidence through the backend and restores rail focus", async
 
   await page.keyboard.press("Escape");
   await expect(page).toHaveURL(`/traces/${sampleTraceId}`);
+  await expect(origin).toBeFocused();
+
+  const externalActions = page.getByRole("region", {
+    name: "External actions",
+  });
   await expect(
-    page.locator(`[data-span-id="${sampleLlmSpanId}"]`),
-  ).toBeFocused();
+    externalActions.getByText("Metadata only", { exact: true }),
+  ).toHaveCount(2);
+  await expect(externalActions.getByRole("link")).toHaveCount(0);
 });
