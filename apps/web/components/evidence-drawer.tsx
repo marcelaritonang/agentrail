@@ -26,6 +26,11 @@ type EvidenceResponse = {
   payload: unknown;
 };
 
+type KeyedEvidenceState = {
+  key: string;
+  view: EvidenceViewState;
+};
+
 function isEvidenceResponse(value: unknown): value is EvidenceResponse {
   if (typeof value !== "object" || value === null) return false;
   const candidate = value as Partial<EvidenceResponse>;
@@ -68,9 +73,15 @@ export function EvidenceDrawer({
   const panelRef = useRef<HTMLElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const activeOriginRef = useRef<HTMLElement | null>(null);
-  const [evidence, setEvidence] = useState<EvidenceViewState>({
-    status: "loading",
+  const evidenceKey = `${traceId}\u0000${span.spanId}`;
+  const [storedEvidence, setStoredEvidence] = useState<KeyedEvidenceState>({
+    key: evidenceKey,
+    view: { status: "loading" },
   });
+  const evidence: EvidenceViewState =
+    storedEvidence.key === evidenceKey
+      ? storedEvidence.view
+      : { status: "loading" };
   const closeHref = `/traces/${encodeURIComponent(traceId)}`;
 
   const close = useCallback(() => {
@@ -84,6 +95,7 @@ export function EvidenceDrawer({
   }, [closeHref, router, span.spanId]);
 
   useLayoutEffect(() => {
+    activeOriginRef.current = null;
     const activeElement = document.activeElement;
     if (
       activeElement instanceof HTMLElement &&
@@ -95,15 +107,22 @@ export function EvidenceDrawer({
       activeOriginRef.current = activeElement;
     }
     closeRef.current?.focus();
-  }, [span.spanId]);
+  }, [span.spanId, traceId]);
 
   useEffect(() => {
     if (!span.hasPayload) {
-      setEvidence({ status: "none" });
+      setStoredEvidence({
+        key: evidenceKey,
+        view: { status: "none" },
+      });
       return;
     }
 
     const controller = new AbortController();
+    setStoredEvidence({
+      key: evidenceKey,
+      view: { status: "loading" },
+    });
     const endpoint = `/api/traces/${encodeURIComponent(traceId)}/payload/${encodeURIComponent(
       span.spanId,
     )}`;
@@ -125,15 +144,25 @@ export function EvidenceDrawer({
           payload: body.payload,
         } as const;
       })
-      .then((state) => setEvidence(state))
+      .then((view) => {
+        if (!controller.signal.aborted) {
+          setStoredEvidence({ key: evidenceKey, view });
+        }
+      })
       .catch((error: unknown) => {
-        if (!(error instanceof DOMException && error.name === "AbortError")) {
-          setEvidence({ status: "error" });
+        if (
+          !controller.signal.aborted &&
+          !(error instanceof DOMException && error.name === "AbortError")
+        ) {
+          setStoredEvidence({
+            key: evidenceKey,
+            view: { status: "error" },
+          });
         }
       });
 
     return () => controller.abort();
-  }, [span.hasPayload, span.spanId, traceId]);
+  }, [evidenceKey, span.hasPayload, span.spanId, traceId]);
 
   function containFocus(event: React.KeyboardEvent<HTMLElement>) {
     if (event.key === "Escape") {
