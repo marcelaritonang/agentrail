@@ -172,10 +172,7 @@ function matchesQuery(query: string | undefined): boolean {
 function matchesActor(actor: string | undefined): boolean {
   if (actor === undefined) return true;
   const normalized = actor.toLowerCase();
-  return (
-    DEMO_TRACE.agentId.toLowerCase().includes(normalized) ||
-    (DEMO_TRACE.onBehalfOf?.toLowerCase().includes(normalized) ?? false)
-  );
+  return DEMO_TRACE.agentId.toLowerCase().includes(normalized);
 }
 
 function demoSpan(spanId: string): (typeof DEMO_SPANS)[number] | null {
