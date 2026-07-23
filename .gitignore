@@ -20,3 +20,4 @@ artifacts/benchmarks/*.json
 artifacts/benchmarks/*.txt
 
 .vercel/
+.worktrees/
