@@ -16,10 +16,12 @@ export function TraceRail({ trace }: { trace: TraceDetail }) {
     <section className="trace-rail" aria-labelledby="trace-rail-title">
       <header className="trace-section-heading">
         <div>
-          <span>Temporal evidence</span>
-          <h2 id="trace-rail-title">Trace Rail</h2>
+          <span>Trace Rail</span>
+          <h2 id="trace-rail-title">Technical timeline</h2>
         </div>
-        <p>{rows.length} persisted spans / start-relative scale</p>
+        <p>
+          Exact order, nesting, and duration of {rows.length} recorded spans
+        </p>
       </header>
       <div className="trace-rail-columns" aria-hidden="true">
         <span>Span / kind</span>

@@ -2,9 +2,10 @@ export default function TraceDetailLoading() {
   return (
     <div
       className="detail-loading"
-      aria-label="Loading trace evidence"
+      aria-label="Loading run details"
       aria-busy="true"
     >
+      <strong>Loading run details…</strong>
       <div className="detail-loading-header" />
       <div className="detail-loading-facts" />
       <div className="detail-loading-rail">

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import type { CSSProperties } from "react";
 
 import { formatDuration } from "../lib/format";
@@ -21,17 +20,12 @@ export function SpanRow({ row }: { row: TraceRailRow }) {
     "--rail-offset": `${row.offsetPercent}%`,
     "--rail-width": `${row.widthPercent}%`,
   };
-  const href = `/traces/${encodeURIComponent(row.span.traceId)}?span=${encodeURIComponent(
-    row.spanId,
-  )}`;
 
   return (
     <li className={`span-row signal-${row.signal}`} style={style}>
-      <Link
-        className="span-row-link"
-        href={href}
+      <div
+        className="span-row-content"
         data-span-id={row.spanId}
-        aria-label={`${row.span.name}, ${row.span.kind}, ${duration}, actor ${row.span.agentId}`}
       >
         <span className="span-identity">
           <strong>{row.span.name}</strong>
@@ -42,7 +36,7 @@ export function SpanRow({ row }: { row: TraceRailRow }) {
         <span className="span-rail-visual" aria-hidden="true">
           <i />
         </span>
-      </Link>
+      </div>
     </li>
   );
 }

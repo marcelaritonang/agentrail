@@ -3,9 +3,16 @@ import { notFound } from "next/navigation";
 
 import { ActionLedger } from "../../../../components/action-ledger";
 import { EvidenceDrawer } from "../../../../components/evidence-drawer";
+import { ReadOnlyExampleBanner } from "../../../../components/read-only-example";
 import { TraceHeader } from "../../../../components/trace-header";
 import { TraceRail } from "../../../../components/trace-rail";
+import { WhatHappened } from "../../../../components/what-happened";
+import {
+  DEMO_TRACE_ID,
+  demoModeEnabled,
+} from "../../../../lib/demo-mode";
 import { configuredProjectId } from "../../../../lib/project-context";
+import { presentTraceDetail } from "../../../../lib/trace-presentation";
 import { getTraceDetail } from "../../../../lib/trace-read-model";
 
 export const dynamic = "force-dynamic";
@@ -27,15 +34,20 @@ export default async function TraceDetailPage({
   const selectedSpan = trace.spans.find(
     (span) => span.spanId === selectedSpanId,
   );
+  const isReadOnlyExample =
+    demoModeEnabled() && trace.traceId === DEMO_TRACE_ID;
+  const presentation = presentTraceDetail(trace, { isReadOnlyExample });
 
   return (
     <>
-      <TraceHeader trace={trace} />
+      {isReadOnlyExample ? <ReadOnlyExampleBanner detail /> : null}
+      <TraceHeader trace={trace} presentation={presentation} />
+      <WhatHappened trace={trace} presentation={presentation} />
       <TraceRail trace={trace} />
       <ActionLedger traceId={trace.traceId} spans={trace.spans} />
-      {selectedSpan === undefined ? null : (
+      {selectedSpan?.hasPayload === true ? (
         <EvidenceDrawer traceId={trace.traceId} span={selectedSpan} />
-      )}
+      ) : null}
     </>
   );
 }
