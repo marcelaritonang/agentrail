@@ -1,71 +1,86 @@
 import { ArrowLeft } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 
-import {
-  formatCost,
-  formatDuration,
-  formatTimestamp,
-  shortId,
-} from "../lib/format";
+import type { RunDetailPresentation } from "../lib/trace-presentation";
 import type { TraceDetail } from "../lib/trace-read-model";
 
-export function TraceHeader({ trace }: { trace: TraceDetail }) {
+export function TraceHeader({
+  trace,
+  presentation,
+}: {
+  trace: TraceDetail;
+  presentation: RunDetailPresentation;
+}) {
   return (
     <header className="trace-detail-header">
       <Link className="trace-back" href="/traces">
         <ArrowLeft aria-hidden="true" size={14} weight="regular" />
-        Trace archive
+        Back to all agent runs
       </Link>
 
       <div className="trace-title-row">
-        <div>
-          <span className="page-eyebrow">
-            Forensic record / {shortId(trace.traceId)}
-          </span>
-          <h1>{trace.name}</h1>
-        </div>
-        <div className="trace-state-line">
-          {trace.outcome === null ? null : (
-            <span className={`outcome outcome-${trace.outcome}`}>
-              <i aria-hidden="true" />
-              {trace.outcome.toUpperCase()}
-            </span>
-          )}
-          {trace.completionState === "incomplete" ? (
-            <strong className="incomplete-label">INCOMPLETE</strong>
-          ) : null}
-        </div>
+        <span className="page-eyebrow">
+          <span>{presentation.technicalName}</span> · Run ID{" "}
+          {presentation.shortRunId}
+        </span>
+        <h1>{presentation.displayTitle}</h1>
+        <p className="run-summary">{presentation.summary}</p>
       </div>
 
-      <dl className="trace-facts">
+      <dl className="trace-facts" aria-label="At a glance">
         <div>
-          <dt>Actor</dt>
-          <dd>{trace.agentId}</dd>
-        </div>
-        <div>
-          <dt>On behalf of</dt>
-          <dd>{trace.onBehalfOf ?? "—"}</dd>
-        </div>
-        <div>
-          <dt>Started</dt>
-          <dd>
-            <time dateTime={trace.startedAt}>
-              {formatTimestamp(trace.startedAt)}
-            </time>
+          <dt>Status</dt>
+          <dd className="trace-status-fact">
+            {presentation.outcomeLabel === null ? (
+              <span>No final outcome has been recorded yet.</span>
+            ) : (
+              <span
+                className={`outcome outcome-${trace.outcome}`}
+                data-outcome={trace.outcome}
+              >
+                <i aria-hidden="true" />
+                {presentation.outcomeLabel}
+              </span>
+            )}
+            {presentation.completionLabel === null ? null : (
+              <>
+                <strong className="incomplete-label">
+                  {presentation.completionLabel}
+                </strong>
+                <small>{presentation.completionExplanation}</small>
+              </>
+            )}
           </dd>
         </div>
         <div>
+          <dt>Agent</dt>
+          <dd>{presentation.agentId}</dd>
+        </div>
+        <div>
+          <dt>Requested by</dt>
+          <dd>{presentation.requestedBy ?? "Not recorded"}</dd>
+        </div>
+        <div>
           <dt>Duration</dt>
-          <dd>{formatDuration(trace.durationMs ?? -1)}</dd>
+          <dd>{presentation.durationLabel}</dd>
         </div>
         <div>
-          <dt>Spans</dt>
-          <dd>{trace.spanCount}</dd>
+          <dt>Steps</dt>
+          <dd>{presentation.stepCount}</dd>
         </div>
         <div>
-          <dt>Cost</dt>
-          <dd className={trace.pricingUnknown ? "cost-unpriced" : undefined}>
-            {formatCost(trace)}
+          <dt>Model cost</dt>
+          <dd
+            className={
+              presentation.modelCostTechnicalLabel === null
+                ? undefined
+                : "cost-unpriced"
+            }
+          >
+            <span>{presentation.modelCostLabel}</span>
+            {presentation.modelCostTechnicalLabel === null ? null : (
+              <code>{presentation.modelCostTechnicalLabel}</code>
+            )}
           </dd>
         </div>
       </dl>

@@ -68,17 +68,23 @@ const trace: TraceDetail = {
 };
 
 describe("TraceRail", () => {
-  it("renders span evidence as text and links rows to a stable selection URL", () => {
+  it("keeps the forensic timeline readable without making whole rows interactive", () => {
     render(<TraceRail trace={trace} />);
 
     expect(
-      screen.getByRole("heading", { name: "Trace Rail" }),
+      screen.getByRole("heading", { name: "Technical timeline" }),
     ).toBeInTheDocument();
-    const child = screen.getByRole("link", { name: /model.generate/i });
-    expect(child).toHaveAttribute("href", "/traces/trace-a?span=llm-child");
+    expect(
+      screen.getByText("Exact order, nesting, and duration of 2 recorded spans"),
+    ).toBeVisible();
+    const child = screen
+      .getAllByRole("listitem")
+      .find((row) => row.textContent?.includes("model.generate"));
+    expect(child).toBeDefined();
     expect(child).toHaveTextContent("LLM");
     expect(child).toHaveTextContent("writer-agent");
     expect(child).toHaveTextContent("250 ms");
+    expect(screen.queryByRole("link")).not.toBeInTheDocument();
   });
 
   it("keeps the visual timing bar hidden from assistive technology", () => {

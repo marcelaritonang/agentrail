@@ -196,12 +196,14 @@ function summary(
   if (trace.completionState === "incomplete") {
     sentences.push("This recording is incomplete.");
   }
-  sentences.push(`${pluralize(steps.length, "step")} were recorded.`);
-  sentences.push(
-    trace.durationMs === null
-      ? "The final duration is unavailable."
-      : `The final duration was ${formatDuration(trace.durationMs)}.`,
-  );
+  if (trace.durationMs === null) {
+    sentences.push(`${pluralize(steps.length, "step")} were recorded.`);
+    sentences.push("The final duration is unavailable.");
+  } else {
+    sentences.push(
+      `${pluralize(steps.length, "step")} were recorded in ${formatDuration(trace.durationMs)}.`,
+    );
+  }
   sentences.push(
     `The agent performed ${pluralize(externalActionCount, "external action")}.`,
   );
