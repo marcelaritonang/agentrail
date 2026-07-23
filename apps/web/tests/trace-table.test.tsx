@@ -2,10 +2,35 @@
 
 import "@testing-library/jest-dom/vitest";
 import { cleanup, render, screen, within } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { TraceTable } from "../components/trace-table";
 import type { TracePage } from "../lib/trace-read-model";
+
+const state = vi.hoisted(() => ({
+  demoMode: true,
+  page: null as TracePage | null,
+}));
+
+vi.mock("../lib/demo-mode", () => ({
+  DEMO_PROJECT_ID: "00000000-0000-4000-8000-000000000001",
+  DEMO_TRACE_ID: "0af7651916cd43dd8448eb211c80319c",
+  demoModeEnabled: () => state.demoMode,
+}));
+
+vi.mock("../lib/project-context", () => ({
+  configuredProjectId: () => "00000000-0000-4000-8000-000000000001",
+}));
+
+vi.mock("../lib/source-url", () => ({
+  configuredSourceUrl: () => null,
+}));
+
+vi.mock("../lib/trace-read-model", () => ({
+  listTraces: () => Promise.resolve(state.page),
+}));
+
+import TracesPage from "../app/(dashboard)/traces/page";
+import { TraceTable } from "../components/trace-table";
 
 afterEach(cleanup);
 
@@ -17,7 +42,7 @@ function tracePageFixture(pricingUnknown = true): TracePage {
     items: [
       {
         traceId: "0af7651916cd43dd8448eb211c80319c",
-        rootSpanId: null,
+        rootSpanId: "root-span",
         name: "sample.research-answer",
         agentId: "research-agent",
         onBehalfOf: "sample-user",
@@ -28,32 +53,69 @@ function tracePageFixture(pricingUnknown = true): TracePage {
         completionState: null,
         totalCostUsd: pricingUnknown ? null : "0.00400000",
         pricingUnknown,
-        spanCount: 3,
+        spanCount: 4,
       },
     ],
   };
 }
 
-describe("TraceTable", () => {
-  it("renders an accessible trace table with UNPRICED state", () => {
-    render(<TraceTable page={tracePageFixture()} queryString="" />);
+describe("agent run index", () => {
+  it("orients users and presents the read-only example as an agent run", async () => {
+    state.page = tracePageFixture(false);
+    state.demoMode = true;
 
-    const table = screen.getByRole("table", { name: /agent traces/i });
+    render(await TracesPage({ searchParams: Promise.resolve({}) }));
+
     expect(
-      within(table).getByRole("columnheader", { name: /actor/i }),
+      screen.getByRole("heading", { level: 1, name: "Agent runs" }),
     ).toBeInTheDocument();
-    expect(within(table).getByText("UNPRICED")).toBeInTheDocument();
-    expect(screen.queryByText(/running/i)).not.toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Review what an AI agent did, how long it took, what it cost, and which tools it used.",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Research answer")).toBeInTheDocument();
+    expect(screen.getByText("sample.research-answer")).toBeInTheDocument();
+    expect(screen.getByText("3 steps")).toBeInTheDocument();
+    expect(
+      screen.getAllByRole("link", { name: "Open run" })[0],
+    ).toHaveAttribute("href", "/traces/0af7651916cd43dd8448eb211c80319c");
+    expect(screen.queryByText(/\bOK\b/)).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("list", { name: "How to inspect an agent run" }),
+    ).toHaveTextContent(
+      "1Choose a run2Open it3Inspect steps and recorded data",
+    );
   });
 
-  it("links the persisted trace name to its detail route", () => {
+  it("renders the semantic desktop ledger and keeps unpriced facts truthful", () => {
     render(
-      <TraceTable page={tracePageFixture(false)} queryString="q=sample" />,
+      <TraceTable
+        page={tracePageFixture()}
+        queryString=""
+        isReadOnlyExample={false}
+      />,
     );
 
+    const table = screen.getByRole("table", { name: "Agent runs" });
     expect(
-      screen.getAllByRole("link", { name: "sample.research-answer" })[0],
-    ).toHaveAttribute("href", "/traces/0af7651916cd43dd8448eb211c80319c");
-    expect(screen.getAllByText("$0.0040").length).toBeGreaterThan(0);
+      within(table).getByRole("columnheader", { name: "Run" }),
+    ).toBeInTheDocument();
+    expect(
+      within(table).getByRole("columnheader", { name: "Agent" }),
+    ).toBeInTheDocument();
+    expect(
+      within(table).getByRole("columnheader", { name: "Recorded" }),
+    ).toBeInTheDocument();
+    expect(
+      within(table).getByRole("columnheader", { name: "Status" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Succeeded")).toBeInTheDocument();
+    expect(within(table).getByText("Price unavailable")).toBeInTheDocument();
+    expect(within(table).getByText("UNPRICED")).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Open run" }).closest("td"),
+    ).toHaveAttribute("data-label", "Action");
+    expect(screen.queryByText(/running/i)).not.toBeInTheDocument();
   });
 });

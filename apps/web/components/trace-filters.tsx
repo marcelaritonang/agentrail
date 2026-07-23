@@ -1,5 +1,3 @@
-import { MagnifyingGlass } from "@phosphor-icons/react/ssr";
-
 export function TraceFilters({
   query,
   outcome,
@@ -10,36 +8,45 @@ export function TraceFilters({
   actor?: string;
 }) {
   return (
-    <form className="trace-filters" action="/traces" method="get" role="search">
-      <label className="filter-search">
-        <span className="sr-only">Search trace name</span>
-        <MagnifyingGlass aria-hidden="true" size={15} weight="regular" />
-        <input
-          type="search"
-          name="q"
-          defaultValue={query}
-          placeholder="Trace name"
-          autoComplete="off"
-        />
-      </label>
-      <label>
-        <span>Outcome</span>
-        <select name="outcome" defaultValue={outcome ?? ""}>
-          <option value="">All</option>
-          <option value="ok">OK</option>
-          <option value="error">Error</option>
-        </select>
-      </label>
-      <label>
-        <span>Actor</span>
-        <input
-          name="actor"
-          defaultValue={actor}
-          placeholder="agent_id"
-          autoComplete="off"
-        />
-      </label>
-      <button type="submit">Apply</button>
-    </form>
+    <details className="run-filter-disclosure" open>
+      <summary>Search and filters</summary>
+      <form
+        className="trace-filters"
+        action="/traces"
+        method="get"
+        role="search"
+      >
+        <label>
+          <span>Search by run name or ID</span>
+          <input
+            name="q"
+            type="search"
+            defaultValue={query}
+            placeholder="Run name or ID"
+            autoComplete="off"
+          />
+        </label>
+        <label>
+          <span>Status</span>
+          <select name="outcome" defaultValue={outcome ?? ""}>
+            <option value="">All</option>
+            <option value="ok">Succeeded</option>
+            <option value="error">Failed</option>
+          </select>
+        </label>
+        <label>
+          <span id="agent-filter-label">Agent</span>
+          <input
+            name="actor"
+            defaultValue={actor}
+            aria-labelledby="agent-filter-label"
+            aria-describedby="agent-filter-help"
+            autoComplete="off"
+          />
+          <small id="agent-filter-help">Agent name or ID</small>
+        </label>
+        <button type="submit">Apply filters</button>
+      </form>
+    </details>
   );
 }

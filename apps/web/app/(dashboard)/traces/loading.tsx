@@ -1,13 +1,21 @@
 export default function TracesLoading() {
   return (
-    <div className="trace-loading" aria-label="Loading traces" aria-busy="true">
-      <div className="loading-heading" />
-      <div className="loading-filters" />
-      <div className="loading-table">
+    <section
+      className="trace-loading"
+      aria-label="Loading agent runs"
+      aria-busy="true"
+    >
+      <header>
+        <h1>Agent runs</h1>
+        <p>Review recorded work from your instrumented AI agents.</p>
+        <strong>Loading agent runs…</strong>
+      </header>
+      <div className="loading-filters" aria-hidden="true" />
+      <div className="loading-table" aria-hidden="true">
         {Array.from({ length: 7 }, (_, index) => (
           <i key={index} />
         ))}
       </div>
-    </div>
+    </section>
   );
 }
