@@ -17,6 +17,7 @@ function tracePageFixture(pricingUnknown = true): TracePage {
     items: [
       {
         traceId: "0af7651916cd43dd8448eb211c80319c",
+        rootSpanId: null,
         name: "sample.research-answer",
         agentId: "research-agent",
         onBehalfOf: "sample-user",
