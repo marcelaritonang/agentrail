@@ -25,7 +25,11 @@ export function WhatHappened({
         {presentation.rootBoundary === null ? null : (
           <li className="run-boundary">
             <span>Run boundary</span>
-            <strong>{presentation.rootBoundary.categoryLabel}</strong>
+            <strong>
+              {presentation.completionLabel === "Incomplete recording"
+                ? "Recorded the run boundary"
+                : presentation.rootBoundary.categoryLabel}
+            </strong>
           </li>
         )}
         {presentation.steps.map((step) => (

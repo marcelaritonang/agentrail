@@ -106,6 +106,28 @@ describe("WhatHappened", () => {
     expect(within(list).getAllByText("draft.answer")).toHaveLength(1);
     expect(within(list).getAllByText("publish.answer")).toHaveLength(1);
   });
+
+  it("uses a neutral root-boundary label for an incomplete recording", () => {
+    const trace = {
+      ...traceFixture(),
+      completionState: "incomplete" as const,
+      endedAt: null,
+      durationMs: null,
+      outcome: null,
+    };
+    render(
+      <WhatHappened
+        trace={trace}
+        presentation={presentTraceDetail(trace)}
+      />,
+    );
+
+    const list = screen.getByRole("list", { name: "What happened" });
+    expect(within(list).getByText("Recorded the run boundary")).toBeVisible();
+    expect(
+      within(list).queryByText("Recorded the complete run"),
+    ).not.toBeInTheDocument();
+  });
 });
 
 describe("trace detail route states", () => {
