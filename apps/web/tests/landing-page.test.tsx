@@ -5,14 +5,19 @@ import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import type { ComponentType } from "react";
 import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.unstubAllEnvs();
+  vi.resetModules();
+});
 
 describe("AgentRail landing page", () => {
   async function renderLandingPage() {
     const pagePath = resolve("apps/web/app/page.tsx");
     expect(existsSync(pagePath)).toBe(true);
+    vi.resetModules();
 
     const pageModule = "../app/page";
     const { default: LandingPage } = (await import(pageModule)) as {
@@ -32,14 +37,16 @@ describe("AgentRail landing page", () => {
       screen.getByText(/The flight recorder for AI agents\./),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: "Open trace dashboard" }),
+      screen.getByRole("link", { name: "Explore the guided demo" }),
     ).toHaveAttribute("href", "/traces");
+    expect(screen.getByText("Investigate")).toBeInTheDocument();
+    expect(screen.queryByText("Replay")).not.toBeInTheDocument();
     expect(
-      screen.getAllByRole("link", { name: "View source" })[0],
-    ).toHaveAttribute(
-      "href",
-      expect.stringMatching(/^https:\/\/github\.com\//),
-    );
+      screen.queryByText(/AWS startup application/i),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/pnpm add @agentrail\/sdk/i),
+    ).not.toBeInTheDocument();
 
     const screenshot = screen.getByRole("img", {
       name: /real Trace Rail screenshot/i,
@@ -58,5 +65,31 @@ describe("AgentRail landing page", () => {
     expect(visibleText).not.toMatch(/elevate|seamless|next-gen|unleash/i);
     expect(visibleText).not.toMatch(/robot|emoji/i);
     expect(screen.queryAllByRole("article")).toHaveLength(0);
+  });
+
+  it("omits source controls when no public source URL is configured", async () => {
+    vi.stubEnv("NEXT_PUBLIC_AGENTRAIL_SOURCE_URL", "");
+
+    await renderLandingPage();
+
+    expect(screen.queryAllByRole("link", { name: /source/i })).toHaveLength(0);
+  });
+
+  it("uses the configured source URL exactly when source controls are enabled", async () => {
+    vi.stubEnv(
+      "NEXT_PUBLIC_AGENTRAIL_SOURCE_URL",
+      "https://git.example.dev/team/agentrail",
+    );
+
+    await renderLandingPage();
+
+    const sourceLinks = screen.getAllByRole("link", { name: /source/i });
+    expect(sourceLinks.length).toBeGreaterThan(0);
+    for (const link of sourceLinks) {
+      expect(link).toHaveAttribute(
+        "href",
+        "https://git.example.dev/team/agentrail",
+      );
+    }
   });
 });

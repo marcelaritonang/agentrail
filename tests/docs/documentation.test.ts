@@ -1,8 +1,18 @@
-import { access, readFile } from "node:fs/promises";
+import { readFileSync } from "node:fs";
 
 import { describe, expect, it } from "vitest";
 
-const required = [
+const landing = readFileSync("apps/web/app/page.tsx", "utf8");
+const readme = readFileSync("README.md", "utf8");
+const architecture = readFileSync("docs/architecture.md", "utf8");
+const aws = readFileSync("docs/deployment/aws.md", "utf8");
+const sdk = [
+  readFileSync("packages/sdk/src/agentrail.ts", "utf8"),
+  readFileSync("packages/sdk/src/trace-context.ts", "utf8"),
+  readFileSync("packages/sdk/src/delivery.ts", "utf8"),
+].join("\n");
+const envExample = readFileSync(".env.example", "utf8");
+const requiredPublicDocuments = [
   "README.md",
   "CONTRIBUTING.md",
   "SECURITY.md",
@@ -12,23 +22,60 @@ const required = [
   "docs/operations/api-keys.md",
 ];
 
-describe("open-source documentation", () => {
-  it("contains every required public document", async () => {
-    await Promise.all(required.map((path) => access(path)));
+function expectNoStalePublicCopy(source: string) {
+  expect(source).not.toMatch(/dashboard is the next implementation stage/i);
+  expect(source).not.toMatch(/new AgentRail\(\{\s*apiKey/i);
+  expect(source).not.toMatch(/trace\.llm\(/i);
+  expect(source).not.toMatch(/pnpm add @agentrail\/sdk/i);
+  expect(source).not.toMatch(/AWS startup application/i);
+}
+
+describe("public AgentRail documentation", () => {
+  it("contains every required public document", () => {
+    for (const path of requiredPublicDocuments) {
+      expect(() => readFileSync(path, "utf8")).not.toThrow();
+    }
   });
 
-  it("documents canonical idempotency and 202 semantics", async () => {
-    const architecture = await readFile("docs/architecture.md", "utf8");
+  it("documents canonical idempotency and 202 semantics", () => {
     expect(architecture).toContain("(project_id, span_id)");
     expect(architecture).toContain("202 Accepted");
     expect(architecture).toContain("queue acknowledgment");
   });
 
-  it("states the project maturity without funding or production guarantees", async () => {
-    const readme = await readFile("README.md", "utf8");
-    const aws = await readFile("docs/deployment/aws.md", "utf8");
-    expect(readme).toContain("Milestone 1");
+  it("keeps landing and README copy aligned with the implemented SDK", () => {
+    for (const source of [landing, readme]) {
+      expect(source).toContain("BufferedDelivery");
+      expect(source).toContain("HttpSpanTransport");
+      expect(source).toContain('await rail.trace({ name: "research.answer" }');
+      expect(source).toContain(
+        'await trace.action({ name: "filesystem.read" }',
+      );
+      expectNoStalePublicCopy(source);
+    }
+
+    expect(sdk).toContain("class BufferedDelivery");
+    expect(sdk).toContain("class HttpSpanTransport");
+    expect(sdk).toContain("span<T>(");
+    expect(sdk).toContain("action<T>(");
+  });
+
+  it("documents the current public product state without grant claims", () => {
+    expect(readme).toMatch(/guided sample/i);
+    expect(readme).toMatch(/forensic dashboard/i);
+    expect(readme).toMatch(/landing page/i);
+    expect(readme).toMatch(/read-only synthetic demo/i);
+    expect(readme).toMatch(/not a production-readiness or funding claim/i);
+    expect(readme).toMatch(/optional/i);
+    expect(readme).toMatch(/HTTPS-only/i);
+    expect(readme).toMatch(/build-time/i);
     expect(aws).toContain("reference mapping");
     expect(aws).toContain("does not guarantee");
+    expectNoStalePublicCopy(readme);
+  });
+
+  it("exposes the public demo and source URL environment contract", () => {
+    expect(envExample).toContain("AGENTRAIL_DEMO_MODE=0");
+    expect(envExample).toContain("NEXT_PUBLIC_AGENTRAIL_SOURCE_URL=");
   });
 });

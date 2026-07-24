@@ -334,6 +334,12 @@ select {
   gap: 26px;
 }
 
+.landing-code-stack {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
 .landing-quickstart pre {
   background: var(--surface-inset);
   border: 1px solid var(--line-strong);

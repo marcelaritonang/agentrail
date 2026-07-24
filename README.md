@@ -2,7 +2,7 @@
 
 AgentRail is an open-source flight recorder for AI agents: immutable traces, model cost, actor attribution, tool/action audit, and redacted evidence in one forensic timeline.
 
-This repository is in **Milestone 1**. The core ingestion pipeline, TypeScript SDK, worker, PostgreSQL model, Redis/SQS queue ports, MinIO/S3 evidence ports, and local Docker topology are implemented. The forensic dashboard is the next implementation stage. This is an early open-source build, not a production-readiness or funding claim.
+This repository is in **Milestone 1.1**. The core ingestion pipeline, TypeScript SDK, worker, PostgreSQL model, Redis/SQS queue ports, MinIO/S3 evidence ports, local Docker topology, forensic dashboard, guided sample, and landing page are implemented. This is an early open-source build, not a production-readiness or funding claim.
 
 ## What works
 
@@ -15,6 +15,9 @@ This repository is in **Milestone 1**. The core ingestion pipeline, TypeScript S
 - idempotency on exactly `(project_id, span_id)`
 - recursive secret redaction, bounded payloads, and private blob storage
 - local PostgreSQL, Redis, MinIO, ingestion, and worker services through Docker Compose
+- forensic dashboard routes for `/traces` and `/traces/[traceId]`
+- guided sample mode for explaining the trace archive, Trace Rail, Evidence Drawer, and Action Ledger
+- landing page with optional source controls for public deployments
 
 ## Local quickstart
 
@@ -83,6 +86,24 @@ await rail.shutdown({ timeoutMs: 5_000 });
 ```
 
 Only the synthetic `test.known` model is priced today. Provider prices must be added with a source and effective date; they are never guessed.
+
+## Web demo and source URL
+
+The web app can run as a read-only synthetic demo by setting:
+
+```bash
+AGENTRAIL_DEMO_MODE=1
+```
+
+Demo mode is for product explanation only. It uses seeded sample data and should not be presented as live customer usage.
+
+Public source links are optional and must be configured explicitly:
+
+```bash
+NEXT_PUBLIC_AGENTRAIL_SOURCE_URL=https://example.com/your-org/agentrail
+```
+
+`NEXT_PUBLIC_AGENTRAIL_SOURCE_URL` is HTTPS-only and read at build-time by the Next.js app. If it is unset or empty, the landing page omits source buttons instead of falling back to a hardcoded repository.
 
 ## Quality gates
 
