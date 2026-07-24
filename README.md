@@ -139,11 +139,12 @@ NEXT_PUBLIC_AGENTRAIL_SOURCE_URL=https://example.com/your-org/agentrail
 
 ## NPM target status
 
-AgentRail is not a live npm download yet. The npm command shown on the website is the package release target, not the current installation path.
+AgentRail is publish-ready for a scoped npm release, but it is not a live npm download yet. The npm command shown on the website is the package release target, not the current installation path.
 
 - Available today: source checkout + local Docker setup from this repository.
+- Package state: `pnpm pack` produces registry-safe tarballs for `@agentrail/contracts`, `@agentrail/db`, `@agentrail/sdk`, and `@agentrail/mcp`; local npm tarball install smoke tests pass.
 - Target after registry publish: `npm install @agentrail/sdk` and `npx @agentrail/mcp`.
-- Publish blocker: npm authentication, scope ownership, and registry-safe package dependencies.
+- Publish blocker: npm authentication and ownership of the selected `@agentrail` scope.
 
 The unscoped npm command `npm install agentrail` is not this project; that package is owned by another maintainer. The scoped packages are not live public registry downloads yet. Until publish is complete, test AgentRail from the source checkout above.
 
@@ -157,7 +158,7 @@ npm install @agentrail/sdk
 npx @agentrail/mcp
 ```
 
-Publishing requires npm authentication and ownership of the selected npm scope. Do not advertise the npm commands as live registry downloads until `npm view @agentrail/sdk` and `npm view @agentrail/mcp` resolve to this repository. See [NPM release checklist](docs/operations/npm-release.md).
+Publishing requires npm authentication and ownership of the selected npm scope. Use `pnpm publish --access public` from each package so workspace dependencies are rewritten to registry versions in the published tarballs. Do not advertise the npm commands as live registry downloads until `npm view @agentrail/sdk` and `npm view @agentrail/mcp` resolve to this repository. See [NPM release checklist](docs/operations/npm-release.md).
 
 ## MCP integration
 

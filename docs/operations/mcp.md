@@ -6,7 +6,7 @@ The goal is simple: while working in Codex, a developer can ask for recent Agent
 
 ## NPM status
 
-The unscoped npm command `npm install agentrail` is not this project. Use the source-checkout quickstarts below until the scoped MCP package is published.
+The unscoped npm command `npm install agentrail` is not this project. The scoped MCP package is publish-ready, but not live on the public registry until npm authentication and scope ownership are configured.
 
 The intended npm command for the published MCP server is:
 
@@ -14,7 +14,7 @@ The intended npm command for the published MCP server is:
 npx @agentrail/mcp
 ```
 
-Treat this as a release target until npm authentication and scope ownership are configured and `npm view @agentrail/mcp` resolves to this repository.
+Treat this as a release target until `npm view @agentrail/mcp` resolves to this repository. Use the source-checkout quickstarts below until then.
 
 ## What it enables
 

@@ -50,7 +50,7 @@ describe("AgentRail landing page", () => {
     expect(
       screen.getByRole("heading", {
         level: 2,
-        name: "NPM target (not live yet)",
+        name: "NPM publish-ready (auth required)",
       }),
     ).toBeInTheDocument();
     expect(
@@ -71,6 +71,7 @@ describe("AgentRail landing page", () => {
     expect(
       screen.getByText(/npm auth and @agentrail scope/i),
     ).toBeInTheDocument();
+    expect(screen.getByText(/pnpm pack smoke tests pass/i)).toBeInTheDocument();
     expect(
       screen.getByText(/Do not treat the commands as live/i),
     ).toBeInTheDocument();

@@ -1,8 +1,22 @@
 {
   "name": "@agentrail/db",
   "version": "0.1.0",
-  "private": true,
+  "description": "PostgreSQL schema, migrations, and read/write repositories for AgentRail.",
+  "private": false,
   "type": "module",
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/marcelaritonang/agentrail#readme",
+  "bugs": {
+    "url": "https://github.com/marcelaritonang/agentrail/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marcelaritonang/agentrail.git",
+    "directory": "packages/db"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "files": [
     "dist",
     "migrations"
@@ -15,6 +29,7 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "prepack": "pnpm run build",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "tsc -p tsconfig.json --noEmit",
     "db:generate": "drizzle-kit generate",

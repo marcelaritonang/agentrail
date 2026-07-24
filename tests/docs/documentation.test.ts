@@ -104,6 +104,10 @@ describe("public AgentRail documentation", () => {
     expect(readme).toContain("npm install @agentrail/sdk");
     expect(mcp).toContain("npx @agentrail/mcp");
     expect(readme).toMatch(/npm authentication/i);
+    expect(readme).toMatch(/publish-ready/i);
+    expect(readme).toContain("pnpm pack");
+    expect(readme).not.toMatch(/still marked `private: true`/i);
+    expect(readme).not.toMatch(/unresolved `workspace:\*`/i);
   });
 
   it("documents startup readiness materials for AWS Activate preparation", () => {
