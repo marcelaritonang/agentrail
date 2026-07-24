@@ -173,7 +173,7 @@ importers:
   packages/mcp:
     dependencies:
       '@agentrail/db':
-        specifier: workspace:*
+        specifier: workspace:0.1.0
         version: link:../db
       '@modelcontextprotocol/sdk':
         specifier: 1.29.0
@@ -199,7 +199,7 @@ importers:
   packages/sdk:
     dependencies:
       '@agentrail/contracts':
-        specifier: workspace:*
+        specifier: workspace:0.1.0
         version: link:../contracts
 
 packages:

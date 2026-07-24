@@ -55,6 +55,10 @@ const testerProfiles = [
 const npmStatus = [
   ["Available today", "Source checkout + local Docker setup"],
   [
+    "Package state",
+    "pnpm pack smoke tests pass for SDK, contracts, DB, and MCP",
+  ],
+  [
     "NPM target",
     "@agentrail/sdk for apps, @agentrail/mcp for Codex-style tools",
   ],
@@ -220,12 +224,13 @@ export default function LandingPage() {
 
       <section id="quickstart" className="landing-section landing-quickstart">
         <div className="landing-quickstart-copy">
-          <h2>NPM target (not live yet)</h2>
+          <h2>NPM publish-ready (auth required)</h2>
           <p>
-            The product direction is simple: developers should eventually
-            install AgentRail with npm, but today the public registry packages
-            are not published. Use the source checkout for testing until
-            registry ownership is verified.
+            The package graph is prepared for a scoped npm release and has
+            passed local tarball install smoke tests. The public registry
+            commands still require npm authentication and ownership of the
+            selected <code>@agentrail</code> scope before they are advertised as
+            live downloads.
           </p>
           <dl className="landing-npm-status" aria-label="NPM release status">
             {npmStatus.map(([term, description]) => (
