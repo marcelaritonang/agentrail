@@ -1,6 +1,8 @@
 import { defineConfig } from "@playwright/test";
 
 const baseURL = process.env.AGENTRAIL_WEB_URL ?? "http://127.0.0.1:3000";
+const demoMode = process.env.AGENTRAIL_DEMO_MODE ?? "1";
+process.env.AGENTRAIL_DEMO_MODE = demoMode;
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -43,6 +45,7 @@ export default defineConfig({
       AGENTRAIL_PROJECT_ID:
         process.env.AGENTRAIL_PROJECT_ID ??
         "00000000-0000-4000-8000-000000000101",
+      AGENTRAIL_DEMO_MODE: demoMode,
       S3_ENDPOINT: process.env.S3_ENDPOINT ?? "http://localhost:9000",
       S3_REGION: process.env.S3_REGION ?? "us-east-1",
       S3_BUCKET: process.env.S3_BUCKET ?? "agentrail-evidence",

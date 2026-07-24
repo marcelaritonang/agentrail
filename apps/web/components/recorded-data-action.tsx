@@ -17,6 +17,7 @@ export function RecordedDataAction({
 
   return (
     <Link
+      className="recorded-data-action"
       href={`/traces/${encodeURIComponent(traceId)}?span=${encodeURIComponent(spanId)}`}
       data-span-id={spanId}
       data-evidence-origin={origin}
