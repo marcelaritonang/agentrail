@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      '@agentrail/config':
+        specifier: workspace:*
+        version: link:packages/config
       '@agentrail/db':
         specifier: workspace:*
         version: link:packages/db

@@ -14,6 +14,8 @@ const routerPush = vi.hoisted(() => vi.fn());
 vi.mock("../lib/demo-mode", () => ({
   DEMO_TRACE_ID: "demo-trace",
   demoModeEnabled: () => false,
+  isReadOnlySampleTrace: (trace: { traceId: string; name: string }) =>
+    trace.name === "sample.research-answer",
 }));
 
 vi.mock("../lib/project-context", () => ({
@@ -157,6 +159,12 @@ describe("TraceDetailPage", () => {
       "Technical timeline",
       "External actions",
     ]);
+  });
+
+  it("marks the seeded local sample detail as read-only outside demo mode", async () => {
+    await renderPage();
+
+    expect(screen.getByText("Read-only example")).toBeVisible();
   });
 
   it("mounts evidence only for a selected span with payload", async () => {

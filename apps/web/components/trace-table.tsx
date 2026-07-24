@@ -36,14 +36,20 @@ export function TraceTable({
   page,
   queryString,
   isReadOnlyExample,
+  readOnlyTraceIds,
 }: {
   page: TracePage;
   queryString: string;
   isReadOnlyExample: boolean;
+  readOnlyTraceIds: readonly string[];
 }) {
   const finalPage = Math.max(1, Math.ceil(page.total / page.pageSize));
+  const readOnlyTraceIdSet = new Set(readOnlyTraceIds);
   const runs = page.items.map((trace) =>
-    presentRun(trace, { isReadOnlyExample }),
+    presentRun(trace, {
+      isReadOnlyExample:
+        isReadOnlyExample || readOnlyTraceIdSet.has(trace.traceId),
+    }),
   );
 
   return (
