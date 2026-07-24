@@ -137,14 +137,23 @@ NEXT_PUBLIC_AGENTRAIL_SOURCE_URL=https://example.com/your-org/agentrail
 
 `NEXT_PUBLIC_AGENTRAIL_SOURCE_URL` is HTTPS-only and read at build-time by the Next.js app. If it is unset or empty, the landing page omits source buttons instead of falling back to a hardcoded repository.
 
-## NPM package release target
+## NPM target status
+
+AgentRail is not a live npm download yet. The npm command shown on the website is the package release target, not the current installation path.
+
+- Available today: source checkout + local Docker setup from this repository.
+- Target after registry publish: `npm install @agentrail/sdk` and `npx @agentrail/mcp`.
+- Publish blocker: npm authentication, scope ownership, and registry-safe package dependencies.
 
 The unscoped npm command `npm install agentrail` is not this project; that package is owned by another maintainer. The scoped packages are not live public registry downloads yet. Until publish is complete, test AgentRail from the source checkout above.
 
-The intended public npm release commands are:
+The intended public commands after publish are:
 
 ```bash
+# Target command after registry publish
 npm install @agentrail/sdk
+
+# Target MCP reader command after registry publish
 npx @agentrail/mcp
 ```
 

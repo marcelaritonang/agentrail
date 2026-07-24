@@ -335,18 +335,28 @@ select {
   margin: 30px 0 0;
 }
 
+.landing-npm-status {
+  display: grid;
+  gap: 0;
+  margin: 24px 0 0;
+  max-width: 680px;
+}
+
 .landing-aws-grid > div,
+.landing-npm-status > div,
 .landing-tester-list li {
   border-top: 1px solid var(--line-subtle);
   padding: 16px 0;
 }
 
 .landing-aws-grid > div:last-child,
+.landing-npm-status > div:last-child,
 .landing-tester-list li:last-child {
   border-bottom: 1px solid var(--line-subtle);
 }
 
 .landing-aws-grid dt,
+.landing-npm-status dt,
 .about-facts dt,
 .about-roadmap dt {
   color: var(--signal-action);
@@ -357,6 +367,7 @@ select {
 }
 
 .landing-aws-grid dd,
+.landing-npm-status dd,
 .landing-status-note,
 .landing-tester-list li,
 .about-hero p,
@@ -370,6 +381,7 @@ select {
 }
 
 .landing-aws-grid dd,
+.landing-npm-status dd,
 .about-facts dd,
 .about-roadmap dd {
   margin-top: 6px;
@@ -380,6 +392,12 @@ select {
   margin-top: 22px;
   max-width: 760px;
   padding-left: 14px;
+}
+
+.landing-status-note code {
+  color: var(--text-primary);
+  font-family: var(--font-jetbrains), monospace;
+  font-size: 0.92em;
 }
 
 .landing-quickstart {

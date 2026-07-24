@@ -52,10 +52,19 @@ const testerProfiles = [
   "open-source maintainer using Codex or Claude-style tools",
 ] as const;
 
-const setupQuickstart = `# Package release target
+const npmStatus = [
+  ["Available today", "Source checkout + local Docker setup"],
+  [
+    "NPM target",
+    "@agentrail/sdk for apps, @agentrail/mcp for Codex-style tools",
+  ],
+  ["Publish blocker", "npm auth and @agentrail scope ownership"],
+] as const;
+
+const setupQuickstart = `# Target command after registry publish
 npm install @agentrail/sdk
 
-# MCP reader for Codex-style tools
+# Target MCP reader command after registry publish
 npx @agentrail/mcp`;
 
 const sdkQuickstart = `import { AgentRail, BufferedDelivery, HttpSpanTransport } from "@agentrail/sdk";
@@ -211,12 +220,25 @@ export default function LandingPage() {
 
       <section id="quickstart" className="landing-section landing-quickstart">
         <div className="landing-quickstart-copy">
-          <h2>NPM package target</h2>
+          <h2>NPM target (not live yet)</h2>
           <p>
-            Users should not need a monorepo checkout just to instrument an AI
-            agent. Registry publish is pending until npm auth and scope
-            ownership are configured; source checkout is available today for
-            maintainers and self-hosting.
+            The product direction is simple: developers should eventually
+            install AgentRail with npm, but today the public registry packages
+            are not published. Use the source checkout for testing until
+            registry ownership is verified.
+          </p>
+          <dl className="landing-npm-status" aria-label="NPM release status">
+            {npmStatus.map(([term, description]) => (
+              <div key={term}>
+                <dt>{term}</dt>
+                <dd>{description}</dd>
+              </div>
+            ))}
+          </dl>
+          <p className="landing-status-note">
+            Do not treat the commands as live downloads until{" "}
+            <code>npm view @agentrail/sdk</code> and{" "}
+            <code>npm view @agentrail/mcp</code> resolve to this repository.
           </p>
         </div>
         <div className="landing-code-stack">

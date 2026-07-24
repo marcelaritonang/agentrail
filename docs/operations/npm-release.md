@@ -4,6 +4,9 @@ AgentRail should publish scoped packages only after the package graph is registr
 
 ## Current status
 
+- Available today: source checkout + local Docker setup from this repository.
+- NPM target: `@agentrail/sdk` for application instrumentation and `@agentrail/mcp` for Codex-style trace lookup.
+- Publish blocker: npm authentication, scope ownership, and registry-safe package dependencies.
 - `npm whoami` returns `ENEEDAUTH` on the current machine.
 - The unscoped `agentrail` package is owned by another maintainer and must not be used.
 - `@agentrail/sdk` and `@agentrail/mcp` are not published on the public registry yet.
@@ -22,7 +25,10 @@ AgentRail should publish scoped packages only after the package graph is registr
 ## Intended commands after publish
 
 ```bash
+# Target command after registry publish
 npm install @agentrail/sdk
+
+# Target MCP reader command after registry publish
 npx @agentrail/mcp
 ```
 
