@@ -525,7 +525,7 @@ select {
   align-items: center;
   color: var(--signal-action);
   display: inline-flex;
-  font-size: 12px;
+  font-size: 13px;
   justify-self: start;
 }
 
@@ -734,7 +734,6 @@ select {
 .trace-table thead {
   clip: rect(0, 0, 0, 0);
   clip-path: inset(50%);
-  display: none;
   height: 1px;
   overflow: hidden;
   position: absolute;
@@ -941,7 +940,7 @@ select {
 .trace-empty > a {
   color: var(--signal-action);
   display: inline-block;
-  font-size: 12px;
+  font-size: 13px;
   margin-top: 18px;
 }
 
@@ -972,11 +971,12 @@ select {
   color: var(--text-muted);
   cursor: pointer;
   font-family: var(--font-jetbrains), monospace;
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .trace-error details p {
-  font-size: 11px;
+  font-size: 14px;
+  line-height: 1.55;
   margin-top: 8px;
 }
 
@@ -1006,7 +1006,8 @@ select {
 
 .trace-loading p {
   color: var(--text-secondary);
-  font-size: 13px;
+  font-size: 14px;
+  line-height: 1.55;
   margin: 0;
 }
 
@@ -1014,7 +1015,8 @@ select {
   color: var(--signal-action);
   display: block;
   font-family: var(--font-jetbrains), monospace;
-  font-size: 11px;
+  font-size: 14px;
+  line-height: 1.55;
   margin-top: 16px;
 }
 
@@ -1135,7 +1137,8 @@ select {
 .span-row-content > a,
 .what-happened li > a,
 .action-table td a,
-.action-mobile-list > li > a {
+.action-mobile-list > li > a,
+.recorded-data-action {
   color: var(--signal-action);
   font-family: var(--font-jetbrains), monospace;
   font-size: 13px;
@@ -1206,7 +1209,7 @@ select {
   color: var(--text-muted);
   display: inline-flex;
   font-family: var(--font-jetbrains), monospace;
-  font-size: 11px;
+  font-size: 13px;
   gap: 6px;
   letter-spacing: 0.04em;
   margin-bottom: 26px;
@@ -1261,11 +1264,10 @@ select {
 
 .trace-facts dd {
   font-family: var(--font-jetbrains), monospace;
-  font-size: 10px;
+  font-size: 11px;
+  line-height: 1.45;
   margin: 5px 0 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .trace-status-fact {
@@ -1286,8 +1288,8 @@ select {
 .trace-status-fact small {
   color: var(--text-muted);
   font-family: var(--font-instrument), sans-serif;
-  font-size: 10px;
-  line-height: 1.4;
+  font-size: 14px;
+  line-height: 1.55;
 }
 
 .cost-unpriced code {
@@ -1375,7 +1377,8 @@ select {
   color: var(--signal-action);
   display: block;
   font-family: var(--font-jetbrains), monospace;
-  font-size: 11px;
+  font-size: 14px;
+  line-height: 1.55;
   margin-bottom: 16px;
 }
 
@@ -1399,7 +1402,7 @@ select {
 
 .trace-not-found p {
   color: var(--text-secondary);
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.55;
   margin: 0;
   max-width: 500px;
@@ -1408,7 +1411,7 @@ select {
 .trace-not-found a {
   color: var(--signal-action);
   display: inline-block;
-  font-size: 12px;
+  font-size: 13px;
   margin-top: 18px;
 }
 
@@ -1580,8 +1583,8 @@ select {
 
 .evidence-drawer-header p {
   color: var(--text-secondary);
-  font-size: 11px;
-  line-height: 1.5;
+  font-size: 14px;
+  line-height: 1.55;
   margin: 6px 0 0;
 }
 
@@ -1620,10 +1623,9 @@ select {
 .evidence-facts dd {
   font-family: var(--font-jetbrains), monospace;
   font-size: 11px;
+  line-height: 1.45;
   margin: 5px 0 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .evidence-body {
@@ -1639,7 +1641,7 @@ select {
   color: var(--text-secondary);
   cursor: pointer;
   font-family: var(--font-jetbrains), monospace;
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .advanced-metadata pre {
@@ -1677,7 +1679,8 @@ select {
 .evidence-loading span {
   color: var(--text-secondary);
   display: block;
-  font-size: 11px;
+  font-size: 14px;
+  line-height: 1.55;
   margin-bottom: 10px;
 }
 
@@ -1719,14 +1722,14 @@ select {
 }
 
 .evidence-message strong {
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 560;
 }
 
 .evidence-message p {
   color: var(--text-secondary);
-  font-size: 11px;
-  line-height: 1.5;
+  font-size: 14px;
+  line-height: 1.55;
   margin: 4px 0 0;
 }
 
@@ -1739,9 +1742,9 @@ select {
   border-top: 1px solid var(--line-subtle);
   color: var(--text-secondary);
   display: flex;
-  font-size: 10px;
+  font-size: 14px;
   gap: 8px;
-  line-height: 1.45;
+  line-height: 1.55;
   padding: 9px 0;
 }
 
@@ -1751,7 +1754,7 @@ select {
   border-radius: var(--radius-sm);
   color: var(--text-secondary);
   font-family: var(--font-jetbrains), monospace;
-  font-size: 10px;
+  font-size: 11px;
   line-height: 1.65;
   margin: 6px 0 0;
   max-height: 54vh;
@@ -1784,10 +1787,12 @@ select {
   .trace-pagination a,
   .trace-empty > a,
   .trace-error button,
+  .trace-error summary,
   .trace-back,
   .span-row-content > a,
   .what-happened li > a,
   .action-mobile-list > li > a,
+  .recorded-data-action,
   .advanced-metadata summary {
     align-items: center;
     display: flex;

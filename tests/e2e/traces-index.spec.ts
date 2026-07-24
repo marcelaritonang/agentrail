@@ -18,7 +18,26 @@ test("lists the persisted sample trace without a running status", async ({
 
   if (testInfo.project.name === "mobile") {
     await expect(page.getByText("Search and filters")).toBeVisible();
-    await expect(page.locator(".trace-table thead")).toBeHidden();
+    await expect(page.locator(".trace-table thead")).toHaveCSS(
+      "position",
+      "absolute",
+    );
+    await expect(page.locator(".trace-table thead")).not.toHaveCSS(
+      "display",
+      "none",
+    );
+    await expect(page.getByRole("columnheader", { name: "Run" })).toHaveCount(
+      1,
+    );
+    await expect(page.getByRole("columnheader", { name: "Agent" })).toHaveCount(
+      1,
+    );
+    await expect(
+      page.getByRole("columnheader", { name: "Recorded" }),
+    ).toHaveCount(1);
+    await expect(
+      page.getByRole("columnheader", { name: "Status" }),
+    ).toHaveCount(1);
     await expect(
       page.getByRole("link", { name: "Open run" }).first(),
     ).toHaveCSS("min-height", "44px");

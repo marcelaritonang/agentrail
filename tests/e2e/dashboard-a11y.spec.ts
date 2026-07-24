@@ -15,16 +15,9 @@ async function expectNoAxeViolations(page: Page) {
   ).toEqual([]);
 }
 
-async function tabUntilFocused(page: Page, target: Locator) {
-  for (let attempt = 0; attempt < 30; attempt += 1) {
-    await page.keyboard.press("Tab");
-    if (
-      await target.evaluate((element) => element === document.activeElement)
-    ) {
-      return;
-    }
-  }
-  throw new Error(`Tab did not reach ${await target.textContent()}`);
+async function expectNextTabFocus(page: Page, target: Locator, label: string) {
+  await page.keyboard.press("Tab");
+  await expect(target, `Tab should move focus to ${label}`).toBeFocused();
 }
 
 async function expectNamedControls(page: Page) {
@@ -66,30 +59,39 @@ test("has logical headings, named controls, and zero Axe violations on detail", 
   await expectNoAxeViolations(page);
 });
 
-test("supports logical keyboard order on the run archive", async ({ page }) => {
+test("supports logical keyboard order on the run archive", async ({
+  page,
+}, testInfo) => {
   await page.goto("/traces");
   await page.locator("body").click({ position: { x: 2, y: 2 } });
 
+  const home = page.getByRole("link", { name: "AgentRail home" });
+  const navigation = page.getByRole("link", { name: "Agent runs" });
   const sampleCta = page.getByRole("link", {
     name: "Explore the sample run",
   });
-  if (await sampleCta.isVisible()) {
-    await tabUntilFocused(page, sampleCta);
-  }
-
+  const filterSummary = page.getByText("Search and filters");
   const search = page.getByRole("searchbox", {
     name: "Search by run name or ID",
   });
   const status = page.getByRole("combobox", { name: "Status" });
   const agent = page.getByRole("textbox", { name: "Agent" });
   const submit = page.getByRole("button", { name: "Apply filters" });
+  const runName = page.getByRole("link", { name: "Research answer" }).first();
   const open = page.getByRole("link", { name: "Open run" }).first();
 
-  await tabUntilFocused(page, search);
-  await tabUntilFocused(page, status);
-  await tabUntilFocused(page, agent);
-  await tabUntilFocused(page, submit);
-  await tabUntilFocused(page, open);
+  await expectNextTabFocus(page, home, "home link");
+  await expectNextTabFocus(page, navigation, "dashboard navigation");
+  await expectNextTabFocus(page, sampleCta, "sample run CTA");
+  if (testInfo.project.name === "mobile") {
+    await expectNextTabFocus(page, filterSummary, "mobile filter disclosure");
+  }
+  await expectNextTabFocus(page, search, "search filter");
+  await expectNextTabFocus(page, status, "status filter");
+  await expectNextTabFocus(page, agent, "agent filter");
+  await expectNextTabFocus(page, submit, "filter submit");
+  await expectNextTabFocus(page, runName, "run title link");
+  await expectNextTabFocus(page, open, "open run link");
 });
 
 test("keeps visible keyboard focus and restores the exact drawer trigger", async ({
@@ -99,8 +101,8 @@ test("keeps visible keyboard focus and restores the exact drawer trigger", async
   const origin = page.locator(
     `[data-span-id="${sampleLlmSpanId}"][data-evidence-origin="steps"]`,
   );
-  await page.locator("body").click({ position: { x: 2, y: 2 } });
-  await tabUntilFocused(page, origin);
+  await page.getByRole("link", { name: "Back to all agent runs" }).focus();
+  await expectNextTabFocus(page, origin, "recorded data action");
   const outline = await origin.evaluate((element) => {
     const style = getComputedStyle(element);
     return {
