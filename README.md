@@ -4,6 +4,37 @@ AgentRail is an open-source flight recorder for AI agents: immutable traces, mod
 
 This repository is in **Milestone 1.1**. The core ingestion pipeline, TypeScript SDK, worker, PostgreSQL model, Redis/SQS queue ports, MinIO/S3 evidence ports, local Docker topology, forensic dashboard, guided sample, and landing page are implemented. This is an early open-source build, not a production-readiness or funding claim.
 
+## Why AgentRail exists
+
+AI agents are becoming harder to explain after they act. A chat transcript usually does not show the full execution path: which tool ran, who the agent acted for, what it cost, whether evidence exists, and which payloads were intentionally kept out of chat. AgentRail records those facts as a forensic timeline for developers building agentic software.
+
+## Who it is for
+
+- AI agent application developers debugging multi-step tool workflows
+- internal automation teams that need action evidence before trusting agents with operations
+- open-source maintainers testing Codex, Claude-style tools, MCP clients, or custom agent runtimes
+
+## Built for AWS
+
+The current local stack is intentionally small, but the production path maps to AWS services:
+
+- API Gateway and Lambda for authenticated span ingestion
+- SQS for fast enqueue and worker decoupling
+- RDS/PostgreSQL for trace and span metadata
+- S3 for redacted evidence payload storage
+- CloudWatch for queue, worker, and ingestion observability
+- Amazon Bedrock cost and audit metadata as a future catalog integration
+
+This is a reference mapping, not a claim that the public demo currently runs on AWS.
+
+## Founding tester plan
+
+AgentRail is seeking three founding testers before the next milestone: one AI agent application developer, one internal automation team, and one open-source maintainer using Codex, Claude-style tools, or an MCP-capable workflow. See [Founding tester plan](docs/community/founding-testers.md).
+
+## Startup pitch
+
+AgentRail is an open-source flight recorder for AI agents. It records traces, tool actions, model cost metadata, actor attribution, and evidence payload status so developers can debug and audit autonomous AI workflows after they act. AWS credits would be used to move the local Docker demo toward an AWS-native reference deployment with API Gateway, Lambda, SQS, RDS/PostgreSQL, S3, CloudWatch, and future Amazon Bedrock cost and audit integrations.
+
 ## What works
 
 - `rail.trace()`, child spans, action spans, automatic actor inheritance, and per-span actor overrides
@@ -106,9 +137,9 @@ NEXT_PUBLIC_AGENTRAIL_SOURCE_URL=https://example.com/your-org/agentrail
 
 `NEXT_PUBLIC_AGENTRAIL_SOURCE_URL` is HTTPS-only and read at build-time by the Next.js app. If it is unset or empty, the landing page omits source buttons instead of falling back to a hardcoded repository.
 
-## NPM install status
+## NPM package release target
 
-The unscoped npm command `npm install agentrail` is not this project; that package is owned by another maintainer. Until the scoped packages are published, test AgentRail from the source checkout above.
+The unscoped npm command `npm install agentrail` is not this project; that package is owned by another maintainer. The scoped packages are not live public registry downloads yet. Until publish is complete, test AgentRail from the source checkout above.
 
 The intended public npm release commands are:
 
@@ -117,7 +148,7 @@ npm install @agentrail/sdk
 npx @agentrail/mcp
 ```
 
-Publishing requires npm authentication and ownership of the selected npm scope. Do not advertise the npm commands as live registry downloads until `npm view @agentrail/sdk` and `npm view @agentrail/mcp` resolve to this repository.
+Publishing requires npm authentication and ownership of the selected npm scope. Do not advertise the npm commands as live registry downloads until `npm view @agentrail/sdk` and `npm view @agentrail/mcp` resolve to this repository. See [NPM release checklist](docs/operations/npm-release.md).
 
 ## MCP integration
 
@@ -147,6 +178,9 @@ Benchmark results describe only the recorded machine and profile; they are not a
 - [AWS reference mapping](docs/deployment/aws.md)
 - [API-key operations](docs/operations/api-keys.md)
 - [MCP operations](docs/operations/mcp.md)
+- [NPM release checklist](docs/operations/npm-release.md)
+- [Startup pitch](docs/startup/pitch.md)
+- [Founding tester plan](docs/community/founding-testers.md)
 - [Contributing](CONTRIBUTING.md)
 - [Security policy](SECURITY.md)
 - [Approved M1 specification](docs/superpowers/specs/2026-07-21-agentrail-m1-design.md)

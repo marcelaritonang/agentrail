@@ -35,7 +35,25 @@ const flow = [
   },
 ];
 
-const setupQuickstart = `npm install @agentrail/sdk
+const awsPlan = [
+  ["Ingest", "API Gateway and Lambda accept spans with HMAC API keys."],
+  ["Buffer", "SQS keeps ingestion fast while workers process traces."],
+  ["Store", "RDS/PostgreSQL stores metadata and S3 stores redacted evidence."],
+  ["Observe", "CloudWatch tracks queue health, worker failures, and latency."],
+  [
+    "Extend",
+    "Amazon Bedrock cost and audit integrations fit the same model catalog path.",
+  ],
+] as const;
+
+const testerProfiles = [
+  "AI agent application developer",
+  "internal automation team",
+  "open-source maintainer using Codex or Claude-style tools",
+] as const;
+
+const setupQuickstart = `# Package release target
+npm install @agentrail/sdk
 
 # MCP reader for Codex-style tools
 npx @agentrail/mcp`;
@@ -88,6 +106,7 @@ export default function LandingPage() {
         </Link>
         <div className="landing-nav-links">
           <Link href="/traces">Dashboard</Link>
+          <Link href="/about">About</Link>
           {sourceUrl === null ? null : (
             <a href={sourceUrl} target="_blank" rel="noreferrer">
               Source
@@ -168,23 +187,69 @@ export default function LandingPage() {
         </ol>
       </section>
 
+      <section id="aws" className="landing-section landing-aws">
+        <div className="landing-section-heading">
+          <h2>Built for AWS-native deployment</h2>
+          <p>
+            The local M1 stack maps directly to AWS services without changing
+            AgentRail&apos;s core contract.
+          </p>
+        </div>
+        <dl className="landing-aws-grid">
+          {awsPlan.map(([term, description]) => (
+            <div key={term}>
+              <dt>{term}</dt>
+              <dd>{description}</dd>
+            </div>
+          ))}
+        </dl>
+        <p className="landing-status-note">
+          Planned AWS path: API Gateway, Lambda, SQS, RDS/PostgreSQL, S3,
+          CloudWatch, and Amazon Bedrock cost metadata.
+        </p>
+      </section>
+
       <section id="quickstart" className="landing-section landing-quickstart">
         <div className="landing-quickstart-copy">
-          <h2>NPM quickstart</h2>
+          <h2>NPM package target</h2>
           <p>
-            Users should not need a monorepo checkout just to instrument an
-            agent. The public path is one SDK install, while source checkout and
-            Docker remain for maintainers and self-hosting.
+            Users should not need a monorepo checkout just to instrument an AI
+            agent. Registry publish is pending until npm auth and scope
+            ownership are configured; source checkout is available today for
+            maintainers and self-hosting.
           </p>
         </div>
         <div className="landing-code-stack">
-          <pre aria-label="NPM install quickstart">
+          <pre aria-label="NPM package commands">
             <code>{setupQuickstart}</code>
           </pre>
           <pre aria-label="TypeScript SDK example">
             <code>{sdkQuickstart}</code>
           </pre>
         </div>
+      </section>
+
+      <section className="landing-section landing-testers">
+        <div className="landing-section-heading">
+          <h2>Founding tester program</h2>
+          <p>
+            AgentRail needs three developer teams to test real agent workflows:
+            one SDK integration, one local dashboard review, and one MCP reader
+            workflow.
+          </p>
+        </div>
+        <ul
+          className="landing-tester-list"
+          aria-label="Founding tester profiles"
+        >
+          {testerProfiles.map((profile) => (
+            <li key={profile}>{profile}</li>
+          ))}
+        </ul>
+        <Link href="/about" className="landing-inline-link">
+          About and contact
+          <ArrowRight size={15} aria-hidden="true" />
+        </Link>
       </section>
 
       <section className="landing-section landing-cta">
