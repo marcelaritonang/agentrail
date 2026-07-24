@@ -4,6 +4,18 @@
 
 The goal is simple: while working in Codex, a developer can ask for recent AgentRail runs, inspect one run, review action/tool spans, check whether recorded data exists, and get a dashboard link for deeper forensic review.
 
+## NPM status
+
+The unscoped npm command `npm install agentrail` is not this project. Use the source-checkout quickstarts below until the scoped MCP package is published.
+
+The intended npm command for the published MCP server is:
+
+```bash
+npx @agentrail/mcp
+```
+
+Treat this as a release target until npm authentication and scope ownership are configured and `npm view @agentrail/mcp` resolves to this repository.
+
 ## What it enables
 
 | Tool                           | Purpose                                                                  |

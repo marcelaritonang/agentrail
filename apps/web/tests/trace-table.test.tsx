@@ -9,6 +9,7 @@ import type { TracePage } from "../lib/trace-read-model";
 const state = vi.hoisted(() => ({
   demoMode: true,
   page: null as TracePage | null,
+  sourceUrl: null as string | null,
 }));
 
 vi.mock("../lib/demo-mode", () => ({
@@ -25,7 +26,8 @@ vi.mock("../lib/project-context", () => ({
 }));
 
 vi.mock("../lib/source-url", () => ({
-  configuredSourceUrl: () => null,
+  configuredSourceUrl: () => state.sourceUrl,
+  sourceQuickstartUrl: (sourceUrl: string) => `${sourceUrl}#local-quickstart`,
 }));
 
 vi.mock("../lib/trace-read-model", () => ({
@@ -66,6 +68,7 @@ describe("agent run index", () => {
   it("orients users and presents the read-only example as an agent run", async () => {
     state.page = tracePageFixture(false);
     state.demoMode = true;
+    state.sourceUrl = null;
 
     render(await TracesPage({ searchParams: Promise.resolve({}) }));
 
@@ -94,6 +97,7 @@ describe("agent run index", () => {
   it("marks the seeded local sample as a read-only example outside demo mode", async () => {
     state.page = tracePageFixture(false);
     state.demoMode = false;
+    state.sourceUrl = null;
 
     render(await TracesPage({ searchParams: Promise.resolve({}) }));
 
@@ -104,6 +108,30 @@ describe("agent run index", () => {
       screen.getByRole("link", { name: "Explore the sample run" }),
     ).toHaveAttribute("href", "/traces/0af7651916cd43dd8448eb211c80319c");
     expect(screen.getByText("Research answer")).toBeInTheDocument();
+  });
+
+  it("explains how to install and test AgentRail without pointing at the wrong npm package", async () => {
+    state.page = tracePageFixture(false);
+    state.demoMode = true;
+    state.sourceUrl = "https://github.com/marcelaritonang/agentrail";
+
+    render(await TracesPage({ searchParams: Promise.resolve({}) }));
+
+    const installGuide = screen.getByRole("region", {
+      name: "Install and test AgentRail",
+    });
+
+    expect(installGuide).toHaveTextContent(
+      "npm install agentrail is not this project",
+    );
+    expect(installGuide).toHaveTextContent("npm install @agentrail/sdk");
+    expect(installGuide).toHaveTextContent("npx @agentrail/mcp");
+    expect(
+      within(installGuide).getByRole("link", { name: "Open source checkout" }),
+    ).toHaveAttribute(
+      "href",
+      "https://github.com/marcelaritonang/agentrail#local-quickstart",
+    );
   });
 
   it("renders the semantic desktop ledger and keeps unpriced facts truthful", () => {

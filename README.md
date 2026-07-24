@@ -106,6 +106,19 @@ NEXT_PUBLIC_AGENTRAIL_SOURCE_URL=https://example.com/your-org/agentrail
 
 `NEXT_PUBLIC_AGENTRAIL_SOURCE_URL` is HTTPS-only and read at build-time by the Next.js app. If it is unset or empty, the landing page omits source buttons instead of falling back to a hardcoded repository.
 
+## NPM install status
+
+The unscoped npm command `npm install agentrail` is not this project; that package is owned by another maintainer. Until the scoped packages are published, test AgentRail from the source checkout above.
+
+The intended public npm release commands are:
+
+```bash
+npm install @agentrail/sdk
+npx @agentrail/mcp
+```
+
+Publishing requires npm authentication and ownership of the selected npm scope. Do not advertise the npm commands as live registry downloads until `npm view @agentrail/sdk` and `npm view @agentrail/mcp` resolve to this repository.
+
 ## MCP integration
 
 `@agentrail/mcp` lets MCP-capable developer tools inspect AgentRail traces without adding mutation features or exposing raw evidence payloads. See [AgentRail MCP operations](docs/operations/mcp.md) for Codex config, demo mode, and local database setup.
