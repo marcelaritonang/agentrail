@@ -47,6 +47,16 @@ describe("AgentRail landing page", () => {
     expect(
       screen.queryByText(/pnpm add @agentrail\/sdk/i),
     ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { level: 2, name: "NPM quickstart" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText("Source-checkout quickstart"),
+    ).not.toBeInTheDocument();
+
+    const installBlock = screen.getByLabelText("NPM install quickstart");
+    expect(installBlock).toHaveTextContent("npm install @agentrail/sdk");
+    expect(installBlock).not.toHaveTextContent("pnpm install");
 
     const screenshot = screen.getByRole("img", {
       name: /real Trace Rail screenshot/i,
