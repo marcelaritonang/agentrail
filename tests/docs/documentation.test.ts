@@ -6,6 +6,7 @@ const landing = readFileSync("apps/web/app/page.tsx", "utf8");
 const readme = readFileSync("README.md", "utf8");
 const architecture = readFileSync("docs/architecture.md", "utf8");
 const aws = readFileSync("docs/deployment/aws.md", "utf8");
+const mcp = readFileSync("docs/operations/mcp.md", "utf8");
 const sdk = [
   readFileSync("packages/sdk/src/agentrail.ts", "utf8"),
   readFileSync("packages/sdk/src/trace-context.ts", "utf8"),
@@ -20,6 +21,7 @@ const requiredPublicDocuments = [
   "docs/architecture.md",
   "docs/deployment/aws.md",
   "docs/operations/api-keys.md",
+  "docs/operations/mcp.md",
 ];
 
 function expectNoStalePublicCopy(source: string) {
@@ -77,5 +79,18 @@ describe("public AgentRail documentation", () => {
   it("exposes the public demo and source URL environment contract", () => {
     expect(envExample).toContain("AGENTRAIL_DEMO_MODE=0");
     expect(envExample).toContain("NEXT_PUBLIC_AGENTRAIL_SOURCE_URL=");
+  });
+
+  it("documents the read-only MCP integration without over-claiming", () => {
+    expect(readme).toContain("@agentrail/mcp");
+    expect(readme).toContain("docs/operations/mcp.md");
+    expect(mcp).toContain("@agentrail/mcp");
+    expect(mcp).toMatch(/read-only MCP/i);
+    expect(mcp).toContain("agentrail_list_traces");
+    expect(mcp).toContain("does not automatically record Codex or Claude");
+    expect(mcp).not.toMatch(/hosted remote MCP/i);
+    expect(mcp).not.toMatch(/AWS acceptance/i);
+    expect(mcp).not.toMatch(/funding guarantee/i);
+    expect(mcp).not.toMatch(/raw payload access/i);
   });
 });

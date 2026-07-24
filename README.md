@@ -18,6 +18,7 @@ This repository is in **Milestone 1.1**. The core ingestion pipeline, TypeScript
 - forensic dashboard routes for `/traces` and `/traces/[traceId]`
 - guided sample mode for explaining the trace archive, Trace Rail, Evidence Drawer, and Action Ledger
 - landing page with optional source controls for public deployments
+- `@agentrail/mcp` read-only MCP server for inspecting traces from Codex-style developer workflows
 
 ## Local quickstart
 
@@ -105,6 +106,10 @@ NEXT_PUBLIC_AGENTRAIL_SOURCE_URL=https://example.com/your-org/agentrail
 
 `NEXT_PUBLIC_AGENTRAIL_SOURCE_URL` is HTTPS-only and read at build-time by the Next.js app. If it is unset or empty, the landing page omits source buttons instead of falling back to a hardcoded repository.
 
+## MCP integration
+
+`@agentrail/mcp` lets MCP-capable developer tools inspect AgentRail traces without adding mutation features or exposing raw evidence payloads. See [AgentRail MCP operations](docs/operations/mcp.md) for Codex config, demo mode, and local database setup.
+
 ## Quality gates
 
 ```bash
@@ -128,6 +133,7 @@ Benchmark results describe only the recorded machine and profile; they are not a
 - [Architecture](docs/architecture.md)
 - [AWS reference mapping](docs/deployment/aws.md)
 - [API-key operations](docs/operations/api-keys.md)
+- [MCP operations](docs/operations/mcp.md)
 - [Contributing](CONTRIBUTING.md)
 - [Security policy](SECURITY.md)
 - [Approved M1 specification](docs/superpowers/specs/2026-07-21-agentrail-m1-design.md)
