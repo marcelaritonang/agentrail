@@ -29,7 +29,9 @@ describe("AgentRail MCP read model configuration", () => {
         DATABASE_URL:
           "postgresql://agentrail:secret@localhost:5433/agentrail_test",
       }),
-    ).toThrow("AGENTRAIL_PROJECT_ID is required for AgentRail MCP database mode");
+    ).toThrow(
+      "AGENTRAIL_PROJECT_ID is required for AgentRail MCP database mode",
+    );
   });
 
   it("does not echo invalid database URLs in errors", () => {
