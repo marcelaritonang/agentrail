@@ -637,6 +637,78 @@ select {
   line-height: 1.55;
 }
 
+.install-agentrail-card {
+  background: var(--surface-panel);
+  border: 1px solid var(--line-strong);
+  display: grid;
+  gap: 16px;
+  margin: 16px 0 0;
+  padding: 14px;
+}
+
+.install-agentrail-copy h2 {
+  font-size: 18px;
+  font-weight: 560;
+  letter-spacing: -0.025em;
+  margin: 8px 0 7px;
+}
+
+.install-agentrail-copy p,
+.install-agentrail-grid p,
+.install-agentrail-grid small {
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.install-agentrail-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.install-agentrail-grid > div {
+  border-top: 1px solid var(--line-subtle);
+  min-width: 0;
+  padding-top: 12px;
+}
+
+.install-agentrail-grid strong {
+  display: block;
+  font-size: 12px;
+  font-weight: 590;
+  margin-bottom: 5px;
+}
+
+.install-agentrail-grid pre {
+  background: var(--surface-inset);
+  border: 1px solid var(--line-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-family: var(--font-jetbrains), monospace;
+  font-size: 11px;
+  line-height: 1.65;
+  margin: 10px 0 0;
+  overflow: auto;
+  padding: 10px;
+}
+
+.install-agentrail-grid code {
+  font-family: inherit;
+}
+
+.install-agentrail-grid a {
+  color: var(--signal-action);
+  display: inline-flex;
+  font-size: 13px;
+  margin-top: 10px;
+}
+
+.install-agentrail-grid small {
+  display: block;
+  margin-top: 8px;
+}
+
 .run-filter-disclosure {
   border-bottom: 1px solid var(--line-subtle);
   padding: 12px 0;
@@ -1916,6 +1988,22 @@ select {
 
   .run-orientation li:last-child {
     border-right: 0;
+  }
+
+  .install-agentrail-card {
+    align-items: start;
+    grid-template-columns: minmax(300px, 0.72fr) minmax(0, 1.28fr);
+    padding: 16px;
+  }
+
+  .install-agentrail-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .install-agentrail-grid > div {
+    border-left: 1px solid var(--line-subtle);
+    border-top: 0;
+    padding: 0 0 0 14px;
   }
 
   .run-filter-disclosure {

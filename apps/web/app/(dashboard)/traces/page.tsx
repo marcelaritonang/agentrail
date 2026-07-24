@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { InstallAgentRailCard } from "../../../components/install-agentrail-card";
 import { ReadOnlyExampleBanner } from "../../../components/read-only-example";
 import { RunOrientation } from "../../../components/run-orientation";
 import { TraceEmptyState } from "../../../components/trace-empty-state";
@@ -82,6 +83,7 @@ export default async function TracesPage({
       </header>
 
       <RunOrientation />
+      <InstallAgentRailCard sourceUrl={sourceUrl} />
       <TraceFilters
         {...(query === undefined ? {} : { query })}
         {...(actor === undefined ? {} : { actor })}

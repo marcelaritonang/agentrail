@@ -93,4 +93,12 @@ describe("public AgentRail documentation", () => {
     expect(mcp).not.toMatch(/funding guarantee/i);
     expect(mcp).not.toMatch(/raw payload access/i);
   });
+
+  it("documents npm install status without directing users to the unrelated unscoped package", () => {
+    expect(readme).toContain("npm install agentrail");
+    expect(readme).toContain("is not this project");
+    expect(readme).toContain("npm install @agentrail/sdk");
+    expect(mcp).toContain("npx @agentrail/mcp");
+    expect(readme).toMatch(/npm authentication/i);
+  });
 });
