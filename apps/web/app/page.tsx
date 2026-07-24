@@ -5,14 +5,12 @@ import {
   ArrowRight,
   Code,
   Database,
-  GithubLogo,
   GitBranch,
   HardDrives,
 } from "@phosphor-icons/react/ssr";
 
 import { ProductMark } from "../components/product-mark";
-
-const SOURCE_URL = "https://github.com/agentrail/agentrail";
+import { configuredSourceUrl } from "../lib/source-url";
 
 const flow = [
   {
@@ -31,26 +29,48 @@ const flow = [
     icon: Database,
   },
   {
-    title: "Replay",
+    title: "Investigate",
     body: "The dashboard reconstructs Trace Rail, Action Ledger, and payload evidence through backend routes.",
     icon: HardDrives,
   },
 ];
 
-const quickstart = `import { AgentRail } from "@agentrail/sdk";
+const setupQuickstart = `From an AgentRail repository checkout:
 
-const rail = new AgentRail({ apiKey: process.env.AGENTRAIL_KEY });
+corepack enable
+pnpm install
+docker compose up -d --build
+pnpm bootstrap:local`;
 
-await rail.trace(
-  "sample.research-answer",
-  { agent_id: "research-agent", on_behalf_of: "sample-user" },
-  async (trace) => {
-    await trace.llm("draft answer", { model: "claude-3-5-sonnet" });
-    await trace.action("filesystem.read", { path: "notes.md" });
-  },
-);
+const sdkQuickstart = `import { AgentRail, BufferedDelivery, HttpSpanTransport } from "@agentrail/sdk";
 
-await rail.shutdown();`;
+const delivery = new BufferedDelivery({
+  transport: new HttpSpanTransport({
+    endpoint: "http://localhost:3001/v1/spans",
+    apiKey: process.env.AGENTRAIL_API_KEY!,
+  }),
+});
+
+const rail = new AgentRail({
+  actor: { agentId: "research-agent", onBehalfOf: "user_42" },
+  sink: delivery,
+});
+
+await rail.trace({ name: "research.answer" }, async (trace) => {
+  await trace.span(
+    {
+      kind: "llm",
+      name: "draft",
+      model: "test.known",
+      inputTokens: 1_000,
+      outputTokens: 500,
+    },
+    async () => undefined,
+  );
+  await trace.action({ name: "filesystem.read" }, async () => undefined);
+});
+
+await rail.shutdown({ timeoutMs: 5_000 });`;
 
 export const metadata: Metadata = {
   title: "AgentRail | Flight recorder for AI agents",
@@ -59,6 +79,8 @@ export const metadata: Metadata = {
 };
 
 export default function LandingPage() {
+  const sourceUrl = configuredSourceUrl();
+
   return (
     <main className="landing-page">
       <nav className="landing-nav" aria-label="Landing navigation">
@@ -68,9 +90,11 @@ export default function LandingPage() {
         </Link>
         <div className="landing-nav-links">
           <Link href="/traces">Dashboard</Link>
-          <a href={SOURCE_URL} target="_blank" rel="noreferrer">
-            GitHub
-          </a>
+          {sourceUrl === null ? null : (
+            <a href={sourceUrl} target="_blank" rel="noreferrer">
+              Source
+            </a>
+          )}
         </div>
       </nav>
 
@@ -89,18 +113,20 @@ export default function LandingPage() {
               href="/traces"
               className="landing-button landing-button-primary"
             >
-              Open trace dashboard
+              Explore the guided demo
               <ArrowRight size={15} aria-hidden="true" />
             </Link>
-            <a
-              href={SOURCE_URL}
-              target="_blank"
-              rel="noreferrer"
-              className="landing-button landing-button-secondary"
-            >
-              View source
-              <GithubLogo size={15} aria-hidden="true" />
-            </a>
+            {sourceUrl === null ? null : (
+              <a
+                href={sourceUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="landing-button landing-button-secondary"
+              >
+                View source
+                <Code size={15} aria-hidden="true" />
+              </a>
+            )}
           </div>
         </div>
 
@@ -144,43 +170,50 @@ export default function LandingPage() {
         </ol>
       </section>
 
-      <section className="landing-section landing-quickstart">
+      <section id="quickstart" className="landing-section landing-quickstart">
         <div className="landing-quickstart-copy">
-          <h2>One SDK surface</h2>
+          <h2>Source-checkout quickstart</h2>
           <p>
             The M1 target stays small: trace, span, action, cost, and payload
             evidence. Enough to prove the core pipeline without pretending to be
             enterprise observability.
           </p>
         </div>
-        <pre aria-label="TypeScript quickstart">
-          <code>{quickstart}</code>
-        </pre>
+        <div className="landing-code-stack">
+          <pre aria-label="Local source-checkout quickstart">
+            <code>{setupQuickstart}</code>
+          </pre>
+          <pre aria-label="TypeScript SDK example">
+            <code>{sdkQuickstart}</code>
+          </pre>
+        </div>
       </section>
 
       <section className="landing-section landing-cta">
         <div>
           <h2>Open-source first, self-hosted by default</h2>
           <p>
-            Apache-2.0, local Docker, and a narrow M1 scope make the AWS startup
-            application credible before the company exists.
+            Run AgentRail locally, inspect recorded agent behavior, and keep
+            sensitive evidence under your control.
           </p>
         </div>
         <div className="landing-actions">
-          <a
-            href={SOURCE_URL}
-            target="_blank"
-            rel="noreferrer"
-            className="landing-button landing-button-primary"
-          >
-            View source
-            <GithubLogo size={15} aria-hidden="true" />
-          </a>
+          {sourceUrl === null ? null : (
+            <a
+              href={sourceUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="landing-button landing-button-primary"
+            >
+              View source
+              <Code size={15} aria-hidden="true" />
+            </a>
+          )}
           <Link
-            href="/traces"
+            href="#quickstart"
             className="landing-button landing-button-secondary"
           >
-            Inspect demo
+            Review quickstart
             <ArrowRight size={15} aria-hidden="true" />
           </Link>
         </div>
