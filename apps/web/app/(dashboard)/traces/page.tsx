@@ -5,7 +5,11 @@ import { RunOrientation } from "../../../components/run-orientation";
 import { TraceEmptyState } from "../../../components/trace-empty-state";
 import { TraceFilters } from "../../../components/trace-filters";
 import { TraceTable } from "../../../components/trace-table";
-import { demoModeEnabled } from "../../../lib/demo-mode";
+import {
+  DEMO_TRACE_ID,
+  demoModeEnabled,
+  isReadOnlySampleTrace,
+} from "../../../lib/demo-mode";
 import { configuredProjectId } from "../../../lib/project-context";
 import { configuredSourceUrl } from "../../../lib/source-url";
 import { listTraces } from "../../../lib/trace-read-model";
@@ -49,12 +53,19 @@ export default async function TracesPage({
   if (actor) activeQuery.set("actor", actor);
   if (outcome) activeQuery.set("outcome", outcome);
   const filtered = activeQuery.size > 0;
-  const isReadOnlyExample = demoModeEnabled();
+  const demoMode = demoModeEnabled();
+  const readOnlyTraceIds = page.items
+    .filter(isReadOnlySampleTrace)
+    .map((trace) => trace.traceId);
+  const sampleTraceId =
+    readOnlyTraceIds[0] ?? (demoMode ? DEMO_TRACE_ID : null);
   const sourceUrl = configuredSourceUrl();
 
   return (
     <>
-      {isReadOnlyExample ? <ReadOnlyExampleBanner /> : null}
+      {sampleTraceId === null ? null : (
+        <ReadOnlyExampleBanner href={`/traces/${sampleTraceId}`} />
+      )}
       <header className="page-heading">
         <div>
           <span className="page-eyebrow">Agent activity / project scope</span>
@@ -82,7 +93,8 @@ export default async function TracesPage({
         <TraceTable
           page={page}
           queryString={activeQuery.toString()}
-          isReadOnlyExample={isReadOnlyExample}
+          isReadOnlyExample={demoMode}
+          readOnlyTraceIds={readOnlyTraceIds}
         />
       )}
     </>

@@ -8,10 +8,11 @@ export function ReadOnlyExampleIndicator(): React.ReactNode {
 
 export function ReadOnlyExampleBanner({
   detail = false,
+  href = `/traces/${DEMO_TRACE_ID}`,
 }: {
   detail?: boolean;
+  href?: string;
 }): React.ReactNode {
-  const href = `/traces/${DEMO_TRACE_ID}`;
   return (
     <aside className="read-only-example" aria-label="Read-only example">
       <div>

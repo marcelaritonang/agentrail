@@ -10,6 +10,7 @@ import { WhatHappened } from "../../../../components/what-happened";
 import {
   DEMO_TRACE_ID,
   demoModeEnabled,
+  isReadOnlySampleTrace,
 } from "../../../../lib/demo-mode";
 import { configuredProjectId } from "../../../../lib/project-context";
 import { presentTraceDetail } from "../../../../lib/trace-presentation";
@@ -34,8 +35,8 @@ export default async function TraceDetailPage({
   const selectedSpan = trace.spans.find(
     (span) => span.spanId === selectedSpanId,
   );
-  const isReadOnlyExample =
-    demoModeEnabled() && trace.traceId === DEMO_TRACE_ID;
+  const demoTrace = demoModeEnabled() && trace.traceId === DEMO_TRACE_ID;
+  const isReadOnlyExample = demoTrace || isReadOnlySampleTrace(trace);
   const presentation = presentTraceDetail(trace, { isReadOnlyExample });
 
   return (

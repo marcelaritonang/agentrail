@@ -15,6 +15,9 @@ vi.mock("../lib/demo-mode", () => ({
   DEMO_PROJECT_ID: "00000000-0000-4000-8000-000000000001",
   DEMO_TRACE_ID: "0af7651916cd43dd8448eb211c80319c",
   demoModeEnabled: () => state.demoMode,
+  isReadOnlySampleTrace: (trace: { traceId: string; name: string }) =>
+    trace.traceId === "0af7651916cd43dd8448eb211c80319c" ||
+    trace.name === "sample.research-answer",
 }));
 
 vi.mock("../lib/project-context", () => ({
@@ -88,12 +91,28 @@ describe("agent run index", () => {
     );
   });
 
+  it("marks the seeded local sample as a read-only example outside demo mode", async () => {
+    state.page = tracePageFixture(false);
+    state.demoMode = false;
+
+    render(await TracesPage({ searchParams: Promise.resolve({}) }));
+
+    expect(screen.getByRole("complementary")).toHaveTextContent(
+      "Read-only example",
+    );
+    expect(
+      screen.getByRole("link", { name: "Explore the sample run" }),
+    ).toHaveAttribute("href", "/traces/0af7651916cd43dd8448eb211c80319c");
+    expect(screen.getByText("Research answer")).toBeInTheDocument();
+  });
+
   it("renders the semantic desktop ledger and keeps unpriced facts truthful", () => {
     render(
       <TraceTable
         page={tracePageFixture()}
         queryString=""
         isReadOnlyExample={false}
+        readOnlyTraceIds={[]}
       />,
     );
 
