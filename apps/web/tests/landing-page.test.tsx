@@ -50,7 +50,7 @@ describe("AgentRail landing page", () => {
     expect(
       screen.getByRole("heading", {
         level: 2,
-        name: "NPM package target",
+        name: "NPM target (not live yet)",
       }),
     ).toBeInTheDocument();
     expect(
@@ -58,10 +58,21 @@ describe("AgentRail landing page", () => {
     ).not.toBeInTheDocument();
 
     const installBlock = screen.getByLabelText("NPM package commands");
+    expect(installBlock).toHaveTextContent(
+      "Target command after registry publish",
+    );
     expect(installBlock).toHaveTextContent("npm install @agentrail/sdk");
     expect(installBlock).not.toHaveTextContent("pnpm install");
+    expect(screen.getByText("Available today")).toBeInTheDocument();
     expect(
-      screen.getByText(/Registry publish is pending/i),
+      screen.getByText("Source checkout + local Docker setup"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Publish blocker")).toBeInTheDocument();
+    expect(
+      screen.getByText(/npm auth and @agentrail scope/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Do not treat the commands as live/i),
     ).toBeInTheDocument();
 
     expect(
