@@ -79,10 +79,7 @@ function dashboardIndexUrl(dashboardUrl: string | undefined): string | null {
   return new URL("/traces", dashboardUrl).toString().replace(/\/$/, "");
 }
 
-function presentTrace(
-  trace: AgentRailTrace,
-  dashboardUrl: string | undefined,
-) {
+function presentTrace(trace: AgentRailTrace, dashboardUrl: string | undefined) {
   return {
     traceId: trace.traceId,
     rootSpanId: trace.rootSpanId,

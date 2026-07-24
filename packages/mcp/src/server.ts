@@ -20,11 +20,7 @@ type ToolConfig = {
 };
 
 export type AgentRailToolRegistrar = {
-  registerTool(
-    name: string,
-    config: ToolConfig,
-    handler: ToolHandler,
-  ): void;
+  registerTool(name: string, config: ToolConfig, handler: ToolHandler): void;
 };
 
 const traceListSchema = {
@@ -148,7 +144,9 @@ function dependenciesFromConfig(
     : { readModel, dashboardUrl: config.dashboardUrl };
 }
 
-export async function main(env: NodeJS.ProcessEnv = process.env): Promise<void> {
+export async function main(
+  env: NodeJS.ProcessEnv = process.env,
+): Promise<void> {
   const config = createEnvironmentConfig(env);
   const server = createAgentRailMcpServer(dependenciesFromConfig(config));
   const transport = new StdioServerTransport();
