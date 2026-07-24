@@ -7,6 +7,8 @@ const readme = readFileSync("README.md", "utf8");
 const architecture = readFileSync("docs/architecture.md", "utf8");
 const aws = readFileSync("docs/deployment/aws.md", "utf8");
 const mcp = readFileSync("docs/operations/mcp.md", "utf8");
+const pitch = readFileSync("docs/startup/pitch.md", "utf8");
+const testers = readFileSync("docs/community/founding-testers.md", "utf8");
 const sdk = [
   readFileSync("packages/sdk/src/agentrail.ts", "utf8"),
   readFileSync("packages/sdk/src/trace-context.ts", "utf8"),
@@ -22,6 +24,8 @@ const requiredPublicDocuments = [
   "docs/deployment/aws.md",
   "docs/operations/api-keys.md",
   "docs/operations/mcp.md",
+  "docs/startup/pitch.md",
+  "docs/community/founding-testers.md",
 ];
 
 function expectNoStalePublicCopy(source: string) {
@@ -100,5 +104,19 @@ describe("public AgentRail documentation", () => {
     expect(readme).toContain("npm install @agentrail/sdk");
     expect(mcp).toContain("npx @agentrail/mcp");
     expect(readme).toMatch(/npm authentication/i);
+  });
+
+  it("documents startup readiness materials for AWS Activate preparation", () => {
+    expect(readme).toContain("Why AgentRail exists");
+    expect(readme).toContain("Built for AWS");
+    expect(readme).toContain("Founding tester plan");
+    expect(readme).toContain("Startup pitch");
+    expect(readme).toContain("API Gateway, Lambda, SQS");
+    expect(readme).toContain("RDS/PostgreSQL, S3, CloudWatch");
+    expect(pitch).toContain("AgentRail is an open-source flight recorder");
+    expect(pitch).toContain("AWS credits");
+    expect(testers).toContain("three founding testers");
+    expect(testers).toContain("AI agent application developer");
+    expect(readme).not.toMatch(/funding guarantee/i);
   });
 });

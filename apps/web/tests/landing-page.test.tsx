@@ -48,15 +48,46 @@ describe("AgentRail landing page", () => {
       screen.queryByText(/pnpm add @agentrail\/sdk/i),
     ).not.toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { level: 2, name: "NPM quickstart" }),
+      screen.getByRole("heading", {
+        level: 2,
+        name: "NPM package target",
+      }),
     ).toBeInTheDocument();
     expect(
       screen.queryByText("Source-checkout quickstart"),
     ).not.toBeInTheDocument();
 
-    const installBlock = screen.getByLabelText("NPM install quickstart");
+    const installBlock = screen.getByLabelText("NPM package commands");
     expect(installBlock).toHaveTextContent("npm install @agentrail/sdk");
     expect(installBlock).not.toHaveTextContent("pnpm install");
+    expect(
+      screen.getByText(/Registry publish is pending/i),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole("heading", {
+        level: 2,
+        name: "Built for AWS-native deployment",
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/API Gateway, Lambda, SQS/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/RDS\/PostgreSQL, S3, CloudWatch/i),
+    ).toBeInTheDocument();
+    expect(screen.getAllByText(/Amazon Bedrock cost/i).length).toBeGreaterThan(
+      0,
+    );
+
+    expect(
+      screen.getByRole("heading", {
+        level: 2,
+        name: "Founding tester program",
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/three developer teams/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "About and contact" }),
+    ).toHaveAttribute("href", "/about");
 
     const screenshot = screen.getByRole("img", {
       name: /real Trace Rail screenshot/i,
@@ -82,6 +113,10 @@ describe("AgentRail landing page", () => {
 
     await renderLandingPage();
 
+    expect(screen.getByRole("link", { name: "About" })).toHaveAttribute(
+      "href",
+      "/about",
+    );
     expect(screen.queryAllByRole("link", { name: /source/i })).toHaveLength(0);
   });
 
