@@ -35,12 +35,10 @@ const flow = [
   },
 ];
 
-const setupQuickstart = `From an AgentRail repository checkout:
+const setupQuickstart = `npm install @agentrail/sdk
 
-corepack enable
-pnpm install
-docker compose up -d --build
-pnpm bootstrap:local`;
+# MCP reader for Codex-style tools
+npx @agentrail/mcp`;
 
 const sdkQuickstart = `import { AgentRail, BufferedDelivery, HttpSpanTransport } from "@agentrail/sdk";
 
@@ -172,15 +170,15 @@ export default function LandingPage() {
 
       <section id="quickstart" className="landing-section landing-quickstart">
         <div className="landing-quickstart-copy">
-          <h2>Source-checkout quickstart</h2>
+          <h2>NPM quickstart</h2>
           <p>
-            The M1 target stays small: trace, span, action, cost, and payload
-            evidence. Enough to prove the core pipeline without pretending to be
-            enterprise observability.
+            Users should not need a monorepo checkout just to instrument an
+            agent. The public path is one SDK install, while source checkout and
+            Docker remain for maintainers and self-hosting.
           </p>
         </div>
         <div className="landing-code-stack">
-          <pre aria-label="Local source-checkout quickstart">
+          <pre aria-label="NPM install quickstart">
             <code>{setupQuickstart}</code>
           </pre>
           <pre aria-label="TypeScript SDK example">
