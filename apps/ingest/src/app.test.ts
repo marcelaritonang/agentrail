@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import type { CanonicalSpanBatch } from "@agentrail/contracts";
+import type { CanonicalSpanBatch } from "@agentrail-sdk/contracts";
 import { digestApiKey } from "./api-key.js";
 import { createIngestApp, type IngestDependencies } from "./app.js";
 

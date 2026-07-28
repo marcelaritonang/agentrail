@@ -60,18 +60,18 @@ const npmStatus = [
   ],
   [
     "NPM target",
-    "@agentrail/sdk for apps, @agentrail/mcp for Codex-style tools",
+    "@agentrail-sdk/sdk for apps, @agentrail-sdk/mcp for Codex-style tools",
   ],
-  ["Publish blocker", "npm auth and @agentrail scope ownership"],
+  ["Publish blocker", "npm auth and @agentrail-sdk scope ownership"],
 ] as const;
 
 const setupQuickstart = `# Target command after registry publish
-npm install @agentrail/sdk
+npm install @agentrail-sdk/sdk
 
 # Target MCP reader command after registry publish
-npx @agentrail/mcp`;
+npx @agentrail-sdk/mcp`;
 
-const sdkQuickstart = `import { AgentRail, BufferedDelivery, HttpSpanTransport } from "@agentrail/sdk";
+const sdkQuickstart = `import { AgentRail, BufferedDelivery, HttpSpanTransport } from "@agentrail-sdk/sdk";
 
 const delivery = new BufferedDelivery({
   transport: new HttpSpanTransport({
@@ -229,8 +229,8 @@ export default function LandingPage() {
             The package graph is prepared for a scoped npm release and has
             passed local tarball install smoke tests. The public registry
             commands still require npm authentication and ownership of the
-            selected <code>@agentrail</code> scope before they are advertised as
-            live downloads.
+            selected <code>@agentrail-sdk</code> scope before they are
+            advertised as live downloads.
           </p>
           <dl className="landing-npm-status" aria-label="NPM release status">
             {npmStatus.map(([term, description]) => (
@@ -242,8 +242,8 @@ export default function LandingPage() {
           </dl>
           <p className="landing-status-note">
             Do not treat the commands as live downloads until{" "}
-            <code>npm view @agentrail/sdk</code> and{" "}
-            <code>npm view @agentrail/mcp</code> resolve to this repository.
+            <code>npm view @agentrail-sdk/sdk</code> and{" "}
+            <code>npm view @agentrail-sdk/mcp</code> resolve to this repository.
           </p>
         </div>
         <div className="landing-code-stack">

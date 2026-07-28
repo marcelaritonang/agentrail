@@ -1,5 +1,5 @@
 {
-  "name": "@agentrail/queue",
+  "name": "@agentrail-sdk/queue",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -18,7 +18,7 @@
     "lint": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@agentrail/contracts": "workspace:*",
+    "@agentrail-sdk/contracts": "workspace:*",
     "@aws-sdk/client-sqs": "^3.1091.0",
     "redis": "^6.1.0"
   }

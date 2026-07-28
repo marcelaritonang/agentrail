@@ -6,25 +6,25 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      "@agentrail/blob": fileURLToPath(
+      "@agentrail-sdk/blob": fileURLToPath(
         new URL("./packages/blob/src/index.ts", import.meta.url),
       ),
-      "@agentrail/config": fileURLToPath(
+      "@agentrail-sdk/config": fileURLToPath(
         new URL("./packages/config/src/index.ts", import.meta.url),
       ),
-      "@agentrail/contracts": fileURLToPath(
+      "@agentrail-sdk/contracts": fileURLToPath(
         new URL("./packages/contracts/src/index.ts", import.meta.url),
       ),
-      "@agentrail/db": fileURLToPath(
+      "@agentrail-sdk/db": fileURLToPath(
         new URL("./packages/db/src/index.ts", import.meta.url),
       ),
-      "@agentrail/pricing": fileURLToPath(
+      "@agentrail-sdk/pricing": fileURLToPath(
         new URL("./packages/pricing/src/index.ts", import.meta.url),
       ),
-      "@agentrail/queue": fileURLToPath(
+      "@agentrail-sdk/queue": fileURLToPath(
         new URL("./packages/queue/src/index.ts", import.meta.url),
       ),
-      "@agentrail/sdk": fileURLToPath(
+      "@agentrail-sdk/sdk": fileURLToPath(
         new URL("./packages/sdk/src/index.ts", import.meta.url),
       ),
     },

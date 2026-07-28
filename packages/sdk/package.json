@@ -1,5 +1,5 @@
 {
-  "name": "@agentrail/sdk",
+  "name": "@agentrail-sdk/sdk",
   "version": "0.1.0",
   "description": "TypeScript SDK for recording AgentRail traces, spans, actions, and delivery buffers.",
   "private": false,
@@ -33,6 +33,6 @@
     "lint": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@agentrail/contracts": "workspace:0.1.0"
+    "@agentrail-sdk/contracts": "workspace:0.1.0"
   }
 }

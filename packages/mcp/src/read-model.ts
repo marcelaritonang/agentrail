@@ -5,7 +5,7 @@ import {
   type SpanKind,
   type SpanOutcome,
   type TraceCompletionState,
-} from "@agentrail/db";
+} from "@agentrail-sdk/db";
 
 import type {
   AgentRailPayloadStatus,

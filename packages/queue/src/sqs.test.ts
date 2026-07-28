@@ -5,7 +5,7 @@ import {
 } from "@aws-sdk/client-sqs";
 import { describe, expect, it } from "vitest";
 
-import type { CanonicalSpanBatch } from "@agentrail/contracts";
+import type { CanonicalSpanBatch } from "@agentrail-sdk/contracts";
 import { createSqsSpanQueue } from "./sqs.js";
 
 const batch: CanonicalSpanBatch = { spans: [] };

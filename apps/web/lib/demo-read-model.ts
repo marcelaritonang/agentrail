@@ -1,4 +1,4 @@
-import type { BlobStore } from "@agentrail/blob";
+import type { BlobStore } from "@agentrail-sdk/blob";
 
 import {
   DEMO_ACTION_SPAN_ID,

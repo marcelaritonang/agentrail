@@ -1,5 +1,5 @@
 {
-  "name": "@agentrail/web",
+  "name": "@agentrail-sdk/web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -11,9 +11,9 @@
     "test": "vitest run --root ../.. apps/web"
   },
   "dependencies": {
-    "@agentrail/blob": "workspace:*",
-    "@agentrail/config": "workspace:*",
-    "@agentrail/db": "workspace:*",
+    "@agentrail-sdk/blob": "workspace:*",
+    "@agentrail-sdk/config": "workspace:*",
+    "@agentrail-sdk/db": "workspace:*",
     "@aws-sdk/client-s3": "^3.1091.0",
     "@phosphor-icons/react": "^2.1.10",
     "next": "16.2.10",

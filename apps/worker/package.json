@@ -1,5 +1,5 @@
 {
-  "name": "@agentrail/worker",
+  "name": "@agentrail-sdk/worker",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -13,12 +13,12 @@
     "start": "node dist/runtime.js"
   },
   "dependencies": {
-    "@agentrail/blob": "workspace:*",
-    "@agentrail/config": "workspace:*",
-    "@agentrail/contracts": "workspace:*",
-    "@agentrail/db": "workspace:*",
-    "@agentrail/pricing": "workspace:*",
-    "@agentrail/queue": "workspace:*",
+    "@agentrail-sdk/blob": "workspace:*",
+    "@agentrail-sdk/config": "workspace:*",
+    "@agentrail-sdk/contracts": "workspace:*",
+    "@agentrail-sdk/db": "workspace:*",
+    "@agentrail-sdk/pricing": "workspace:*",
+    "@agentrail-sdk/queue": "workspace:*",
     "@aws-sdk/client-s3": "^3.1091.0"
   }
 }

@@ -3,8 +3,8 @@ import { arch, cpus, platform, release } from "node:os";
 import { dirname, resolve } from "node:path";
 import { performance } from "node:perf_hooks";
 
-import type { CanonicalSpanBatch } from "@agentrail/contracts";
-import { createRedisStreamsQueue } from "@agentrail/queue";
+import type { CanonicalSpanBatch } from "@agentrail-sdk/contracts";
+import { createRedisStreamsQueue } from "@agentrail-sdk/queue";
 import { digestApiKey } from "./api-key.js";
 import { createIngestApp } from "./app.js";
 

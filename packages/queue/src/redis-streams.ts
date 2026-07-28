@@ -1,6 +1,6 @@
 import { createClient, type RedisClientType } from "redis";
 
-import type { CanonicalSpanBatch } from "@agentrail/contracts";
+import type { CanonicalSpanBatch } from "@agentrail-sdk/contracts";
 import type { QueueMessage, SpanQueue } from "./types.js";
 
 type RedisStreamsOptions = {

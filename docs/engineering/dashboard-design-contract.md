@@ -20,6 +20,6 @@ The AgentRail dashboard is a forensic recorder, not a marketing surface. It uses
 
 ## Automated gate
 
-`pnpm --filter @agentrail/web anti-slop` blocks raw component colors, gradient/glass effects, a second icon family, `transition-all`, low-contrast amber-on-amber declarations, and the forbidden running status. Large radii, decorative animation, and hover scaling are advisory so a reviewer can judge context.
+`pnpm --filter @agentrail-sdk/web anti-slop` blocks raw component colors, gradient/glass effects, a second icon family, `transition-all`, low-contrast amber-on-amber declarations, and the forbidden running status. Large radii, decorative animation, and hover scaling are advisory so a reviewer can judge context.
 
 These checks are a project-specific implementation of the approved AgentRail constraints and universal anti-template audit concepts. No Soleur ZIP code, paths, hooks, connector behavior, or brand rules were copied or installed. The landing-only `design-taste-frontend` skill does not govern dashboard composition.

@@ -7,7 +7,7 @@ import {
   createSpanRepository,
   type DatabaseConnection,
   type SpanWrite,
-} from "@agentrail/db";
+} from "@agentrail-sdk/db";
 import { createTraceReadModel } from "./trace-read-model";
 
 const PROJECT_A = "00000000-0000-4000-8000-000000000101";

@@ -1,7 +1,7 @@
 import { S3Client } from "@aws-sdk/client-s3";
 
-import { createS3BlobStore } from "@agentrail/blob";
-import { createDatabase, createSpanRepository } from "@agentrail/db";
+import { createS3BlobStore } from "@agentrail-sdk/blob";
+import { createDatabase, createSpanRepository } from "@agentrail-sdk/db";
 import {
   createDemoBlobStore,
   createDemoEvidenceRepository,

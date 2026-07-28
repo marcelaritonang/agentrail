@@ -33,7 +33,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "pnpm --filter @agentrail/web dev",
+    command: "pnpm --filter @agentrail-sdk/web dev",
     url: `${baseURL}/traces`,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

@@ -1,5 +1,5 @@
 {
-  "name": "@agentrail/db",
+  "name": "@agentrail-sdk/db",
   "version": "0.1.0",
   "description": "PostgreSQL schema, migrations, and read/write repositories for AgentRail.",
   "private": false,

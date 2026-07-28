@@ -41,8 +41,8 @@ pnpm bootstrap:local`}</code>
             These are the intended package names after npm auth is configured.
           </p>
           <pre aria-label="NPM install commands">
-            <code>{`npm install @agentrail/sdk
-npx @agentrail/mcp`}</code>
+            <code>{`npm install @agentrail-sdk/sdk
+npx @agentrail-sdk/mcp`}</code>
           </pre>
           <small>
             Publish requires npm authentication and scope ownership.

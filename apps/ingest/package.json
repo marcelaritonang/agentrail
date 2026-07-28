@@ -1,5 +1,5 @@
 {
-  "name": "@agentrail/ingest",
+  "name": "@agentrail-sdk/ingest",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -20,10 +20,10 @@
     "start": "node dist/runtime.js"
   },
   "dependencies": {
-    "@agentrail/config": "workspace:*",
-    "@agentrail/contracts": "workspace:*",
-    "@agentrail/db": "workspace:*",
-    "@agentrail/queue": "workspace:*",
+    "@agentrail-sdk/config": "workspace:*",
+    "@agentrail-sdk/contracts": "workspace:*",
+    "@agentrail-sdk/db": "workspace:*",
+    "@agentrail-sdk/queue": "workspace:*",
     "@hono/node-server": "^2.0.11",
     "hono": "^4.12.31"
   },

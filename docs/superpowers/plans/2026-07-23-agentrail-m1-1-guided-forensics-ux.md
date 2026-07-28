@@ -18,7 +18,7 @@
 - Summary copy is deterministic and uses persisted fields only; no LLM-generated summary is allowed.
 - `stepCount` excludes the root trace span only when `rootSpanId` is present; `technicalSpanCount` remains the persisted `spanCount`.
 - `completion_state = null` never renders `Running`, `Pending`, or `Live`.
-- Timed-out traces render `Incomplete recording` and use `TRACE_INCOMPLETE_AFTER_MS` from `@agentrail/config`.
+- Timed-out traces render `Incomplete recording` and use `TRACE_INCOMPLETE_AFTER_MS` from `@agentrail-sdk/config`.
 - Unknown model pricing renders `Price unavailable` with technical state `UNPRICED`, never `$0.00`.
 - A span with `hasPayload = false` renders non-interactive `Metadata only`; it never opens the recorded-data drawer.
 - Payload content continues to travel only through the project-scoped Next.js backend route; no browser object-store access is introduced.
@@ -385,7 +385,7 @@ Expected: FAIL because the presentation module does not exist.
 Use explicit mappings:
 
 ```ts
-import { TRACE_INCOMPLETE_AFTER_MS } from "@agentrail/config";
+import { TRACE_INCOMPLETE_AFTER_MS } from "@agentrail-sdk/config";
 
 import { formatCost, formatDuration, formatTimestamp, shortId } from "./format";
 import type { TraceDetail, TraceListItem, TraceSpan } from "./trace-read-model";
@@ -660,7 +660,7 @@ Run:
 
 ```powershell
 $env:NEXT_PUBLIC_AGENTRAIL_SOURCE_URL = "http://example.com"
-rtk pnpm --filter @agentrail/web build
+rtk pnpm --filter @agentrail-sdk/web build
 ```
 
 Expected: nonzero exit with
@@ -671,7 +671,7 @@ Then run:
 ```powershell
 Remove-Item Env:NEXT_PUBLIC_AGENTRAIL_SOURCE_URL
 rtk vitest run apps/web/lib/source-url.test.ts apps/web/tests/dashboard-shell.test.tsx
-rtk pnpm --filter @agentrail/web build
+rtk pnpm --filter @agentrail-sdk/web build
 ```
 
 Expected: tests pass and an unset-source production build exits 0 without a
@@ -1410,7 +1410,7 @@ Run:
 ```bash
 rtk vitest run apps/web/tests/design-contract.test.ts
 rtk playwright test tests/e2e/traces-index.spec.ts tests/e2e/trace-detail.spec.ts tests/e2e/dashboard-a11y.spec.ts tests/e2e/dashboard-visual.spec.ts
-rtk pnpm --filter @agentrail/web anti-slop
+rtk pnpm --filter @agentrail-sdk/web anti-slop
 ```
 
 Expected: desktop/mobile tests pass, Axe has zero listed violations, and the
@@ -1511,7 +1511,7 @@ pnpm bootstrap:local
 The TypeScript API example must use the implemented interfaces:
 
 ```ts
-import { AgentRail, BufferedDelivery, HttpSpanTransport } from "@agentrail/sdk";
+import { AgentRail, BufferedDelivery, HttpSpanTransport } from "@agentrail-sdk/sdk";
 
 const delivery = new BufferedDelivery({
   transport: new HttpSpanTransport({
@@ -1618,7 +1618,7 @@ export async function seedRunStateFixtures(): Promise<void>;
 export async function removeRunStateFixtures(): Promise<void>;
 ```
 
-Use `@agentrail/db` against only the configured `agentrail_test` database.
+Use `@agentrail-sdk/db` against only the configured `agentrail_test` database.
 Abort unless the parsed URL pathname is exactly `/agentrail_test`. Insert one
 old trace row whose completion envelope never arrived, plus one complete trace
 with unknown model pricing. The incomplete trace intentionally has no root
@@ -1628,8 +1628,8 @@ root completion envelope does not.
 Use these fixed identifiers and values:
 
 ```ts
-import { TRACE_INCOMPLETE_AFTER_MS } from "@agentrail/config";
-import { createDatabase } from "@agentrail/db";
+import { TRACE_INCOMPLETE_AFTER_MS } from "@agentrail-sdk/config";
+import { createDatabase } from "@agentrail-sdk/db";
 
 const projectId =
   process.env.AGENTRAIL_PROJECT_ID ?? "00000000-0000-4000-8000-000000000101";
@@ -1790,10 +1790,10 @@ Run every command separately and require exit 0:
 ```bash
 rtk vitest run apps/web
 rtk vitest run tests/docs/documentation.test.ts
-rtk pnpm --filter @agentrail/web anti-slop
+rtk pnpm --filter @agentrail-sdk/web anti-slop
 rtk playwright test
 rtk tsc -p apps/web/tsconfig.json --noEmit
-rtk pnpm --filter @agentrail/web build
+rtk pnpm --filter @agentrail-sdk/web build
 rtk prettier --check .
 rtk git diff --check
 ```

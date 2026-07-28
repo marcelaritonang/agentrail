@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { SpanEnvelope } from "@agentrail/contracts";
+import type { SpanEnvelope } from "@agentrail-sdk/contracts";
 import { AgentRail } from "./agentrail.js";
 
 const TRACE_ID = "0af7651916cd43dd8448eb211c80319c";

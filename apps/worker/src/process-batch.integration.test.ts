@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { MemoryBlobStore } from "@agentrail/blob";
-import type { CanonicalSpanBatch } from "@agentrail/contracts";
-import type { SpanWrite } from "@agentrail/db";
+import { MemoryBlobStore } from "@agentrail-sdk/blob";
+import type { CanonicalSpanBatch } from "@agentrail-sdk/contracts";
+import type { SpanWrite } from "@agentrail-sdk/db";
 import { processBatch, type WorkerRepository } from "./process-batch.js";
 
 const PROJECT_ID = "00000000-0000-4000-8000-000000000001";

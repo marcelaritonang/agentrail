@@ -1,5 +1,5 @@
 {
-  "name": "@agentrail/mcp",
+  "name": "@agentrail-sdk/mcp",
   "version": "0.1.0",
   "description": "Read-only MCP server for inspecting AgentRail traces from Codex-style developer tools.",
   "private": false,
@@ -37,8 +37,8 @@
     "start": "node ./dist/index.js"
   },
   "dependencies": {
-    "@agentrail/db": "workspace:0.1.0",
-    "@modelcontextprotocol/sdk": "1.29.0",
+    "@agentrail-sdk/db": "workspace:0.1.0",
+    "@modelcontextprotocol/sdk": "1.30.0",
     "zod": "^4.1.0"
   }
 }

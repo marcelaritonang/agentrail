@@ -17,8 +17,8 @@
     "format:check": "prettier --check ."
   },
   "devDependencies": {
-    "@agentrail/db": "workspace:*",
-    "@agentrail/config": "workspace:*",
+    "@agentrail-sdk/db": "workspace:*",
+    "@agentrail-sdk/config": "workspace:*",
     "@axe-core/playwright": "^4.12.1",
     "@playwright/test": "^1.61.1",
     "@types/node": "^24.0.0",
