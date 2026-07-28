@@ -44,7 +44,7 @@ expect(
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `pnpm --filter @agentrail/web test -- apps/web/tests/landing-page.test.tsx`
+Run: `pnpm --filter @agentrail-sdk/web test -- apps/web/tests/landing-page.test.tsx`
 Expected: FAIL because `apps/web/app/page.tsx` does not exist.
 
 ### Task 2: Landing Route and Asset
@@ -109,7 +109,7 @@ Run the landing unit test and landing Playwright spec.
 
 - [ ] **Step 2: Run project checks**
 
-Run `pnpm test`, `pnpm --filter @agentrail/web anti-slop`, `pnpm typecheck`, `pnpm build`, and `pnpm format:check`.
+Run `pnpm test`, `pnpm --filter @agentrail-sdk/web anti-slop`, `pnpm typecheck`, `pnpm build`, and `pnpm format:check`.
 
 - [ ] **Step 3: Commit**
 

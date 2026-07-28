@@ -245,7 +245,7 @@ Expected: the legacy ApplyMate deletion and AgentRail foundation are committed t
 
 **Interfaces:**
 
-- Consumes: token usage and model strings from `@agentrail/contracts`.
+- Consumes: token usage and model strings from `@agentrail-sdk/contracts`.
 - Produces: `calculateCost(input): PricingResult` and `PRICING_CATALOG_VERSION`.
 
 - [ ] **Step 1: Write failing pricing tests**
@@ -395,7 +395,7 @@ it("sets trace total to null when any priced span is unknown", async () => {
 
 - [ ] **Step 5: Run migration, tests, and commit**
 
-Run: `rtk pnpm --filter @agentrail/db db:migrate`
+Run: `rtk pnpm --filter @agentrail-sdk/db db:migrate`
 Run: `rtk vitest run packages/db/src/span-repository.integration.test.ts`
 Expected: PASS with duplicate and unknown-total cases.
 Run: `rtk git add packages/db && rtk git commit -m "feat: persist idempotent spans"`
@@ -692,7 +692,7 @@ Expected: PASS, and the test dependency reports zero pricing, database-write, or
 
 Create a benchmark script that performs 100 warmups and 1,000 requests at concurrency 10 against a warm local Redis adapter with worker stopped. It must report p50, p95, p99, body bytes, and machine metadata.
 
-Run: `rtk pnpm --filter @agentrail/ingest bench`
+Run: `rtk pnpm --filter @agentrail-sdk/ingest bench`
 Expected: p95 at or below 100 ms in the recorded local environment.
 Run: `rtk git add apps/ingest && rtk git commit -m "feat: accept spans after fast enqueue"`
 

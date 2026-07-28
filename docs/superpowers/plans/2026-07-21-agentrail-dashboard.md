@@ -496,7 +496,7 @@ Run: `rtk git add apps/web tests/e2e/evidence-drawer.spec.ts && rtk git commit -
 **Interfaces:**
 
 - Consumes: AgentRail TSX and CSS files.
-- Produces: `pnpm --filter @agentrail/web anti-slop` with advisory findings and blocking brand/accessibility findings.
+- Produces: `pnpm --filter @agentrail-sdk/web anti-slop` with advisory findings and blocking brand/accessibility findings.
 
 - [ ] **Step 1: Write failing scanner fixture tests**
 
@@ -523,7 +523,7 @@ Port only universal concepts from the audited ZIP with attribution. Do not copy 
 
 - [ ] **Step 3: Run scanner over dashboard and commit**
 
-Run: `rtk pnpm --filter @agentrail/web anti-slop`
+Run: `rtk pnpm --filter @agentrail-sdk/web anti-slop`
 Expected: zero blocking findings; advisory findings reviewed and either fixed or documented with a reason.
 Run: `rtk git add apps/web/scripts apps/web/package.json docs/engineering && rtk git commit -m "test: enforce dashboard design contract"`
 
@@ -557,8 +557,8 @@ The accessibility test traverses every interactive control with the keyboard, ch
 
 - [ ] **Step 3: Run the complete dashboard gate**
 
-Run: `rtk pnpm --filter @agentrail/web test`
-Run: `rtk pnpm --filter @agentrail/web anti-slop`
+Run: `rtk pnpm --filter @agentrail-sdk/web test`
+Run: `rtk pnpm --filter @agentrail-sdk/web anti-slop`
 Run: `rtk next build`
 Run: `rtk playwright test tests/e2e/traces-index.spec.ts tests/e2e/trace-detail.spec.ts tests/e2e/evidence-drawer.spec.ts tests/e2e/dashboard-visual.spec.ts tests/e2e/dashboard-a11y.spec.ts`
 Expected: all commands exit 0 on desktop and mobile projects.

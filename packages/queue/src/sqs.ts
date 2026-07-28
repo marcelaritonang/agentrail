@@ -5,7 +5,7 @@ import {
   SendMessageCommand,
 } from "@aws-sdk/client-sqs";
 
-import type { CanonicalSpanBatch } from "@agentrail/contracts";
+import type { CanonicalSpanBatch } from "@agentrail-sdk/contracts";
 import type { QueueMessage, SpanQueue } from "./types.js";
 
 type SqsCommand =

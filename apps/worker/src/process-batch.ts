@@ -1,14 +1,14 @@
-import type { BlobStore } from "@agentrail/blob";
+import type { BlobStore } from "@agentrail-sdk/blob";
 import {
   CanonicalSpanBatchSchema,
   type CanonicalSpanEnvelope,
-} from "@agentrail/contracts";
-import type { PayloadMode, SpanWrite } from "@agentrail/db";
+} from "@agentrail-sdk/contracts";
+import type { PayloadMode, SpanWrite } from "@agentrail-sdk/db";
 import {
   calculateCost,
   PRICING_CATALOG_VERSION,
   type PricingResult,
-} from "@agentrail/pricing";
+} from "@agentrail-sdk/pricing";
 import { redactPayload } from "./redact.js";
 
 export type WorkerRepository = {

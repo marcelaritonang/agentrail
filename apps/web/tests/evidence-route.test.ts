@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import type { BlobStore } from "@agentrail/blob";
+import type { BlobStore } from "@agentrail-sdk/blob";
 import {
   createEvidenceHandler,
   type EvidenceRepository,

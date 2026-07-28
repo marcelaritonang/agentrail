@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { MemoryBlobStore } from "@agentrail/blob";
-import type { QueueMessage, SpanQueue } from "@agentrail/queue";
+import { MemoryBlobStore } from "@agentrail-sdk/blob";
+import type { QueueMessage, SpanQueue } from "@agentrail-sdk/queue";
 import { consumeOnce } from "./main.js";
 import type { WorkerRepository } from "./process-batch.js";
 

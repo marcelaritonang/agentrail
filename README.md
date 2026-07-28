@@ -49,7 +49,7 @@ AgentRail is an open-source flight recorder for AI agents. It records traces, to
 - forensic dashboard routes for `/traces` and `/traces/[traceId]`
 - guided sample mode for explaining the trace archive, Trace Rail, Evidence Drawer, and Action Ledger
 - landing page with optional source controls for public deployments
-- `@agentrail/mcp` read-only MCP server for inspecting traces from Codex-style developer workflows
+- `@agentrail-sdk/mcp` read-only MCP server for inspecting traces from Codex-style developer workflows
 
 ## Local quickstart
 
@@ -81,7 +81,11 @@ In PowerShell, set `$env:RUN_CORE_SMOKE='1'` before the Vitest command.
 ## SDK example
 
 ```ts
-import { AgentRail, BufferedDelivery, HttpSpanTransport } from "@agentrail/sdk";
+import {
+  AgentRail,
+  BufferedDelivery,
+  HttpSpanTransport,
+} from "@agentrail-sdk/sdk";
 
 const delivery = new BufferedDelivery({
   transport: new HttpSpanTransport({
@@ -142,9 +146,9 @@ NEXT_PUBLIC_AGENTRAIL_SOURCE_URL=https://example.com/your-org/agentrail
 AgentRail is publish-ready for a scoped npm release, but it is not a live npm download yet. The npm command shown on the website is the package release target, not the current installation path.
 
 - Available today: source checkout + local Docker setup from this repository.
-- Package state: `pnpm pack` produces registry-safe tarballs for `@agentrail/contracts`, `@agentrail/db`, `@agentrail/sdk`, and `@agentrail/mcp`; local npm tarball install smoke tests pass.
-- Target after registry publish: `npm install @agentrail/sdk` and `npx @agentrail/mcp`.
-- Publish blocker: npm authentication and ownership of the selected `@agentrail` scope.
+- Package state: `pnpm pack` produces registry-safe tarballs for `@agentrail-sdk/contracts`, `@agentrail-sdk/db`, `@agentrail-sdk/sdk`, and `@agentrail-sdk/mcp`; local npm tarball install smoke tests pass.
+- Target after registry publish: `npm install @agentrail-sdk/sdk` and `npx @agentrail-sdk/mcp`.
+- Publish blocker: npm authentication and ownership of the selected `@agentrail-sdk` scope.
 
 The unscoped npm command `npm install agentrail` is not this project; that package is owned by another maintainer. The scoped packages are not live public registry downloads yet. Until publish is complete, test AgentRail from the source checkout above.
 
@@ -152,17 +156,17 @@ The intended public commands after publish are:
 
 ```bash
 # Target command after registry publish
-npm install @agentrail/sdk
+npm install @agentrail-sdk/sdk
 
 # Target MCP reader command after registry publish
-npx @agentrail/mcp
+npx @agentrail-sdk/mcp
 ```
 
-Publishing requires npm authentication and ownership of the selected npm scope. Use `pnpm publish --access public` from each package so workspace dependencies are rewritten to registry versions in the published tarballs. Do not advertise the npm commands as live registry downloads until `npm view @agentrail/sdk` and `npm view @agentrail/mcp` resolve to this repository. See [NPM release checklist](docs/operations/npm-release.md).
+Publishing requires npm authentication and ownership of the selected npm scope. Use `pnpm publish --access public` from each package so workspace dependencies are rewritten to registry versions in the published tarballs. Do not advertise the npm commands as live registry downloads until `npm view @agentrail-sdk/sdk` and `npm view @agentrail-sdk/mcp` resolve to this repository. See [NPM release checklist](docs/operations/npm-release.md).
 
 ## MCP integration
 
-`@agentrail/mcp` lets MCP-capable developer tools inspect AgentRail traces without adding mutation features or exposing raw evidence payloads. See [AgentRail MCP operations](docs/operations/mcp.md) for Codex config, demo mode, and local database setup.
+`@agentrail-sdk/mcp` lets MCP-capable developer tools inspect AgentRail traces without adding mutation features or exposing raw evidence payloads. See [AgentRail MCP operations](docs/operations/mcp.md) for Codex config, demo mode, and local database setup.
 
 ## Quality gates
 
@@ -177,7 +181,7 @@ docker compose config --quiet
 The local ingestion benchmark runs 100 warmups and 1,000 measured requests at concurrency 10 against warm Redis with the worker stopped:
 
 ```bash
-pnpm --filter @agentrail/ingest bench
+pnpm --filter @agentrail-sdk/ingest bench
 ```
 
 Benchmark results describe only the recorded machine and profile; they are not a universal latency guarantee.

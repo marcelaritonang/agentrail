@@ -1,5 +1,5 @@
-import type { BlobStore } from "@agentrail/blob";
-import type { SpanQueue } from "@agentrail/queue";
+import type { BlobStore } from "@agentrail-sdk/blob";
+import type { SpanQueue } from "@agentrail-sdk/queue";
 import { processBatch, type WorkerRepository } from "./process-batch.js";
 
 export type WorkerDependencies = {

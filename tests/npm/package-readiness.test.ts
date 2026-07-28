@@ -35,11 +35,11 @@ const expectedInternalWorkspaceDependencies: Record<
   string,
   Record<string, string>
 > = {
-  "@agentrail/sdk": {
-    "@agentrail/contracts": "workspace:0.1.0",
+  "@agentrail-sdk/sdk": {
+    "@agentrail-sdk/contracts": "workspace:0.1.0",
   },
-  "@agentrail/mcp": {
-    "@agentrail/db": "workspace:0.1.0",
+  "@agentrail-sdk/mcp": {
+    "@agentrail-sdk/db": "workspace:0.1.0",
   },
 };
 
@@ -62,7 +62,7 @@ describe("npm package readiness", () => {
     for (const packageName of publishablePackages) {
       const manifest = readPackageJson(packageName);
 
-      expect(manifest.name).toMatch(/^@agentrail\//);
+      expect(manifest.name).toMatch(/^@agentrail-sdk\//);
       expect(manifest.version).toBe("0.1.0");
       expect(manifest.private).not.toBe(true);
       expect(manifest.publishConfig?.access).toBe("public");
@@ -92,7 +92,7 @@ describe("npm package readiness", () => {
         for (const [dependencyName, versionRange] of Object.entries(
           dependencies,
         )) {
-          if (dependencyName.startsWith("@agentrail/")) {
+          if (dependencyName.startsWith("@agentrail-sdk/")) {
             expect(versionRange, `${manifest.name} -> ${dependencyName}`).toBe(
               expectedInternalWorkspaceDependencies[manifest.name]?.[
                 dependencyName

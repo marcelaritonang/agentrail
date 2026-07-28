@@ -2,11 +2,11 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build a local read-only `@agentrail/mcp` package that lets Codex inspect AgentRail traces through MCP tools.
+**Goal:** Build a local read-only `@agentrail-sdk/mcp` package that lets Codex inspect AgentRail traces through MCP tools.
 
 **Architecture:** Add a new workspace package under `packages/mcp`. Keep the package independent from Next.js by defining a small read-model interface, pure tool handlers, and a stdio MCP server entrypoint. The first milestone reads database/demo trace metadata and payload availability only; raw payload content stays behind the dashboard backend.
 
-**Tech Stack:** TypeScript, Vitest, `@modelcontextprotocol/sdk@1.29.0`, `zod`, `@agentrail/db`, existing demo data.
+**Tech Stack:** TypeScript, Vitest, `@modelcontextprotocol/sdk@1.29.0`, `zod`, `@agentrail-sdk/db`, existing demo data.
 
 ## Global Constraints
 
@@ -43,7 +43,7 @@
 
 - [ ] **Step 1: Add package manifest and tsconfig**
 
-Create `packages/mcp/package.json` with package name `@agentrail/mcp`, `bin.agentrail-mcp = ./dist/index.js`, scripts `build`, `typecheck`, `lint`, and dependencies on `@agentrail/db`, `@modelcontextprotocol/sdk`, and `zod`.
+Create `packages/mcp/package.json` with package name `@agentrail-sdk/mcp`, `bin.agentrail-mcp = ./dist/index.js`, scripts `build`, `typecheck`, `lint`, and dependencies on `@agentrail-sdk/db`, `@modelcontextprotocol/sdk`, and `zod`.
 
 Create `packages/mcp/tsconfig.json` extending `../../tsconfig.base.json` with `rootDir = "src"` and `outDir = "dist"`.
 
@@ -179,7 +179,7 @@ rtk git commit -m "feat(mcp): add readonly trace handlers"
 
 **Interfaces:**
 
-- Consumes existing `@agentrail/db` repository shape and demo-mode data.
+- Consumes existing `@agentrail-sdk/db` repository shape and demo-mode data.
 - Produces:
   - `createEnvironmentConfig(env: NodeJS.ProcessEnv): AgentRailMcpConfig`
   - `createDatabaseReadModel(config: AgentRailMcpConfig): AgentRailReadModel`
@@ -240,7 +240,7 @@ Run:
 ```bash
 rtk vitest run packages/mcp/src/read-model.test.ts packages/mcp/src/server.test.ts packages/mcp/src/tools.test.ts
 rtk tsc -p packages/mcp/tsconfig.json --noEmit
-rtk pnpm --filter @agentrail/mcp build
+rtk pnpm --filter @agentrail-sdk/mcp build
 ```
 
 Expected: tests pass, TypeScript has no errors, and package builds.
@@ -269,7 +269,7 @@ rtk git commit -m "feat(mcp): serve readonly stdio tools"
 
 Add tests that assert:
 
-- docs mention `@agentrail/mcp`;
+- docs mention `@agentrail-sdk/mcp`;
 - docs mention read-only MCP;
 - docs include `agentrail_list_traces`;
 - docs warn that MCP does not automatically record Codex or Claude activity;
@@ -315,10 +315,10 @@ Run:
 ```bash
 rtk vitest run packages/mcp tests/docs/documentation.test.ts
 rtk tsc -p packages/mcp/tsconfig.json --noEmit
-rtk pnpm --filter @agentrail/mcp build
+rtk pnpm --filter @agentrail-sdk/mcp build
 rtk vitest run apps/web
-rtk pnpm --filter @agentrail/web anti-slop
-rtk pnpm --filter @agentrail/web build
+rtk pnpm --filter @agentrail-sdk/web anti-slop
+rtk pnpm --filter @agentrail-sdk/web build
 rtk git diff --check
 ```
 

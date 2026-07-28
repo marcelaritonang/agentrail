@@ -4,7 +4,7 @@ RUN corepack enable
 WORKDIR /app
 
 COPY . .
-RUN pnpm install --frozen-lockfile && pnpm --filter @agentrail/ingest... build
+RUN pnpm install --frozen-lockfile && pnpm --filter @agentrail-sdk/ingest... build
 
 ENV NODE_ENV=production
 EXPOSE 3001

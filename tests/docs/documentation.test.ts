@@ -32,7 +32,7 @@ function expectNoStalePublicCopy(source: string) {
   expect(source).not.toMatch(/dashboard is the next implementation stage/i);
   expect(source).not.toMatch(/new AgentRail\(\{\s*apiKey/i);
   expect(source).not.toMatch(/trace\.llm\(/i);
-  expect(source).not.toMatch(/pnpm add @agentrail\/sdk/i);
+  expect(source).not.toMatch(/pnpm add @agentrail-sdk\/sdk/i);
   expect(source).not.toMatch(/AWS startup application/i);
 }
 
@@ -86,9 +86,9 @@ describe("public AgentRail documentation", () => {
   });
 
   it("documents the read-only MCP integration without over-claiming", () => {
-    expect(readme).toContain("@agentrail/mcp");
+    expect(readme).toContain("@agentrail-sdk/mcp");
     expect(readme).toContain("docs/operations/mcp.md");
-    expect(mcp).toContain("@agentrail/mcp");
+    expect(mcp).toContain("@agentrail-sdk/mcp");
     expect(mcp).toMatch(/read-only MCP/i);
     expect(mcp).toContain("agentrail_list_traces");
     expect(mcp).toContain("does not automatically record Codex or Claude");
@@ -101,8 +101,8 @@ describe("public AgentRail documentation", () => {
   it("documents npm install status without directing users to the unrelated unscoped package", () => {
     expect(readme).toContain("npm install agentrail");
     expect(readme).toContain("is not this project");
-    expect(readme).toContain("npm install @agentrail/sdk");
-    expect(mcp).toContain("npx @agentrail/mcp");
+    expect(readme).toContain("npm install @agentrail-sdk/sdk");
+    expect(mcp).toContain("npx @agentrail-sdk/mcp");
     expect(readme).toMatch(/npm authentication/i);
     expect(readme).toMatch(/publish-ready/i);
     expect(readme).toContain("pnpm pack");

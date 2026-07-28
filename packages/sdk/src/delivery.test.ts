@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import type { SpanEnvelope } from "@agentrail/contracts";
+import type { SpanEnvelope } from "@agentrail-sdk/contracts";
 import { AgentRail } from "./agentrail.js";
 import {
   BufferedDelivery,

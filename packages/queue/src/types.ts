@@ -1,4 +1,4 @@
-import type { CanonicalSpanBatch } from "@agentrail/contracts";
+import type { CanonicalSpanBatch } from "@agentrail-sdk/contracts";
 
 export type QueueMessage = {
   messageId: string;

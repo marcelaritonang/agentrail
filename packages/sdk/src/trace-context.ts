@@ -1,4 +1,4 @@
-import type { SpanEnvelope } from "@agentrail/contracts";
+import type { SpanEnvelope } from "@agentrail-sdk/contracts";
 import { resolveActor, type ResolvedActor } from "./actor.js";
 import type { IdGenerator } from "./ids.js";
 import { completedSpan, type SpanOptions } from "./span-builder.js";

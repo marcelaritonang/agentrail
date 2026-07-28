@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 
 import { afterAll, describe, expect, it } from "vitest";
 
-import { createDatabase, createSpanRepository } from "@agentrail/db";
+import { createDatabase, createSpanRepository } from "@agentrail-sdk/db";
 
 const runSmoke = process.env.RUN_CORE_SMOKE === "1";
 const databaseUrl =

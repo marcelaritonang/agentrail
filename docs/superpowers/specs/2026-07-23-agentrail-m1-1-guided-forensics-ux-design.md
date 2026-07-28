@@ -121,7 +121,7 @@ ideal customer profile.
 | Severity | Current problem                                                                              | User impact                                                        | M1.1 response                                                                             |
 | -------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
 | P0       | Landing quickstart does not match the implemented SDK API                                    | A developer copying it receives invalid guidance                   | Replace it with verified source-first setup and an SDK example copied from the tested API |
-| P0       | `@agentrail/sdk` is private while the empty state recommends installing it from a registry   | The first action cannot succeed                                    | Point to the repository quickstart while the package remains private                      |
+| P0       | `@agentrail-sdk/sdk` is private while the empty state recommends installing it from a registry   | The first action cannot succeed                                    | Point to the repository quickstart while the package remains private                      |
 | P0       | Landing source links target a missing repository and dashboard source targets generic GitHub | The open-source claim is not verifiable                            | Configure one canonical source URL and omit the control when unset                        |
 | P0       | Landing copy describes making an AWS application credible                                    | Product value appears subordinate to obtaining credits             | Replace grant-centric copy with customer problem and product value                        |
 | P1       | `/traces` begins with internal recorder vocabulary                                           | First-time users cannot form a mental model                        | Add an orientation block and use `Agent runs` as the primary label                        |
@@ -523,7 +523,7 @@ persists them.`
 It shows the supported local command `docker compose up -d --build`. When the
 canonical source URL is configured, it also links to
 `{sourceUrl}#local-quickstart`. It does not recommend installing
-`@agentrail/sdk` from a registry while the package is private.
+`@agentrail-sdk/sdk` from a registry while the package is private.
 
 Database or storage diagnostics appear only inside an accessible
 `Technical details` disclosure and never expose secrets.
@@ -610,7 +610,7 @@ architecture:
 - `Open trace dashboard` becomes `Explore the guided demo`.
 - `Replay` becomes `Investigate`.
 - The quickstart uses commands and SDK calls that exist in the repository.
-- While `@agentrail/sdk` is private, setup begins from the public source
+- While `@agentrail-sdk/sdk` is private, setup begins from the public source
   repository rather than a registry-install claim.
 - Copy about making an AWS application credible is removed.
 - Replacement copy explains the product value:

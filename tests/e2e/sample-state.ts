@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { TRACE_INCOMPLETE_AFTER_MS } from "@agentrail/config";
-import { createDatabase } from "@agentrail/db";
+import { TRACE_INCOMPLETE_AFTER_MS } from "@agentrail-sdk/config";
+import { createDatabase } from "@agentrail-sdk/db";
 import { DEMO_LLM_SPAN_ID, DEMO_TRACE_ID } from "../../apps/web/lib/demo-mode";
 
 type SampleSpan = {

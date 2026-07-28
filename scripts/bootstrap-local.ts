@@ -2,7 +2,7 @@ import { createHmac, randomBytes, randomUUID } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
-import { createDatabase, createSpanRepository } from "@agentrail/db";
+import { createDatabase, createSpanRepository } from "@agentrail-sdk/db";
 
 const databaseUrl =
   process.env.DATABASE_URL ??

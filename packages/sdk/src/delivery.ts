@@ -1,4 +1,4 @@
-import type { SpanEnvelope } from "@agentrail/contracts";
+import type { SpanEnvelope } from "@agentrail-sdk/contracts";
 import type {
   DeliverySummary,
   ShutdownOptions,

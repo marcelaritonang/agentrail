@@ -5,7 +5,7 @@ import {
   type SpanKind,
   type SpanOutcome,
   type TraceCompletionState,
-} from "@agentrail/db";
+} from "@agentrail-sdk/db";
 import { createDemoTraceReadRepository } from "./demo-read-model";
 import { demoModeEnabled } from "./demo-mode";
 

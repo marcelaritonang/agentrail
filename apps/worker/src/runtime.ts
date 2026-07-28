@@ -1,10 +1,10 @@
 import { hostname } from "node:os";
 import { S3Client } from "@aws-sdk/client-s3";
 
-import { createS3BlobStore } from "@agentrail/blob";
-import { TRACE_INCOMPLETE_AFTER_MS } from "@agentrail/config";
-import { createDatabase, createSpanRepository } from "@agentrail/db";
-import { createRedisStreamsQueue } from "@agentrail/queue";
+import { createS3BlobStore } from "@agentrail-sdk/blob";
+import { TRACE_INCOMPLETE_AFTER_MS } from "@agentrail-sdk/config";
+import { createDatabase, createSpanRepository } from "@agentrail-sdk/db";
+import { createRedisStreamsQueue } from "@agentrail-sdk/queue";
 import { runWorker } from "./main.js";
 import { reconcileIncompleteTraces } from "./reconcile-incomplete.js";
 

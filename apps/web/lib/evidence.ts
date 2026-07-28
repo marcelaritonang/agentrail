@@ -1,5 +1,5 @@
-import type { BlobStore } from "@agentrail/blob";
-import type { PayloadMode } from "@agentrail/db";
+import type { BlobStore } from "@agentrail-sdk/blob";
+import type { PayloadMode } from "@agentrail-sdk/db";
 
 export type EvidenceSpan = {
   payloadRef: string | null;

@@ -1,4 +1,4 @@
-import type { PayloadMode, SpanKind, SpanOutcome } from "@agentrail/db";
+import type { PayloadMode, SpanKind, SpanOutcome } from "@agentrail-sdk/db";
 
 export type AgentRailTrace = {
   traceId: string;

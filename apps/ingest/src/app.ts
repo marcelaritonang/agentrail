@@ -2,12 +2,12 @@ import { randomUUID } from "node:crypto";
 import { Hono } from "hono";
 import { bodyLimit } from "hono/body-limit";
 
-import { MAX_INGEST_BODY_BYTES } from "@agentrail/config";
+import { MAX_INGEST_BODY_BYTES } from "@agentrail-sdk/config";
 import {
   IngestSpanBatchSchema,
   type CanonicalSpanBatch,
-} from "@agentrail/contracts";
-import type { SpanQueue } from "@agentrail/queue";
+} from "@agentrail-sdk/contracts";
+import type { SpanQueue } from "@agentrail-sdk/queue";
 import { apiKeyPrefix, verifyApiKey } from "./api-key.js";
 
 type ApiKeyRecord = {

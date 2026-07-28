@@ -45,7 +45,7 @@ describe("AgentRail landing page", () => {
       screen.queryByText(/AWS startup application/i),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByText(/pnpm add @agentrail\/sdk/i),
+      screen.queryByText(/pnpm add @agentrail-sdk\/sdk/i),
     ).not.toBeInTheDocument();
     expect(
       screen.getByRole("heading", {
@@ -61,7 +61,7 @@ describe("AgentRail landing page", () => {
     expect(installBlock).toHaveTextContent(
       "Target command after registry publish",
     );
-    expect(installBlock).toHaveTextContent("npm install @agentrail/sdk");
+    expect(installBlock).toHaveTextContent("npm install @agentrail-sdk/sdk");
     expect(installBlock).not.toHaveTextContent("pnpm install");
     expect(screen.getByText("Available today")).toBeInTheDocument();
     expect(
@@ -69,7 +69,7 @@ describe("AgentRail landing page", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("Publish blocker")).toBeInTheDocument();
     expect(
-      screen.getByText(/npm auth and @agentrail scope/i),
+      screen.getByText(/npm auth and @agentrail-sdk scope/i),
     ).toBeInTheDocument();
     expect(screen.getByText(/pnpm pack smoke tests pass/i)).toBeInTheDocument();
     expect(

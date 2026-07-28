@@ -1,4 +1,4 @@
-import { TRACE_INCOMPLETE_AFTER_MS } from "@agentrail/config";
+import { TRACE_INCOMPLETE_AFTER_MS } from "@agentrail-sdk/config";
 
 import { formatCost, formatDuration, formatTimestamp, shortId } from "./format";
 import type { TraceDetail, TraceListItem, TraceSpan } from "./trace-read-model";

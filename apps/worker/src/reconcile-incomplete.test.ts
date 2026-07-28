@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { TRACE_INCOMPLETE_AFTER_MS } from "@agentrail/config";
+import { TRACE_INCOMPLETE_AFTER_MS } from "@agentrail-sdk/config";
 import { reconcileIncompleteTraces } from "./reconcile-incomplete.js";
 
 describe("reconcileIncompleteTraces", () => {

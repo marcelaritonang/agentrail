@@ -27,7 +27,7 @@ Explicitly excluded:
 
 ## Approach options
 
-### Option A: `@agentrail/mcp` reads the database directly
+### Option A: `@agentrail-sdk/mcp` reads the database directly
 
 The package owns its MCP server entrypoint and uses existing database repositories. It formats read-only tool results with small presenter functions.
 
@@ -51,7 +51,7 @@ Chosen approach: Option A.
 
 Create `packages/mcp` with three layers:
 
-1. `src/read-model.ts`: project-scoped read-only functions over `@agentrail/db`.
+1. `src/read-model.ts`: project-scoped read-only functions over `@agentrail-sdk/db`.
 2. `src/tools.ts`: pure tool handlers that transform traces into MCP-safe text/JSON results.
 3. `src/server.ts` and `src/index.ts`: MCP server registration and stdio entrypoint using the official Model Context Protocol TypeScript SDK.
 
@@ -128,7 +128,7 @@ Codex config example:
 ```toml
 [mcp_servers.agentrail]
 command = "pnpm"
-args = ["--dir", "/absolute/path/to/agentrail", "--filter", "@agentrail/mcp", "start"]
+args = ["--dir", "/absolute/path/to/agentrail", "--filter", "@agentrail-sdk/mcp", "start"]
 env = {
   DATABASE_URL = "postgresql://agentrail:agentrail@localhost:5433/agentrail_test",
   AGENTRAIL_PROJECT_ID = "00000000-0000-4000-8000-000000000101",

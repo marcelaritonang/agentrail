@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { MemorySpanQueue } from "./memory.js";
-import type { CanonicalSpanBatch } from "@agentrail/contracts";
+import type { CanonicalSpanBatch } from "@agentrail-sdk/contracts";
 
 const batch: CanonicalSpanBatch = {
   spans: [

@@ -1,5 +1,5 @@
-import { createDatabase, createSpanRepository } from "@agentrail/db";
-import { createRedisStreamsQueue } from "@agentrail/queue";
+import { createDatabase, createSpanRepository } from "@agentrail-sdk/db";
+import { createRedisStreamsQueue } from "@agentrail-sdk/queue";
 import { createIngestApp } from "./app.js";
 import { serveIngestApp } from "./server.js";
 
