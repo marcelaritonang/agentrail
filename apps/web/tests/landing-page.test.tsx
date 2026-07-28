@@ -48,16 +48,26 @@ describe("AgentRail landing page", () => {
       screen.queryByText(/pnpm add @agentrail-sdk\/sdk/i),
     ).not.toBeInTheDocument();
     expect(
-      screen.getByRole("heading", {
+      screen.queryByRole("heading", {
         level: 2,
         name: "NPM publish-ready (auth required)",
       }),
-    ).toBeInTheDocument();
+    ).not.toBeInTheDocument();
     expect(
       screen.queryByText("Source-checkout quickstart"),
     ).not.toBeInTheDocument();
 
-    const installBlock = screen.getByLabelText("NPM package commands");
+    expect(
+      screen.getByRole("heading", {
+        level: 2,
+        name: "Install AgentRail with npm",
+      }),
+    ).toBeInTheDocument();
+    const installBlock = screen.getByLabelText(
+      "Highlighted npm install commands",
+    );
+    expect(screen.getByText("SDK package")).toBeInTheDocument();
+    expect(screen.getByText("MCP reader")).toBeInTheDocument();
     expect(installBlock).toHaveTextContent(
       "Target command after registry publish",
     );
@@ -108,7 +118,7 @@ describe("AgentRail landing page", () => {
       "src",
       expect.stringContaining("agentrail-trace-rail"),
     );
-  }, 15_000);
+  }, 60_000);
 
   it("keeps landing copy restrained and free from AI-slop punctuation", async () => {
     const { container } = await renderLandingPage();

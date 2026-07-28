@@ -65,11 +65,18 @@ const npmStatus = [
   ["Publish blocker", "npm auth and @agentrail-sdk scope ownership"],
 ] as const;
 
-const setupQuickstart = `# Target command after registry publish
-npm install @agentrail-sdk/sdk
-
-# Target MCP reader command after registry publish
-npx @agentrail-sdk/mcp`;
+const npmCommands = [
+  {
+    label: "SDK package",
+    command: "npm install @agentrail-sdk/sdk",
+    description: "Add AgentRail tracing to a TypeScript AI application.",
+  },
+  {
+    label: "MCP reader",
+    command: "npx @agentrail-sdk/mcp",
+    description: "Open read-only trace lookup from Codex-style tools.",
+  },
+] as const;
 
 const sdkQuickstart = `import { AgentRail, BufferedDelivery, HttpSpanTransport } from "@agentrail-sdk/sdk";
 
@@ -224,13 +231,13 @@ export default function LandingPage() {
 
       <section id="quickstart" className="landing-section landing-quickstart">
         <div className="landing-quickstart-copy">
-          <h2>NPM publish-ready (auth required)</h2>
+          <p className="landing-section-kicker">NPM publish-ready</p>
+          <h2>Install AgentRail with npm</h2>
           <p>
-            The package graph is prepared for a scoped npm release and has
-            passed local tarball install smoke tests. The public registry
-            commands still require npm authentication and ownership of the
-            selected <code>@agentrail-sdk</code> scope before they are
-            advertised as live downloads.
+            Copy the public package names from here. The registry commands are
+            prepared and smoke-tested, but they still require npm authentication
+            and ownership of the selected <code>@agentrail-sdk</code> scope
+            before they are advertised as live downloads.
           </p>
           <dl className="landing-npm-status" aria-label="NPM release status">
             {npmStatus.map(([term, description]) => (
@@ -247,9 +254,24 @@ export default function LandingPage() {
           </p>
         </div>
         <div className="landing-code-stack">
-          <pre aria-label="NPM package commands">
-            <code>{setupQuickstart}</code>
-          </pre>
+          <section
+            className="landing-npm-command-panel"
+            aria-label="Highlighted npm install commands"
+          >
+            <div>
+              <p>Target command after registry publish</p>
+              <strong>Use these exact package names</strong>
+            </div>
+            <div className="landing-npm-command-list">
+              {npmCommands.map((item) => (
+                <div className="landing-npm-command-card" key={item.label}>
+                  <span>{item.label}</span>
+                  <code>{item.command}</code>
+                  <p>{item.description}</p>
+                </div>
+              ))}
+            </div>
+          </section>
           <pre aria-label="TypeScript SDK example">
             <code>{sdkQuickstart}</code>
           </pre>
