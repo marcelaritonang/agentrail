@@ -170,6 +170,15 @@ select {
   text-transform: uppercase;
 }
 
+.landing-section-kicker {
+  color: var(--signal-action);
+  font-family: var(--font-jetbrains), monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  margin: 0 0 12px;
+  text-transform: uppercase;
+}
+
 .landing-hero h1 {
   font-size: clamp(52px, 18vw, 78px);
   font-weight: 620;
@@ -409,6 +418,77 @@ select {
   display: grid;
   gap: 12px;
   min-width: 0;
+}
+
+.landing-npm-command-panel {
+  background: var(--surface-panel);
+  border: 1px solid var(--line-strong);
+  border-left: 2px solid var(--signal-action);
+  border-radius: var(--radius-md);
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+}
+
+.landing-npm-command-panel > div:first-child {
+  display: grid;
+  gap: 5px;
+}
+
+.landing-npm-command-panel > div:first-child p {
+  color: var(--signal-action);
+  font-family: var(--font-jetbrains), monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.landing-npm-command-panel strong {
+  color: var(--text-primary);
+  font-size: 20px;
+  font-weight: 620;
+  letter-spacing: -0.03em;
+}
+
+.landing-npm-command-list {
+  display: grid;
+  gap: 10px;
+}
+
+.landing-npm-command-card {
+  background: var(--surface-inset);
+  border: 1px solid var(--line-subtle);
+  border-radius: var(--radius-sm);
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 14px;
+}
+
+.landing-npm-command-card span {
+  color: var(--text-secondary);
+  font-family: var(--font-jetbrains), monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.landing-npm-command-card code {
+  color: var(--text-primary);
+  display: block;
+  font-family: var(--font-jetbrains), monospace;
+  font-size: clamp(15px, 2.5vw, 22px);
+  line-height: 1.35;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.landing-npm-command-card p {
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.55;
+  margin: 0;
 }
 
 .landing-quickstart pre {
@@ -2122,6 +2202,10 @@ select {
   .landing-quickstart pre {
     font-size: 12px;
     padding: 20px;
+  }
+
+  .landing-npm-command-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .landing-cta {
