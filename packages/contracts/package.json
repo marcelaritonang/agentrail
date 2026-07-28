@@ -1,6 +1,6 @@
 {
   "name": "@agentrail-sdk/contracts",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Shared AgentRail trace and span contracts for SDK, ingestion, and worker packages.",
   "private": false,
   "type": "module",
