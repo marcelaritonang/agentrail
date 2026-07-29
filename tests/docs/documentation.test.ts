@@ -206,4 +206,55 @@ describe("public AgentRail documentation", () => {
       expect(testerInterview).toContain(expected);
     }
   });
+
+  it("keeps the AWS Activate application pack evidence-linked and honest", () => {
+    const application = readFileSync(
+      "docs/startup/aws-activate-application.md",
+      "utf8",
+    );
+    const creditPlan = readFileSync(
+      "docs/startup/aws-90-day-credit-plan.md",
+      "utf8",
+    );
+    const evidence = readFileSync("docs/startup/evidence-register.md", "utf8");
+    const checklist = readFileSync(
+      "docs/startup/application-readiness-checklist.md",
+      "utf8",
+    );
+    const evidenceHeader =
+      /\|\s*Claim\s*\|\s*Evidence\s*\|\s*Status\s*\|\s*Owner\s*\|/;
+
+    expect(application).toContain("Problem");
+    expect(application).toContain("Solution");
+    expect(application).toContain("Target user");
+    expect(application).toContain("Why AWS");
+    expect(application).toContain("90-day plan");
+    expect(application).toMatch(/does not guarantee acceptance/i);
+    expect(application).toMatch(evidenceHeader);
+    expect(application).not.toMatch(
+      /guaranteed|already funded|thousands of users/i,
+    );
+
+    for (const source of [application, evidence]) {
+      expect(source).toMatch(evidenceHeader);
+      expect(source).toMatch(/\|\s*verified\s*\|/i);
+      expect(source).toMatch(/\|\s*pending\s*\|/i);
+      expect(source).toMatch(/\|\s*not-applicable\s*\|/i);
+    }
+
+    expect(creditPlan).toContain("API Gateway");
+    expect(creditPlan).toContain("Lambda");
+    expect(creditPlan).toContain("SQS");
+    expect(creditPlan).toContain("RDS PostgreSQL");
+    expect(creditPlan).toContain("S3 only for opt-in evidence");
+    expect(creditPlan).toContain("Secrets Manager");
+    expect(creditPlan).toContain("CloudWatch");
+    expect(creditPlan).toContain("AWS Budgets");
+    expect(creditPlan).not.toMatch(/invoice|guaranteed|unlimited/i);
+
+    expect(checklist).toContain("AWS Paid Tier account");
+    expect(checklist).toContain("company website");
+    expect(checklist).toContain("npm scope");
+    expect(checklist).toContain("GitHub");
+  });
 });

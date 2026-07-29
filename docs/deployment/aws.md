@@ -15,6 +15,22 @@ This document is an evidence-based **reference mapping** from the verified local
 | Secrets              | AWS Secrets Manager                                           | secret names, rotation ownership, caching strategy, IAM                           |
 | Logs/metrics         | Amazon CloudWatch                                             | structured redacted logs, retention, dashboards, alarms                           |
 
+## AWS Activate Founders boundary
+
+The application should be framed as a request to validate an early, self-funded,
+open-source developer tool. AWS's public Activate materials describe Founders as
+the path for self-funded early-stage startups, with a functioning website and a
+startup founded in the past 10 years. AWS also states that applications can be
+accepted or rejected at its discretion, so AgentRail documentation must not
+present credits as guaranteed.
+
+Application materials live in:
+
+- `docs/startup/aws-activate-application.md`
+- `docs/startup/aws-90-day-credit-plan.md`
+- `docs/startup/evidence-register.md`
+- `docs/startup/application-readiness-checklist.md`
+
 ### Dashboard hosting decision
 
 AWS Amplify Hosting documents managed SSR support through Next.js 15, while this repository's approved dashboard plan uses Next.js 16. Therefore the current recommendation is ECS/Fargate with an Application Load Balancer, which supports HTTP/HTTPS routing to Fargate services. Amplify can be reconsidered only after its documented support covers the chosen Next.js version, or after the project deliberately pins and tests a supported version.
