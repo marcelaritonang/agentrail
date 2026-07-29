@@ -6,9 +6,12 @@ import {
   createDatabaseReadModel,
   createEnvironmentConfig,
   type AgentRailMcpConfig,
-} from "./read-model";
-import type { AgentRailToolDependencies, AgentRailToolResult } from "./types";
-import { createAgentRailToolHandlers, safeErrorMessage } from "./tools";
+} from "./read-model.js";
+import type {
+  AgentRailToolDependencies,
+  AgentRailToolResult,
+} from "./types.js";
+import { createAgentRailToolHandlers, safeErrorMessage } from "./tools.js";
 
 type ToolHandler = (
   input: Record<string, unknown>,
@@ -120,7 +123,7 @@ export function createAgentRailMcpServer(
 ): McpServer {
   const server = new McpServer({
     name: "agentrail",
-    version: "0.1.0",
+    version: "0.1.1",
   });
 
   registerAgentRailMcpTools(

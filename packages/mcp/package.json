@@ -1,6 +1,6 @@
 {
   "name": "@agentrail-sdk/mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Read-only MCP server for inspecting AgentRail traces from Codex-style developer tools.",
   "private": false,
   "type": "module",

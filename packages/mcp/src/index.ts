@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { main, reportStartupError } from "./server";
+import { main, reportStartupError } from "./server.js";
 
 main().catch((error: unknown) => {
   reportStartupError(error);

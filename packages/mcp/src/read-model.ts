@@ -14,7 +14,7 @@ import type {
   AgentRailTrace,
   AgentRailTraceDetail,
   AgentRailTraceListInput,
-} from "./types";
+} from "./types.js";
 
 export type AgentRailMcpConfig =
   | {

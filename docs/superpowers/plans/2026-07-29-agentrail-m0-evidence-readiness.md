@@ -121,7 +121,7 @@ const expectedPackageVersions = {
   contracts: "0.1.1",
   db: "0.1.0",
   sdk: "0.1.0",
-  mcp: "0.1.0",
+  mcp: "0.1.1",
 } as const;
 
 expect(manifest.version).toBe(expectedPackageVersions[packageName]);
@@ -279,7 +279,7 @@ Registry mode installs:
 @agentrail-sdk/contracts@0.1.1
 @agentrail-sdk/db@0.1.0
 @agentrail-sdk/sdk@0.1.0
-@agentrail-sdk/mcp@0.1.0
+@agentrail-sdk/mcp@0.1.1
 ```
 
 Add root scripts:
