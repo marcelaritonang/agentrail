@@ -9,6 +9,18 @@ const aws = readFileSync("docs/deployment/aws.md", "utf8");
 const mcp = readFileSync("docs/operations/mcp.md", "utf8");
 const pitch = readFileSync("docs/startup/pitch.md", "utf8");
 const testers = readFileSync("docs/community/founding-testers.md", "utf8");
+const testerInterview = readFileSync(
+  "docs/community/founding-tester-interview.md",
+  "utf8",
+);
+const testerIssueTemplate = readFileSync(
+  ".github/ISSUE_TEMPLATE/founding-tester.yml",
+  "utf8",
+);
+const testerPage = readFileSync(
+  "apps/web/app/founding-testers/page.tsx",
+  "utf8",
+);
 const sdk = [
   readFileSync("packages/sdk/src/agentrail.ts", "utf8"),
   readFileSync("packages/sdk/src/trace-context.ts", "utf8"),
@@ -26,6 +38,8 @@ const requiredPublicDocuments = [
   "docs/operations/mcp.md",
   "docs/startup/pitch.md",
   "docs/community/founding-testers.md",
+  "docs/community/founding-tester-interview.md",
+  ".github/ISSUE_TEMPLATE/founding-tester.yml",
 ];
 
 function expectNoStalePublicCopy(source: string) {
@@ -155,5 +169,41 @@ describe("public AgentRail documentation", () => {
     expect(testers).toContain("three founding testers");
     expect(testers).toContain("AI agent application developer");
     expect(readme).not.toMatch(/funding guarantee/i);
+  });
+
+  it("defines a real founding-tester intake without fake traction", () => {
+    expect(testers).toContain("installation completed");
+    expect(testers).toContain("first Context Pack created");
+    expect(testers).toContain("returned within seven days");
+    expect(testers).toContain("uninstall reason");
+    expect(testers).not.toMatch(/already used by|customers|active users/i);
+
+    expect(testerPage).toContain("NEXT_PUBLIC_AGENTRAIL_TESTER_INTAKE_URL");
+    expect(testerPage).toContain("intake is being prepared");
+    expect(testerPage).toContain("Open tester intake");
+
+    expect(testerIssueTemplate).toContain("Do not paste source code");
+    expect(testerIssueTemplate).toContain("prompts");
+    expect(testerIssueTemplate).toContain("API keys");
+    expect(testerIssueTemplate).toContain("credentials");
+    expect(testerIssueTemplate).toContain("client");
+    expect(testerIssueTemplate).toContain("operating system");
+    expect(testerIssueTemplate).toContain("repository language");
+    expect(testerIssueTemplate).toContain("installation outcome");
+    expect(testerIssueTemplate).toContain("first Context Pack outcome");
+    expect(testerIssueTemplate).toContain("anonymized aggregate use");
+
+    for (const expected of [
+      "task category",
+      "context miss",
+      "useful sources",
+      "irrelevant sources",
+      "latency perception",
+      "privacy concern",
+      "uninstall reason",
+      "anonymized quote",
+    ]) {
+      expect(testerInterview).toContain(expected);
+    }
   });
 });

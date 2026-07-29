@@ -56,6 +56,7 @@ test("serves public trust routes with stable navigation", async ({ page }) => {
   const routes = [
     { path: "/about", title: /About AgentRail/ },
     { path: "/architecture", title: /AgentRail Architecture/ },
+    { path: "/founding-testers", title: /AgentRail Founding Testers/ },
     { path: "/privacy", title: /AgentRail Privacy/ },
     { path: "/security", title: /AgentRail Security/ },
     { path: "/terms", title: /AgentRail Terms/ },
@@ -71,5 +72,31 @@ test("serves public trust routes with stable navigation", async ({ page }) => {
     ).toHaveAttribute("href", "/");
     await expect(page.locator('a[href^="mailto:"]')).toHaveCount(0);
     await expect(page.getByRole("link", { name: "Docs" })).toHaveCount(0);
+  }
+});
+
+test("serves the founding tester intake state truthfully", async ({ page }) => {
+  const intakeUrl =
+    process.env.NEXT_PUBLIC_AGENTRAIL_TESTER_INTAKE_URL?.trim() ?? "";
+
+  await page.goto("/founding-testers");
+
+  await expect(
+    page.getByRole("heading", { level: 1, name: "AgentRail Founding Testers" }),
+  ).toBeVisible();
+  await expect(page.getByText("installation completed")).toBeVisible();
+  await expect(page.getByText("first Context Pack created")).toBeVisible();
+  await expect(page.getByText("returned within seven days")).toBeVisible();
+
+  if (intakeUrl.length > 0) {
+    await expect(
+      page.getByRole("link", { name: "Open tester intake" }),
+    ).toHaveAttribute("href", intakeUrl);
+    await expect(page.getByText(/intake is being prepared/i)).toHaveCount(0);
+  } else {
+    await expect(page.getByText(/intake is being prepared/i)).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Open tester intake" }),
+    ).toHaveCount(0);
   }
 });
