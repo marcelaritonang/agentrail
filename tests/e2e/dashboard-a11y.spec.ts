@@ -29,6 +29,46 @@ async function expectNamedControls(page: Page) {
   }
 }
 
+async function focusedControlName(page: Page) {
+  return page.locator(":focus").evaluate((element) => {
+    function normalize(value: string | null | undefined) {
+      return (value ?? "").replace(/\s+/g, " ").trim();
+    }
+
+    const ariaLabel = normalize(element.getAttribute("aria-label"));
+    if (ariaLabel) return ariaLabel;
+
+    const labelledBy = normalize(element.getAttribute("aria-labelledby"));
+    if (labelledBy) {
+      const label = labelledBy
+        .split(" ")
+        .map((id) => normalize(document.getElementById(id)?.textContent))
+        .filter(Boolean)
+        .join(" ");
+      if (label) return label;
+    }
+
+    const label = element.closest("label");
+    if (label) {
+      const explicit = normalize(
+        label.querySelector("span")?.textContent ?? label.textContent,
+      );
+      if (explicit) return explicit;
+    }
+
+    return normalize(element.textContent);
+  });
+}
+
+async function tabSequence(page: Page, steps: number) {
+  const names: string[] = [];
+  for (let index = 0; index < steps; index += 1) {
+    await page.keyboard.press("Tab");
+    names.push(await focusedControlName(page));
+  }
+  return names;
+}
+
 test("has logical headings, named controls, and zero Axe violations on the index", async ({
   page,
 }) => {
@@ -65,33 +105,33 @@ test("supports logical keyboard order on the run archive", async ({
   await page.goto("/traces");
   await page.locator("body").click({ position: { x: 2, y: 2 } });
 
-  const home = page.getByRole("link", { name: "AgentRail home" });
-  const navigation = page.getByRole("link", { name: "Agent runs" });
-  const sampleCta = page.getByRole("link", {
-    name: "Explore the sample run",
-  });
-  const filterSummary = page.getByText("Search and filters");
-  const search = page.getByRole("searchbox", {
-    name: "Search by run name or ID",
-  });
-  const status = page.getByRole("combobox", { name: "Status" });
-  const agent = page.getByRole("textbox", { name: "Agent" });
-  const submit = page.getByRole("button", { name: "Apply filters" });
-  const runName = page.getByRole("link", { name: "Research answer" }).first();
-  const open = page.getByRole("link", { name: "Open run" }).first();
-
-  await expectNextTabFocus(page, home, "home link");
-  await expectNextTabFocus(page, navigation, "dashboard navigation");
-  await expectNextTabFocus(page, sampleCta, "sample run CTA");
   if (testInfo.project.name === "mobile") {
-    await expectNextTabFocus(page, filterSummary, "mobile filter disclosure");
+    expect(await tabSequence(page, 10)).toEqual([
+      "AgentRail home",
+      "Agent runs",
+      "Explore the sample run",
+      "Search and filters",
+      "Search by run name or ID",
+      "Status",
+      "Agent",
+      "Apply filters",
+      "Research answer",
+      "Open run",
+    ]);
+    return;
   }
-  await expectNextTabFocus(page, search, "search filter");
-  await expectNextTabFocus(page, status, "status filter");
-  await expectNextTabFocus(page, agent, "agent filter");
-  await expectNextTabFocus(page, submit, "filter submit");
-  await expectNextTabFocus(page, runName, "run title link");
-  await expectNextTabFocus(page, open, "open run link");
+
+  expect(await tabSequence(page, 9)).toEqual([
+    "AgentRail home",
+    "Agent runs",
+    "Explore the sample run",
+    "Search by run name or ID",
+    "Status",
+    "Agent",
+    "Apply filters",
+    "Research answer",
+    "Open run",
+  ]);
 });
 
 test("keeps visible keyboard focus and restores the exact drawer trigger", async ({

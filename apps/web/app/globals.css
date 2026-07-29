@@ -2153,6 +2153,7 @@ select {
   .dashboard-brand,
   .dashboard-nav a,
   .read-only-example a,
+  .install-agentrail-command button,
   .run-filter-disclosure summary,
   .trace-filters input,
   .trace-filters select,
