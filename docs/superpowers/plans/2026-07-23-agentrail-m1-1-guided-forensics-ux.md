@@ -1511,7 +1511,11 @@ pnpm bootstrap:local
 The TypeScript API example must use the implemented interfaces:
 
 ```ts
-import { AgentRail, BufferedDelivery, HttpSpanTransport } from "@agentrail-sdk/sdk";
+import {
+  AgentRail,
+  BufferedDelivery,
+  HttpSpanTransport,
+} from "@agentrail-sdk/sdk";
 
 const delivery = new BufferedDelivery({
   transport: new HttpSpanTransport({

@@ -9,4 +9,4 @@ minimumReleaseAgeExclude:
   - "@aws-sdk/client-sqs@3.1091.0"
   - "@hono/node-server@2.0.11"
   - "@testing-library/jest-dom@7.0.0"
-  - '@modelcontextprotocol/sdk@1.30.0'
+  - "@modelcontextprotocol/sdk@1.30.0"
