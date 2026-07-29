@@ -6,15 +6,15 @@ The goal is simple: while working in Codex, a developer can ask for recent Agent
 
 ## NPM status
 
-The unscoped npm command `npm install agentrail` is not this project. The scoped MCP package is publish-ready, but not live on the public registry until npm authentication and scope ownership are configured.
+The scoped MCP package is published on npm as `@agentrail-sdk/mcp`. The unscoped npm command `npm install agentrail` is not this project.
 
-The intended npm command for the published MCP server is:
+Use this command for the local read-only MCP server:
 
 ```bash
-npx @agentrail-sdk/mcp
+npx -y @agentrail-sdk/mcp
 ```
 
-Treat this as a release target until `npm view @agentrail-sdk/mcp` resolves to this repository. Use the source-checkout quickstarts below until then.
+Use the source-checkout quickstarts below when you are developing AgentRail itself or running the full local stack.
 
 ## What it enables
 
@@ -85,8 +85,8 @@ Add a local MCP server entry to your Codex configuration:
 
 ```toml
 [mcp_servers.agentrail]
-command = "pnpm"
-args = ["--dir", "/absolute/path/to/agentrail", "--filter", "@agentrail-sdk/mcp", "start"]
+command = "npx"
+args = ["-y", "@agentrail-sdk/mcp"]
 env = {
   DATABASE_URL = "postgresql://agentrail:agentrail@localhost:5433/agentrail_test",
   AGENTRAIL_PROJECT_ID = "00000000-0000-4000-8000-000000000101",

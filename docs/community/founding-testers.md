@@ -13,14 +13,14 @@ AgentRail needs three founding testers before the next milestone. The goal is to
 Ask each tester to complete the same three tasks:
 
 1. Open the public guided demo and explain what the Trace Rail, Evidence Drawer, and Action Ledger are for.
-2. Review the local quickstart and identify the first command or concept that feels unclear.
+2. Try either `npm install @agentrail-sdk/sdk`, `npx -y @agentrail-sdk/mcp`, or the local source quickstart, then identify the first command or concept that feels unclear.
 3. Describe one workflow where AgentRail should record traces, actions, cost, and evidence status.
 
 ## Outreach message
 
 Subject: founding tester request for AgentRail
 
-I am building AgentRail, an open-source flight recorder for AI agents. It records traces, tool actions, model cost metadata, actor attribution, and evidence payload status so developers can debug and audit autonomous AI workflows. I am looking for three founding testers who can review the demo, try the local setup if relevant, and give blunt feedback on whether this would help with real agent debugging. The demo and source are public at https://agentrail-rho.vercel.app and https://github.com/marcelaritonang/agentrail.
+I am building AgentRail, an open-source flight recorder for AI agents. It records traces, tool actions, model cost metadata, actor attribution, and evidence payload status so developers can debug and audit autonomous AI workflows. I am looking for three founding testers who can review the demo, try `npm install @agentrail-sdk/sdk` or `npx -y @agentrail-sdk/mcp` if relevant, and give blunt feedback on whether this would help with real agent debugging. The demo and source are public at https://agentrail.id and https://github.com/marcelaritonang/agentrail.
 
 ## Success criteria
 

@@ -21,7 +21,14 @@ test("renders the AgentRail landing page without fake-product overflow", async (
   await expect(page.getByText("Replay")).toHaveCount(0);
   await expect(page.getByText(/AWS startup application/i)).toHaveCount(0);
   await expect(page.getByText(/pnpm add @agentrail\/sdk/i)).toHaveCount(0);
-  await expect(page.getByRole("link", { name: /source/i })).toHaveCount(0);
+  const sourceUrl = process.env.NEXT_PUBLIC_AGENTRAIL_SOURCE_URL?.trim();
+  const sourceLinks = page.getByRole("link", { name: /source/i });
+
+  if (sourceUrl) {
+    await expect(sourceLinks.first()).toHaveAttribute("href", sourceUrl);
+  } else {
+    await expect(sourceLinks).toHaveCount(0);
+  }
   await expect(page.getByText(/robot|emoji|next-gen|unleash/i)).toHaveCount(0);
 
   expect(

@@ -900,6 +900,13 @@ select {
   margin: 0;
 }
 
+.install-agentrail-status {
+  color: var(--signal-action);
+  font-family: var(--font-jetbrains), monospace;
+  font-size: 11px;
+  min-height: 18px;
+}
+
 .install-agentrail-grid {
   display: grid;
   gap: 12px;
@@ -933,6 +940,57 @@ select {
 
 .install-agentrail-grid code {
   font-family: inherit;
+}
+
+.install-agentrail-command-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.install-agentrail-command {
+  background: var(--surface-inset);
+  border: 1px solid var(--line-subtle);
+  border-radius: var(--radius-sm);
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 10px;
+}
+
+.install-agentrail-command span {
+  color: var(--signal-action);
+  font-family: var(--font-jetbrains), monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.install-agentrail-command code {
+  color: var(--text-primary);
+  display: block;
+  font-size: 12px;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.install-agentrail-command button {
+  align-items: center;
+  background: transparent;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 12px;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0 10px;
+  width: fit-content;
+}
+
+.install-agentrail-command button:hover {
+  border-color: var(--signal-action);
+  color: var(--signal-action);
 }
 
 .install-agentrail-grid a {

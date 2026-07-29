@@ -1,12 +1,40 @@
+"use client";
+
 import Link from "next/link";
+import { useId, useState } from "react";
 
 import { sourceQuickstartUrl } from "../lib/source-url";
+
+const npmCommands = [
+  {
+    label: "SDK package",
+    command: "npm install @agentrail-sdk/sdk",
+    description: "Record traces from a TypeScript AI application.",
+  },
+  {
+    label: "MCP reader",
+    command: "npx -y @agentrail-sdk/mcp",
+    description: "Inspect AgentRail traces from Codex-style local tools.",
+  },
+] as const;
 
 export function InstallAgentRailCard({
   sourceUrl,
 }: {
   sourceUrl: string | null;
 }) {
+  const statusId = useId();
+  const [copiedCommand, setCopiedCommand] = useState<string | null>(null);
+
+  async function copyCommand(command: string) {
+    try {
+      await navigator.clipboard.writeText(command);
+      setCopiedCommand(command);
+    } catch {
+      setCopiedCommand("copy failed");
+    }
+  }
+
   return (
     <section
       aria-label="Install and test AgentRail"
@@ -16,9 +44,12 @@ export function InstallAgentRailCard({
         <span className="page-eyebrow">Open-source test path</span>
         <h2>Install and test AgentRail</h2>
         <p>
-          Start with the guided sample here, then run the local stack from
-          source. npm install agentrail is not this project; that unscoped npm
-          package belongs to another maintainer.
+          Install the scoped npm packages or run the local stack from source.
+          npm install agentrail is not this project; that unscoped npm package
+          belongs to another maintainer.
+        </p>
+        <p id={statusId} className="install-agentrail-status" role="status">
+          {copiedCommand === null ? "" : `Copied ${copiedCommand}`}
         </p>
       </div>
       <div className="install-agentrail-grid">
@@ -36,17 +67,26 @@ pnpm bootstrap:local`}</code>
           )}
         </div>
         <div>
-          <strong>NPM release target</strong>
-          <p>
-            These are the intended package names after npm auth is configured.
-          </p>
-          <pre aria-label="NPM install commands">
-            <code>{`npm install @agentrail-sdk/sdk
-npx @agentrail-sdk/mcp`}</code>
-          </pre>
-          <small>
-            Publish requires npm authentication and scope ownership.
-          </small>
+          <strong>Install from npm</strong>
+          <p>Use the live scoped packages published under @agentrail-sdk.</p>
+          <div className="install-agentrail-command-list">
+            {npmCommands.map((item) => (
+              <div className="install-agentrail-command" key={item.command}>
+                <span>{item.label}</span>
+                <code>{item.command}</code>
+                <p>{item.description}</p>
+                <button
+                  aria-describedby={statusId}
+                  aria-label={`Copy ${item.command}`}
+                  onClick={() => void copyCommand(item.command)}
+                  type="button"
+                >
+                  Copy
+                </button>
+              </div>
+            ))}
+          </div>
+          <small>Current MCP package is read-only forensic inspection.</small>
         </div>
       </div>
     </section>

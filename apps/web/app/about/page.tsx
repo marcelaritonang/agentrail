@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 const roadmap = [
   [
     "30 days",
-    "Finish package publish readiness, collect feedback from three founding testers, and cut the first public SDK/MCP release.",
+    "Collect feedback from three founding testers using the published SDK/MCP packages and the guided forensic dashboard.",
   ],
   [
     "60 days",
