@@ -53,16 +53,13 @@ const testerProfiles = [
 ] as const;
 
 const npmStatus = [
-  ["Available today", "Source checkout + local Docker setup"],
+  ["Available today", "Public npm packages + source checkout"],
   [
-    "Package state",
-    "pnpm pack smoke tests pass for SDK, contracts, DB, and MCP",
+    "Published packages",
+    "@agentrail-sdk/contracts@0.1.1, @agentrail-sdk/db@0.1.0, @agentrail-sdk/sdk@0.1.0, @agentrail-sdk/mcp@0.1.1",
   ],
-  [
-    "NPM target",
-    "@agentrail-sdk/sdk for apps, @agentrail-sdk/mcp for Codex-style tools",
-  ],
-  ["Publish blocker", "npm auth and @agentrail-sdk scope ownership"],
+  ["SDK path", "npm install @agentrail-sdk/sdk for TypeScript AI applications"],
+  ["MCP path", "npx -y @agentrail-sdk/mcp for read-only local inspection"],
 ] as const;
 
 const npmCommands = [
@@ -73,7 +70,7 @@ const npmCommands = [
   },
   {
     label: "MCP reader",
-    command: "npx @agentrail-sdk/mcp",
+    command: "npx -y @agentrail-sdk/mcp",
     description: "Open read-only trace lookup from Codex-style tools.",
   },
 ] as const;
@@ -231,13 +228,12 @@ export default function LandingPage() {
 
       <section id="quickstart" className="landing-section landing-quickstart">
         <div className="landing-quickstart-copy">
-          <p className="landing-section-kicker">NPM publish-ready</p>
+          <p className="landing-section-kicker">Published on npm</p>
           <h2>Install AgentRail with npm</h2>
           <p>
-            Copy the public package names from here. The registry commands are
-            prepared and smoke-tested, but they still require npm authentication
-            and ownership of the selected <code>@agentrail-sdk</code> scope
-            before they are advertised as live downloads.
+            Copy the scoped package names from here. AgentRail is published on
+            npm under <code>@agentrail-sdk</code>; the unscoped{" "}
+            <code>agentrail</code> package is not this project.
           </p>
           <dl className="landing-npm-status" aria-label="NPM release status">
             {npmStatus.map(([term, description]) => (
@@ -248,9 +244,9 @@ export default function LandingPage() {
             ))}
           </dl>
           <p className="landing-status-note">
-            Do not treat the commands as live downloads until{" "}
-            <code>npm view @agentrail-sdk/sdk</code> and{" "}
-            <code>npm view @agentrail-sdk/mcp</code> resolve to this repository.
+            Current boundary: SDK recording and read-only MCP forensic
+            inspection. Context Relay is the next verified milestone, not an
+            active hosted feature.
           </p>
         </div>
         <div className="landing-code-stack">
@@ -259,7 +255,7 @@ export default function LandingPage() {
             aria-label="Highlighted npm install commands"
           >
             <div>
-              <p>Target command after registry publish</p>
+              <p>Live npm commands</p>
               <strong>Use these exact package names</strong>
             </div>
             <div className="landing-npm-command-list">

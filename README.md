@@ -143,26 +143,24 @@ NEXT_PUBLIC_AGENTRAIL_SOURCE_URL=https://example.com/your-org/agentrail
 
 ## NPM target status
 
-AgentRail is publish-ready for a scoped npm release, but it is not a live npm download yet. The npm command shown on the website is the package release target, not the current installation path.
+AgentRail is published on npm under the scoped `@agentrail-sdk` namespace. Use these scoped packages; the unscoped npm command `npm install agentrail` is not this project and belongs to another maintainer.
 
-- Available today: source checkout + local Docker setup from this repository.
-- Package state: `pnpm pack` produces registry-safe tarballs for `@agentrail-sdk/contracts`, `@agentrail-sdk/db`, `@agentrail-sdk/sdk`, and `@agentrail-sdk/mcp`; local npm tarball install smoke tests pass.
-- Target after registry publish: `npm install @agentrail-sdk/sdk` and `npx @agentrail-sdk/mcp`.
-- Publish blocker: npm authentication and ownership of the selected `@agentrail-sdk` scope.
+| Package                    | Version | Purpose                                                   |
+| -------------------------- | ------- | --------------------------------------------------------- |
+| `@agentrail-sdk/contracts` | `0.1.1` | Shared span and trace contracts.                          |
+| `@agentrail-sdk/db`        | `0.1.0` | Database schema and repository helpers.                   |
+| `@agentrail-sdk/sdk`       | `0.1.0` | TypeScript SDK for recording agent traces.                |
+| `@agentrail-sdk/mcp`       | `0.1.1` | Read-only local MCP server for forensic trace inspection. |
 
-The unscoped npm command `npm install agentrail` is not this project; that package is owned by another maintainer. The scoped packages are not live public registry downloads yet. Until publish is complete, test AgentRail from the source checkout above.
-
-The intended public commands after publish are:
+Live install commands:
 
 ```bash
-# Target command after registry publish
 npm install @agentrail-sdk/sdk
 
-# Target MCP reader command after registry publish
-npx @agentrail-sdk/mcp
+npx -y @agentrail-sdk/mcp
 ```
 
-Publishing requires npm authentication and ownership of the selected npm scope. Use `pnpm publish --access public` from each package so workspace dependencies are rewritten to registry versions in the published tarballs. Do not advertise the npm commands as live registry downloads until `npm view @agentrail-sdk/sdk` and `npm view @agentrail-sdk/mcp` resolve to this repository. See [NPM release checklist](docs/operations/npm-release.md).
+Local source checkout remains the recommended path for running the full ingestion API, worker, PostgreSQL, Redis, MinIO, and dashboard stack. See [NPM release checklist](docs/operations/npm-release.md) for the release verification process.
 
 ## MCP integration
 

@@ -68,23 +68,29 @@ describe("AgentRail landing page", () => {
     );
     expect(screen.getByText("SDK package")).toBeInTheDocument();
     expect(screen.getByText("MCP reader")).toBeInTheDocument();
-    expect(installBlock).toHaveTextContent(
-      "Target command after registry publish",
-    );
+    expect(installBlock).toHaveTextContent("Live npm commands");
     expect(installBlock).toHaveTextContent("npm install @agentrail-sdk/sdk");
+    expect(installBlock).toHaveTextContent("npx -y @agentrail-sdk/mcp");
     expect(installBlock).not.toHaveTextContent("pnpm install");
     expect(screen.getByText("Available today")).toBeInTheDocument();
     expect(
-      screen.getByText("Source checkout + local Docker setup"),
+      screen.getByText("Public npm packages + source checkout"),
     ).toBeInTheDocument();
-    expect(screen.getByText("Publish blocker")).toBeInTheDocument();
+    expect(screen.queryByText("Publish blocker")).not.toBeInTheDocument();
+    expect(screen.getByText(/Published packages/i)).toBeInTheDocument();
     expect(
-      screen.getByText(/npm auth and @agentrail-sdk scope/i),
+      screen.getByText(/@agentrail-sdk\/mcp@0\.1\.1/i),
     ).toBeInTheDocument();
-    expect(screen.getByText(/pnpm pack smoke tests pass/i)).toBeInTheDocument();
     expect(
-      screen.getByText(/Do not treat the commands as live/i),
-    ).toBeInTheDocument();
+      screen.queryByText(/Do not treat the commands as live/i),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/npm auth and @agentrail-sdk scope/i),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/pnpm pack smoke tests pass/i),
+    ).not.toBeInTheDocument();
+    expect(screen.getAllByText(/published on npm/i).length).toBeGreaterThan(0);
 
     expect(
       screen.getByRole("heading", {
