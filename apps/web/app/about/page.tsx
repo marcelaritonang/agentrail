@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Code } from "@phosphor-icons/react/ssr";
 
-import { ProductMark } from "../../components/product-mark";
-import { configuredSourceUrl } from "../../lib/source-url";
+import { PublicSiteShell } from "../../components/public-site-shell";
+import { readPublicAgentRailConfig } from "../../lib/public-config";
 
 export const metadata: Metadata = {
   title: "About AgentRail",
@@ -27,30 +26,14 @@ const roadmap = [
 ] as const;
 
 export default function AboutPage() {
-  const sourceUrl = configuredSourceUrl();
+  const config = readPublicAgentRailConfig();
+  const sourceUrl = config.sourceUrl?.href ?? null;
   const issuesUrl =
-    sourceUrl === null
-      ? "https://github.com/marcelaritonang/agentrail/issues"
-      : `${sourceUrl.replace(/\/$/, "")}/issues`;
+    config.contactUrl?.href ??
+    (sourceUrl === null ? null : `${sourceUrl.replace(/\/$/, "")}/issues`);
 
   return (
-    <main className="about-page">
-      <nav className="landing-nav" aria-label="About navigation">
-        <Link href="/" className="landing-brand" aria-label="AgentRail home">
-          <ProductMark />
-          <span>AgentRail</span>
-        </Link>
-        <div className="landing-nav-links">
-          <Link href="/">Home</Link>
-          <Link href="/traces">Dashboard</Link>
-          {sourceUrl === null ? null : (
-            <a href={sourceUrl} target="_blank" rel="noreferrer">
-              Source
-            </a>
-          )}
-        </div>
-      </nav>
-
+    <PublicSiteShell>
       <div className="about-main">
         <header className="about-hero">
           <h1>About AgentRail</h1>
@@ -93,9 +76,13 @@ export default function AboutPage() {
               <div>
                 <dt>Contact</dt>
                 <dd>
-                  <a href={issuesUrl} target="_blank" rel="noreferrer">
-                    GitHub Issues
-                  </a>
+                  {issuesUrl === null ? (
+                    "Contact URL pending"
+                  ) : (
+                    <a href={issuesUrl} target="_blank" rel="noreferrer">
+                      GitHub Issues
+                    </a>
+                  )}
                 </dd>
               </div>
               <div>
@@ -127,6 +114,6 @@ export default function AboutPage() {
           </section>
         </div>
       </div>
-    </main>
+    </PublicSiteShell>
   );
 }

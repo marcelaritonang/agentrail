@@ -39,3 +39,25 @@ test("renders the AgentRail landing page without fake-product overflow", async (
     ),
   ).toBe(true);
 });
+
+test("serves public trust routes with stable navigation", async ({ page }) => {
+  const routes = [
+    { path: "/about", title: /About AgentRail/ },
+    { path: "/architecture", title: /AgentRail Architecture/ },
+    { path: "/privacy", title: /AgentRail Privacy/ },
+    { path: "/security", title: /AgentRail Security/ },
+    { path: "/terms", title: /AgentRail Terms/ },
+  ] as const;
+
+  for (const route of routes) {
+    const response = await page.goto(route.path);
+    expect(response?.status()).toBe(200);
+    await expect(page).toHaveTitle(route.title);
+    await expect(page.locator("main h1")).toHaveCount(1);
+    await expect(
+      page.getByRole("link", { name: "AgentRail home" }),
+    ).toHaveAttribute("href", "/");
+    await expect(page.locator('a[href^="mailto:"]')).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "Docs" })).toHaveCount(0);
+  }
+});

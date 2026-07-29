@@ -124,6 +124,7 @@ export default function LandingPage() {
         <div className="landing-nav-links">
           <Link href="/traces">Dashboard</Link>
           <Link href="/about">About</Link>
+          <Link href="/architecture">Architecture</Link>
           {sourceUrl === null ? null : (
             <a href={sourceUrl} target="_blank" rel="noreferrer">
               Source

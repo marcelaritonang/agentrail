@@ -82,7 +82,30 @@ describe("public AgentRail documentation", () => {
 
   it("exposes the public demo and source URL environment contract", () => {
     expect(envExample).toContain("AGENTRAIL_DEMO_MODE=0");
+    expect(envExample).toContain(
+      "NEXT_PUBLIC_AGENTRAIL_SITE_URL=https://agentrail.id",
+    );
     expect(envExample).toContain("NEXT_PUBLIC_AGENTRAIL_SOURCE_URL=");
+    expect(envExample).toContain("NEXT_PUBLIC_AGENTRAIL_CONTACT_URL=");
+    expect(envExample).toContain("NEXT_PUBLIC_AGENTRAIL_TESTER_INTAKE_URL=");
+  });
+
+  it("keeps public trust routes explicit without fake contact details", () => {
+    for (const path of [
+      "apps/web/app/privacy/page.tsx",
+      "apps/web/app/terms/page.tsx",
+      "apps/web/app/security/page.tsx",
+      "apps/web/app/architecture/page.tsx",
+    ]) {
+      expect(() => readFileSync(path, "utf8")).not.toThrow();
+    }
+
+    expect(readFileSync("apps/web/app/security/page.tsx", "utf8")).not.toMatch(
+      /mailto:/i,
+    );
+    expect(readFileSync("apps/web/app/terms/page.tsx", "utf8")).not.toMatch(
+      /governing law|jurisdiction/i,
+    );
   });
 
   it("documents the read-only MCP integration without over-claiming", () => {
