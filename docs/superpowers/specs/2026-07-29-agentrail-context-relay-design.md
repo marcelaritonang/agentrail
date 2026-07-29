@@ -1,7 +1,7 @@
 # AgentRail Context Relay System Design
 
-**Status:** Approved design  
-**Date:** 2026-07-29  
+**Status:** Approved design
+**Date:** 2026-07-29
 **Audience:** AgentRail maintainers, founding testers, and implementation reviewers
 
 ## 1. Decision summary
