@@ -12,6 +12,7 @@
     "typecheck": "turbo run typecheck",
     "test": "vitest run",
     "test:e2e": "playwright test",
+    "test:production": "tsx scripts/verify-production.ts",
     "test:npm:registry": "tsx scripts/verify-npm-release.ts --mode registry",
     "test:npm:tarball": "tsx scripts/verify-npm-release.ts --mode tarball",
     "test:watch": "vitest",
