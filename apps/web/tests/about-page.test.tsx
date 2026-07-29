@@ -5,8 +5,13 @@ import type { ComponentType } from "react";
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("../lib/source-url", () => ({
-  configuredSourceUrl: () => "https://github.com/marcelaritonang/agentrail",
+vi.mock("../lib/public-config", () => ({
+  readPublicAgentRailConfig: () => ({
+    siteUrl: new URL("https://agentrail.id/"),
+    sourceUrl: new URL("https://github.com/marcelaritonang/agentrail"),
+    contactUrl: null,
+    testerIntakeUrl: null,
+  }),
 }));
 
 afterEach(() => {
