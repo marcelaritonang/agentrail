@@ -11,6 +11,18 @@ test("renders the AgentRail landing page without fake-product overflow", async (
   await expect(
     page.getByText(/The flight recorder for AI agents\./),
   ).toBeVisible();
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    "href",
+    "https://agentrail.id",
+  );
+  await expect(page.locator('meta[property="og:site_name"]')).toHaveAttribute(
+    "content",
+    "AgentRail",
+  );
+  await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute(
+    "content",
+    "summary_large_image",
+  );
   await expect(
     page.getByRole("img", { name: /real Trace Rail screenshot/i }),
   ).toBeVisible();
