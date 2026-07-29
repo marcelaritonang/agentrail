@@ -29,13 +29,17 @@ type PackageJson = {
   peerDependencies?: Record<string, string>;
 };
 
+type RootPackageJson = {
+  scripts?: Record<string, string>;
+};
+
 const publishablePackages = ["contracts", "db", "sdk", "mcp"] as const;
 
 const expectedPackageVersions = {
   contracts: "0.1.1",
   db: "0.1.0",
   sdk: "0.1.0",
-  mcp: "0.1.0",
+  mcp: "0.1.1",
 } as const;
 
 const expectedInternalWorkspaceDependencies = {
@@ -51,6 +55,10 @@ function readPackageJson(packageName: (typeof publishablePackages)[number]) {
   return JSON.parse(
     readFileSync(join("packages", packageName, "package.json"), "utf8"),
   ) as PackageJson;
+}
+
+function readRootPackageJson() {
+  return JSON.parse(readFileSync("package.json", "utf8")) as RootPackageJson;
 }
 
 function dependencyGroups(manifest: PackageJson) {
@@ -124,5 +132,16 @@ describe("npm package readiness", () => {
     expect(manifest.bin).toEqual({
       "agentrail-mcp": "./dist/index.js",
     });
+  });
+
+  it("exposes repeatable tarball and registry smoke commands", () => {
+    const manifest = readRootPackageJson();
+
+    expect(manifest.scripts?.["test:npm:tarball"]).toBe(
+      "tsx scripts/verify-npm-release.ts --mode tarball",
+    );
+    expect(manifest.scripts?.["test:npm:registry"]).toBe(
+      "tsx scripts/verify-npm-release.ts --mode registry",
+    );
   });
 });

@@ -15,6 +15,7 @@ test-results/
 .DS_Store
 Thumbs.db
 .agentrail/
+/agentrail-release-*/
 
 artifacts/benchmarks/*.json
 artifacts/benchmarks/*.txt

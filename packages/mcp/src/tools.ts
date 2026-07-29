@@ -4,7 +4,7 @@ import type {
   AgentRailToolResult,
   AgentRailTrace,
   AgentRailTraceListInput,
-} from "./types";
+} from "./types.js";
 
 export const AGENTRAIL_MCP_TOOL_NAMES = [
   "agentrail_list_traces",
