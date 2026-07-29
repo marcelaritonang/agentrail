@@ -33,6 +33,6 @@
     "lint": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@agentrail-sdk/contracts": "workspace:0.1.0"
+    "@agentrail-sdk/contracts": "workspace:0.1.1"
   }
 }
