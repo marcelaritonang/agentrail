@@ -181,6 +181,7 @@ describe("dashboard design contract", () => {
     const mobile = mediaBody("max-width: 1023px");
     for (const selector of [
       ".read-only-example a",
+      ".install-agentrail-command button",
       ".trace-filters input",
       ".trace-filters select",
       ".trace-filters button",

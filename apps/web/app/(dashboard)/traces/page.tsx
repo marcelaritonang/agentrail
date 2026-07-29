@@ -83,7 +83,6 @@ export default async function TracesPage({
       </header>
 
       <RunOrientation />
-      <InstallAgentRailCard sourceUrl={sourceUrl} />
       <TraceFilters
         {...(query === undefined ? {} : { query })}
         {...(actor === undefined ? {} : { actor })}
@@ -99,6 +98,7 @@ export default async function TracesPage({
           readOnlyTraceIds={readOnlyTraceIds}
         />
       )}
+      <InstallAgentRailCard sourceUrl={sourceUrl} />
     </>
   );
 }
