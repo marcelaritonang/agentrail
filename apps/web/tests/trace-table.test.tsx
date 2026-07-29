@@ -125,7 +125,7 @@ describe("agent run index", () => {
       "npm install agentrail is not this project",
     );
     expect(installGuide).toHaveTextContent("npm install @agentrail-sdk/sdk");
-    expect(installGuide).toHaveTextContent("npx @agentrail-sdk/mcp");
+    expect(installGuide).toHaveTextContent("npx -y @agentrail-sdk/mcp");
     expect(
       within(installGuide).getByRole("link", { name: "Open source checkout" }),
     ).toHaveAttribute(

@@ -71,3 +71,5 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build
+      - run: pnpm test:e2e
+      - run: pnpm test:npm:tarball
