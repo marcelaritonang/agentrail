@@ -31,17 +31,21 @@ type PackageJson = {
 
 const publishablePackages = ["contracts", "db", "sdk", "mcp"] as const;
 
-const expectedInternalWorkspaceDependencies: Record<
-  string,
-  Record<string, string>
-> = {
+const expectedPackageVersions = {
+  contracts: "0.1.1",
+  db: "0.1.0",
+  sdk: "0.1.0",
+  mcp: "0.1.0",
+} as const;
+
+const expectedInternalWorkspaceDependencies = {
   "@agentrail-sdk/sdk": {
-    "@agentrail-sdk/contracts": "workspace:0.1.0",
+    "@agentrail-sdk/contracts": "workspace:0.1.1",
   },
   "@agentrail-sdk/mcp": {
     "@agentrail-sdk/db": "workspace:0.1.0",
   },
-};
+} satisfies Record<string, Record<string, string>>;
 
 function readPackageJson(packageName: (typeof publishablePackages)[number]) {
   return JSON.parse(
@@ -63,7 +67,7 @@ describe("npm package readiness", () => {
       const manifest = readPackageJson(packageName);
 
       expect(manifest.name).toMatch(/^@agentrail-sdk\//);
-      expect(manifest.version).toBe("0.1.0");
+      expect(manifest.version).toBe(expectedPackageVersions[packageName]);
       expect(manifest.private).not.toBe(true);
       expect(manifest.publishConfig?.access).toBe("public");
       expect(manifest.description).toMatch(/AgentRail/i);
