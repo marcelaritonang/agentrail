@@ -45,6 +45,7 @@ describe("public metadata routes", () => {
       "/",
       "/about",
       "/architecture",
+      "/founding-testers",
       "/privacy",
       "/security",
       "/terms",

@@ -1,0 +1,86 @@
+name: Founding tester
+description: Apply to test AgentRail with a real local AI workflow.
+title: "[founding tester]: "
+labels:
+  - founding-tester
+body:
+  - type: markdown
+    attributes:
+      value: "Do not paste source code, prompts, API keys, credentials, or proprietary data."
+  - type: dropdown
+    id: client
+    attributes:
+      label: AI client
+      description: Which client will you test with?
+      options:
+        - Codex
+        - Claude
+        - Other MCP-capable client
+        - TypeScript AI application only
+    validations:
+      required: true
+  - type: input
+    id: operating-system
+    attributes:
+      label: operating system
+      description: "Example: Windows 11, macOS, Ubuntu."
+    validations:
+      required: true
+  - type: input
+    id: repository-language
+    attributes:
+      label: repository language
+      description: Main language or stack for the repository you will test.
+    validations:
+      required: true
+  - type: dropdown
+    id: installation-outcome
+    attributes:
+      label: installation outcome
+      description: Did the npm SDK or MCP package install successfully?
+      options:
+        - installation completed
+        - installation failed
+        - not attempted yet
+    validations:
+      required: true
+  - type: dropdown
+    id: context-pack-outcome
+    attributes:
+      label: first Context Pack outcome
+      description: Can you create or evaluate a first Context Pack when that milestone is available?
+      options:
+        - first Context Pack created
+        - blocked before first Context Pack
+        - waiting for Context Relay milestone
+    validations:
+      required: true
+  - type: dropdown
+    id: interview
+    attributes:
+      label: 20-minute interview
+      description: Are you willing to do one short follow-up call or async interview?
+      options:
+        - yes
+        - async only
+        - no
+    validations:
+      required: true
+  - type: dropdown
+    id: aggregate-consent
+    attributes:
+      label: anonymized aggregate use
+      description: May AgentRail use your feedback in anonymized aggregate notes?
+      options:
+        - yes
+        - no
+    validations:
+      required: true
+  - type: textarea
+    id: workflow
+    attributes:
+      label: workflow to test
+      description: Describe the AI agent workflow category without sharing private source, prompts, credentials, or data.
+      placeholder: "Example: local coding agent reviewing a TypeScript repo."
+    validations:
+      required: true

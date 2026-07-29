@@ -28,3 +28,26 @@ I am building AgentRail, an open-source flight recorder for AI agents. It record
 - At least one concrete workflow proposed by each tester.
 - At least five product or documentation improvements captured as GitHub issues.
 - One decision on whether the next milestone should prioritize hosted onboarding, recorder integrations, or AWS reference deployment.
+
+## Intake checklist
+
+Each tester report should capture:
+
+- installation completed
+- first Context Pack created
+- returned within seven days
+- uninstall reason
+
+If the Context Relay milestone is not available to the tester yet, mark the
+first Context Pack field as waiting for the milestone. Do not fill traction
+fields from assumptions.
+
+## Public intake
+
+The website exposes `/founding-testers`. The call to action is controlled by the
+validated `NEXT_PUBLIC_AGENTRAIL_TESTER_INTAKE_URL` environment variable. When
+that value is missing, the page must say the intake is being prepared rather
+than showing a dead button.
+
+Use `.github/ISSUE_TEMPLATE/founding-tester.yml` for GitHub issue intake and
+`docs/community/founding-tester-interview.md` for structured follow-up.

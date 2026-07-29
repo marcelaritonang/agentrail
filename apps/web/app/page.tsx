@@ -296,6 +296,10 @@ export default function LandingPage() {
           About and contact
           <ArrowRight size={15} aria-hidden="true" />
         </Link>
+        <Link href="/founding-testers" className="landing-inline-link">
+          Founding tester details
+          <ArrowRight size={15} aria-hidden="true" />
+        </Link>
       </section>
 
       <section className="landing-section landing-cta">

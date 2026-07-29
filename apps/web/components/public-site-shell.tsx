@@ -16,6 +16,7 @@ export function PublicSiteShell({ children }: { children: React.ReactNode }) {
         <div className="landing-nav-links">
           <Link href="/about">About</Link>
           <Link href="/architecture">Architecture</Link>
+          <Link href="/founding-testers">Founding testers</Link>
           <Link href="/privacy">Privacy</Link>
           <Link href="/terms">Terms</Link>
           <Link href="/security">Security</Link>
