@@ -9,9 +9,9 @@ describe("configuredSourceUrl", () => {
   });
 
   it("returns a configured absolute HTTPS source URL", () => {
-    expect(
-      configuredSourceUrl("https://github.com/example/agentrail"),
-    ).toBe("https://github.com/example/agentrail");
+    expect(configuredSourceUrl("https://github.com/example/agentrail")).toBe(
+      "https://github.com/example/agentrail",
+    );
   });
 
   it.each(["http://example.com/repo", "/relative"])(

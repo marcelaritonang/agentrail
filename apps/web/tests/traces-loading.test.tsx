@@ -16,7 +16,9 @@ describe("TracesLoading", () => {
       screen.getByRole("heading", { level: 1, name: "Agent runs" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Review recorded work from your instrumented AI agents."),
+      screen.getByText(
+        "Review recorded work from your instrumented AI agents.",
+      ),
     ).toBeInTheDocument();
     expect(screen.getByText("Loading agent runs…")).toBeInTheDocument();
 
@@ -24,9 +26,10 @@ describe("TracesLoading", () => {
       name: "Loading agent runs",
     });
     expect(busyRegion).toHaveAttribute("aria-busy", "true");
-    expect(
-      container.querySelector(".loading-filters"),
-    ).toHaveAttribute("aria-hidden", "true");
+    expect(container.querySelector(".loading-filters")).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
     expect(container.querySelector(".loading-table")).toHaveAttribute(
       "aria-hidden",
       "true",

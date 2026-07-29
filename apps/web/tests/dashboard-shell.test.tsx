@@ -37,17 +37,18 @@ describe("dashboard shell", () => {
       </DashboardLayout>,
     );
 
-    expect(screen.getByRole("link", { name: "AgentRail home" })).toHaveAttribute(
-      "href",
-      "/",
-    );
+    expect(
+      screen.getByRole("link", { name: "AgentRail home" }),
+    ).toHaveAttribute("href", "/");
     expect(screen.getByRole("link", { name: "Agent runs" })).toHaveAttribute(
       "href",
       "/traces",
     );
     expect(screen.getByText("Read-only example")).toBeInTheDocument();
     expect(screen.queryByText("M1 recorder")).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: "Source" })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: "Source" }),
+    ).not.toBeInTheDocument();
   });
 
   it("uses the parsed configured URL for the source control", () => {

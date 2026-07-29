@@ -17,11 +17,7 @@ export default function DashboardLayout({
   return (
     <div className="dashboard-frame">
       <header className="dashboard-header">
-        <Link
-          className="dashboard-brand"
-          href="/"
-          aria-label="AgentRail home"
-        >
+        <Link className="dashboard-brand" href="/" aria-label="AgentRail home">
           <ProductMark />
           <strong>AgentRail</strong>
         </Link>
