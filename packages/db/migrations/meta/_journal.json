@@ -15,6 +15,13 @@
       "when": 1785420000000,
       "tag": "0001_context_control_plane",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1785423600000,
+      "tag": "0002_installation_usage_lifecycle",
+      "breakpoints": true
     }
   ]
 }

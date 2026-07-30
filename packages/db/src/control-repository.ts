@@ -332,6 +332,27 @@ export function createControlRepository(db: AgentRailDatabase) {
       return true;
     },
 
+    async markInstallationUsage(input: {
+      projectId: string;
+      installationId: string;
+      seenAt: Date;
+    }): Promise<void> {
+      const seenAt = input.seenAt.toISOString();
+      await db
+        .update(installations)
+        .set({
+          activatedAt: sql`coalesce(${installations.activatedAt}, ${seenAt}::timestamptz)`,
+          lastSeenAt: input.seenAt,
+        })
+        .where(
+          and(
+            eq(installations.projectId, input.projectId),
+            eq(installations.installationId, input.installationId),
+            isNull(installations.revokedAt),
+          ),
+        );
+    },
+
     async insertUsageEvent(
       input: CanonicalUsageEvent,
     ): Promise<"inserted" | "duplicate"> {

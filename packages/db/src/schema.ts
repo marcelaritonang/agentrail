@@ -211,6 +211,14 @@ export const installations = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
       .defaultNow()
       .notNull(),
+    activatedAt: timestamp("activated_at", {
+      withTimezone: true,
+      mode: "date",
+    }),
+    lastSeenAt: timestamp("last_seen_at", {
+      withTimezone: true,
+      mode: "date",
+    }),
     revokedAt: timestamp("revoked_at", {
       withTimezone: true,
       mode: "date",
@@ -223,6 +231,10 @@ export const installations = pgTable(
     uniqueIndex("installations_project_installation_unique").on(
       table.projectId,
       table.installationId,
+    ),
+    index("installations_project_last_seen_idx").on(
+      table.projectId,
+      table.lastSeenAt,
     ),
   ],
 );

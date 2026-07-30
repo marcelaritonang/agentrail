@@ -23,6 +23,16 @@ const USER_A = "user_a";
 const USER_B = "user_b";
 const NOW = new Date("2026-07-29T10:00:00.000Z");
 
+function timestampIso(value: Date | string | null | undefined): string | null {
+  if (!value) {
+    return null;
+  }
+
+  return value instanceof Date
+    ? value.toISOString()
+    : new Date(value).toISOString();
+}
+
 let database: DatabaseConnection;
 let controlRepository: ReturnType<typeof createControlRepository>;
 let spanRepository: ReturnType<typeof createSpanRepository>;
@@ -40,6 +50,13 @@ beforeAll(async () => {
     ),
     readFile(
       new URL("../migrations/0001_context_control_plane.sql", import.meta.url),
+      "utf8",
+    ),
+    readFile(
+      new URL(
+        "../migrations/0002_installation_usage_lifecycle.sql",
+        import.meta.url,
+      ),
       "utf8",
     ),
   ]);
@@ -334,6 +351,42 @@ describe("ControlRepository", () => {
     await expect(
       controlRepository.findActiveInstallationByPrefix(credential.prefix),
     ).resolves.toBeNull();
+  });
+
+  it("marks installation activation once and advances last seen", async () => {
+    await insertUser(USER_A, "a@example.com");
+    await insertOwnedProject(PROJECT_A, USER_A);
+    const credential = fixtureCredential();
+    await insertInstallation(PROJECT_A, credential);
+
+    await controlRepository.markInstallationUsage({
+      projectId: PROJECT_A,
+      installationId: credential.installationId,
+      seenAt: new Date("2026-07-29T10:00:00.000Z"),
+    });
+    await controlRepository.markInstallationUsage({
+      projectId: PROJECT_A,
+      installationId: credential.installationId,
+      seenAt: new Date("2026-07-29T10:10:00.000Z"),
+    });
+
+    const rows = await database.sql<
+      {
+        activated_at: Date | string | null;
+        last_seen_at: Date | string | null;
+      }[]
+    >`
+      select activated_at, last_seen_at
+      from installations
+      where project_id = ${PROJECT_A} and installation_id = ${credential.installationId}
+    `;
+
+    expect(timestampIso(rows[0]?.activated_at)).toBe(
+      "2026-07-29T10:00:00.000Z",
+    );
+    expect(timestampIso(rows[0]?.last_seen_at)).toBe(
+      "2026-07-29T10:10:00.000Z",
+    );
   });
 
   it("stores context pack metrics without task, path, content, or prompt columns", async () => {

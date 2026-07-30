@@ -10,6 +10,7 @@ export {
 } from "./usage-redis.js";
 export { createSqsUsageEventQueue } from "./usage-sqs.js";
 export type { UsageSqsClientLike } from "./usage-sqs.js";
+export { assertCanonicalUsageEventBatch } from "./usage-types.js";
 export type {
   CanonicalUsageEvent,
   CanonicalUsageEventBatch,

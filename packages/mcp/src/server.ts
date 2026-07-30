@@ -257,6 +257,9 @@ export async function main(
       ...(env.AGENTRAIL_INSTALLATION_ID === undefined
         ? {}
         : { installationId: env.AGENTRAIL_INSTALLATION_ID }),
+      ...(env.AGENTRAIL_API_URL === undefined
+        ? {}
+        : { apiUrl: env.AGENTRAIL_API_URL }),
       ...(env.AGENTRAIL_DASHBOARD_URL === undefined
         ? {}
         : { dashboardUrl: env.AGENTRAIL_DASHBOARD_URL }),
@@ -264,7 +267,10 @@ export async function main(
   }
 
   if (profileIncludesForensics(profile)) {
-    Object.assign(dependencies, dependenciesFromConfig(createEnvironmentConfig(env)));
+    Object.assign(
+      dependencies,
+      dependenciesFromConfig(createEnvironmentConfig(env)),
+    );
   }
 
   const server = createAgentRailMcpServer(dependencies, profile);
