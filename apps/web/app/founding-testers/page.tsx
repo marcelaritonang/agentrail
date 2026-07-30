@@ -35,7 +35,7 @@ export default function FoundingTestersPage() {
         <p>
           AgentRail is collecting a small evidence set from individual
           developers before hosted onboarding. The goal is to learn whether the
-          SDK, MCP reader, and upcoming Context Relay help real AI workflows
+          SDK, MCP reader, and local Context Relay help real AI workflows
           preserve useful context and forensic evidence.
         </p>
 

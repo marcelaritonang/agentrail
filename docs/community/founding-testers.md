@@ -10,24 +10,25 @@ AgentRail needs three founding testers before the next milestone. The goal is to
 
 ## Feedback tasks
 
-Ask each tester to complete the same three tasks:
+Ask each tester to complete the same four tasks:
 
 1. Open the public guided demo and explain what the Trace Rail, Evidence Drawer, and Action Ledger are for.
-2. Try either `npm install @agentrail-sdk/sdk`, `npx -y @agentrail-sdk/mcp`, or the local source quickstart, then identify the first command or concept that feels unclear.
-3. Describe one workflow where AgentRail should record traces, actions, cost, and evidence status.
+2. Try either `npm install @agentrail-sdk/sdk`, `npm install -D @agentrail-sdk/cli`, `npx -y @agentrail-sdk/mcp`, or the local source quickstart, then identify the first command or concept that feels unclear.
+3. Run `npx -y @agentrail-sdk/cli context --root . --task "Audit this change" --token-budget 4000 --json` on a safe test repository and confirm whether the returned Context Pack is useful.
+4. Describe one workflow where AgentRail should record traces, actions, cost, context, and evidence status.
 
 ## Outreach message
 
 Subject: founding tester request for AgentRail
 
-I am building AgentRail, an open-source flight recorder for AI agents. It records traces, tool actions, model cost metadata, actor attribution, and evidence payload status so developers can debug and audit autonomous AI workflows. I am looking for three founding testers who can review the demo, try `npm install @agentrail-sdk/sdk` or `npx -y @agentrail-sdk/mcp` if relevant, and give blunt feedback on whether this would help with real agent debugging. The demo and source are public at https://agentrail.id and https://github.com/marcelaritonang/agentrail.
+I am building AgentRail, an open-source flight recorder for AI agents. It records traces, tool actions, model cost metadata, actor attribution, local Context Packs, and evidence payload status so developers can debug and audit autonomous AI workflows. I am looking for three founding testers who can review the demo, try `npm install @agentrail-sdk/sdk`, `npm install -D @agentrail-sdk/cli`, or `npx -y @agentrail-sdk/mcp` if relevant, and give blunt feedback on whether this would help with real agent debugging. The demo and source are public at https://agentrail.id and https://github.com/marcelaritonang/agentrail.
 
 ## Success criteria
 
 - Three tester conversations or issue comments.
 - At least one concrete workflow proposed by each tester.
 - At least five product or documentation improvements captured as GitHub issues.
-- One decision on whether the next milestone should prioritize hosted onboarding, recorder integrations, or AWS reference deployment.
+- One decision on whether the next milestone should prioritize hosted onboarding, recorder integrations, client setup hardening, or AWS reference deployment.
 
 ## Intake checklist
 
@@ -38,9 +39,9 @@ Each tester report should capture:
 - returned within seven days
 - uninstall reason
 
-If the Context Relay milestone is not available to the tester yet, mark the
-first Context Pack field as waiting for the milestone. Do not fill traction
-fields from assumptions.
+Do not fill traction fields from assumptions. If a tester cannot run the
+Context CLI, record the exact blocker instead of treating the tester as
+successful.
 
 ## Public intake
 

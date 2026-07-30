@@ -67,19 +67,30 @@ describe("AgentRail landing page", () => {
       "Highlighted npm install commands",
     );
     expect(screen.getByText("SDK package")).toBeInTheDocument();
-    expect(screen.getByText("MCP reader")).toBeInTheDocument();
+    expect(screen.getAllByText("Context CLI").length).toBeGreaterThan(0);
+    expect(screen.getByText("MCP trace reader")).toBeInTheDocument();
     expect(installBlock).toHaveTextContent("Live npm commands");
     expect(installBlock).toHaveTextContent("npm install @agentrail-sdk/sdk");
+    expect(installBlock).toHaveTextContent(
+      "npm install -D @agentrail-sdk/cli",
+    );
+    expect(installBlock).toHaveTextContent(
+      "npx -y @agentrail-sdk/cli context",
+    );
     expect(installBlock).toHaveTextContent("npx -y @agentrail-sdk/mcp");
     expect(installBlock).not.toHaveTextContent("pnpm install");
     expect(screen.getByText("Available today")).toBeInTheDocument();
-    expect(
-      screen.getByText("Public npm packages + source checkout"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("SDK, Context CLI, MCP reader")).toBeInTheDocument();
     expect(screen.queryByText("Publish blocker")).not.toBeInTheDocument();
     expect(screen.getByText(/Published packages/i)).toBeInTheDocument();
     expect(
       screen.getByText(/@agentrail-sdk\/mcp@0\.1\.1/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/@agentrail-sdk\/context@0\.1\.1/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/@agentrail-sdk\/cli@0\.1\.1/i),
     ).toBeInTheDocument();
     expect(
       screen.queryByText(/Do not treat the commands as live/i),
@@ -87,9 +98,7 @@ describe("AgentRail landing page", () => {
     expect(
       screen.queryByText(/npm auth and @agentrail-sdk scope/i),
     ).not.toBeInTheDocument();
-    expect(
-      screen.queryByText(/pnpm pack smoke tests pass/i),
-    ).not.toBeInTheDocument();
+    expect(screen.getAllByText(/MCP Context profile 0\.1\.2/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/published on npm/i).length).toBeGreaterThan(0);
 
     expect(

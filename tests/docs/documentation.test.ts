@@ -139,6 +139,8 @@ describe("public AgentRail documentation", () => {
     expect(readme).toContain("npm install agentrail");
     expect(readme).toContain("is not this project");
     expect(readme).toContain("npm install @agentrail-sdk/sdk");
+    expect(readme).toContain("npm install -D @agentrail-sdk/cli");
+    expect(readme).toContain("npx -y @agentrail-sdk/cli context");
     expect(readme).toContain("npx -y @agentrail-sdk/mcp");
     expect(readme).toMatch(/published on npm/i);
     expect(readme).toContain("@agentrail-sdk/contracts");
@@ -147,7 +149,10 @@ describe("public AgentRail documentation", () => {
     expect(readme).toContain("0.1.0");
     expect(readme).toContain("@agentrail-sdk/sdk");
     expect(readme).toContain("@agentrail-sdk/mcp");
+    expect(readme).toContain("@agentrail-sdk/context");
+    expect(readme).toContain("@agentrail-sdk/cli");
     expect(mcp).toContain("npx -y @agentrail-sdk/mcp");
+    expect(mcp).toContain("MCP Context profile 0.1.2");
     expect(mcp).toMatch(/published on npm/i);
     expect(readme).not.toMatch(/npm authentication/i);
     expect(readme).not.toMatch(/publish-ready/i);
@@ -176,6 +181,7 @@ describe("public AgentRail documentation", () => {
     expect(testers).toContain("first Context Pack created");
     expect(testers).toContain("returned within seven days");
     expect(testers).toContain("uninstall reason");
+    expect(testers).not.toMatch(/waiting for the milestone/i);
     expect(testers).not.toMatch(/already used by|customers|active users/i);
 
     expect(testerPage).toContain("NEXT_PUBLIC_AGENTRAIL_TESTER_INTAKE_URL");

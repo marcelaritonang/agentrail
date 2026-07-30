@@ -14,6 +14,12 @@ Use this command for the local read-only MCP server:
 npx -y @agentrail-sdk/mcp
 ```
 
+MCP Context profile 0.1.2 is implemented in this repository and wired to the local Context Relay tools. Use it from source checkout now, or through `npx` only after `npm view @agentrail-sdk/mcp version` returns `0.1.2`.
+
+```bash
+npx -y @agentrail-sdk/mcp --profile context
+```
+
 Use the source-checkout quickstarts below when you are developing AgentRail itself or running the full local stack.
 
 ## What it enables
@@ -104,6 +110,25 @@ env = {
 ```
 
 Keep this server local unless you have reviewed authentication, network exposure, and data-handling requirements for your own environment.
+
+## Context profile from source checkout
+
+When running from source before the `0.1.2` registry publish, build the context and MCP packages and start the context profile locally:
+
+```bash
+pnpm --filter @agentrail-sdk/context build
+pnpm --filter @agentrail-sdk/mcp build
+pnpm --filter @agentrail-sdk/mcp start -- --profile context
+```
+
+The default Context Relay profile exposes four tools:
+
+| Tool                           | Purpose                                               |
+| ------------------------------ | ----------------------------------------------------- |
+| `agentrail_prepare_context`    | Create a bounded local Context Pack for a task.       |
+| `agentrail_recall`             | Recall local project memory records.                  |
+| `agentrail_remember`           | Save a local project memory record.                   |
+| `agentrail_report_outcome`     | Record whether a Context Pack helped or missed.       |
 
 ## Privacy notes
 

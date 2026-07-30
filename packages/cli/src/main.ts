@@ -6,6 +6,8 @@ import { setupClient, uninstallClient } from "./clients.js";
 import type { CommandResult } from "./types.js";
 import { resolveWorkspaceRoot } from "@agentrail-sdk/context";
 
+const CLI_PACKAGE_VERSION = "0.1.1";
+
 export async function runAgentRailCommand(
   argv: readonly string[],
 ): Promise<CommandResult> {
@@ -51,7 +53,7 @@ export async function runAgentRailCommand(
           workspaceRoot: command.root,
           privacyMode: "local-only",
           client: "cli",
-          packageVersion: "0.1.0",
+          packageVersion: CLI_PACKAGE_VERSION,
         });
         const pack = await relay.prepareContext({
           task: command.task,
