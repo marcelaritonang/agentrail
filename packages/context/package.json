@@ -1,6 +1,6 @@
 {
   "name": "@agentrail-sdk/context",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Local Context Relay engine for AgentRail MCP and CLI integrations.",
   "private": false,
   "type": "module",
@@ -37,6 +37,6 @@
     "zod": "^4.1.0"
   },
   "engines": {
-    "node": ">=24 <25"
+    "node": ">=20.16"
   }
 }

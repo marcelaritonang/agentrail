@@ -1,6 +1,6 @@
 {
   "name": "@agentrail-sdk/cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "AgentRail CLI for local Context Relay setup and diagnostics.",
   "private": false,
   "type": "module",
@@ -37,9 +37,9 @@
     "start": "node ./dist/main.js"
   },
   "dependencies": {
-    "@agentrail-sdk/context": "workspace:0.1.0"
+    "@agentrail-sdk/context": "workspace:0.1.1"
   },
   "engines": {
-    "node": ">=24 <25"
+    "node": ">=20.16"
   }
 }

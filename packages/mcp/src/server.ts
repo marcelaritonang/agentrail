@@ -216,7 +216,7 @@ export function createAgentRailMcpServer(
 ): McpServer {
   const server = new McpServer({
     name: "agentrail",
-    version: "0.1.1",
+    version: "0.1.2",
   });
 
   registerAgentRailMcpTools(
@@ -253,7 +253,7 @@ export async function main(
       workspaceRoot: env.AGENTRAIL_WORKSPACE_ROOT ?? process.cwd(),
       privacyMode: privacyMode(env.AGENTRAIL_PRIVACY_MODE),
       client: env.AGENTRAIL_CLIENT ?? "mcp",
-      packageVersion: "0.1.1",
+      packageVersion: "0.1.2",
       ...(env.AGENTRAIL_INSTALLATION_ID === undefined
         ? {}
         : { installationId: env.AGENTRAIL_INSTALLATION_ID }),
