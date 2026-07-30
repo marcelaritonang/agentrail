@@ -20,6 +20,7 @@ export function PublicSiteShell({ children }: { children: React.ReactNode }) {
           <Link href="/privacy">Privacy</Link>
           <Link href="/terms">Terms</Link>
           <Link href="/security">Security</Link>
+          <Link href="/login">Sign in</Link>
           {config.contactUrl === null ? null : (
             <a href={config.contactUrl.href} target="_blank" rel="noreferrer">
               Contact
