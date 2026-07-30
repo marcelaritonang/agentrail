@@ -1,4 +1,4 @@
-import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 
@@ -42,6 +42,17 @@ describe("AgentRail CLI commands", () => {
       expect(JSON.parse(context.stdout).pack.context[0].path).toBe(
         "src/app.ts",
       );
+      const receipts = await readdir(
+        join(root, ".agentrail", "receipts", "v1"),
+      );
+      expect(receipts).toHaveLength(1);
+      const receipt = JSON.parse(
+        await readFile(
+          join(root, ".agentrail", "receipts", "v1", receipts[0] ?? ""),
+          "utf8",
+        ),
+      ) as { packageVersion?: string };
+      expect(receipt.packageVersion).toBe("0.1.1");
     } finally {
       await rm(root, { recursive: true, force: true });
     }

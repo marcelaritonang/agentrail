@@ -42,6 +42,33 @@ describe("InstallAgentRailCard", () => {
 
     fireEvent.click(
       screen.getByRole("button", {
+        name: "Copy npm install -D @agentrail-sdk/cli",
+      }),
+    );
+
+    await waitFor(() =>
+      expect(writeText).toHaveBeenCalledWith(
+        "npm install -D @agentrail-sdk/cli",
+      ),
+    );
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Copied npm install -D @agentrail-sdk/cli",
+    );
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: /Copy npx -y @agentrail-sdk\/cli context/,
+      }),
+    );
+
+    await waitFor(() =>
+      expect(writeText).toHaveBeenCalledWith(
+        'npx -y @agentrail-sdk/cli context --root . --task "Audit this change" --token-budget 4000 --json',
+      ),
+    );
+
+    fireEvent.click(
+      screen.getByRole("button", {
         name: "Copy npx -y @agentrail-sdk/mcp",
       }),
     );

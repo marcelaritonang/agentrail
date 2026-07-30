@@ -12,7 +12,18 @@ const npmCommands = [
     description: "Record traces from a TypeScript AI application.",
   },
   {
-    label: "MCP reader",
+    label: "Context CLI",
+    command: "npm install -D @agentrail-sdk/cli",
+    description: "Install local Context Relay commands in a project.",
+  },
+  {
+    label: "Create Context Pack",
+    command:
+      'npx -y @agentrail-sdk/cli context --root . --task "Audit this change" --token-budget 4000 --json',
+    description: "Return a bounded source pack before an AI coding run.",
+  },
+  {
+    label: "MCP trace reader",
     command: "npx -y @agentrail-sdk/mcp",
     description: "Inspect AgentRail traces from Codex-style local tools.",
   },
@@ -86,7 +97,10 @@ pnpm bootstrap:local`}</code>
               </div>
             ))}
           </div>
-          <small>Current MCP package is read-only forensic inspection.</small>
+          <small>
+            MCP Context profile 0.1.2 is source-ready but should be used through
+            npx only after the registry shows 0.1.2.
+          </small>
         </div>
       </div>
     </section>

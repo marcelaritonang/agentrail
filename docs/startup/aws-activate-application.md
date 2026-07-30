@@ -38,8 +38,7 @@ AgentRail records an evidence trail around AI agent work:
 - worker-side cost calculation from a shared pricing catalog.
 - dashboard views for Trace Rail, Evidence Drawer, and Action Ledger.
 - read-only MCP package for Codex-style inspection of recorded traces.
-- planned Context Relay milestone for local context packs that can reduce
-  irrelevant context and make source selection auditable.
+- local Context Relay packages for bounded source packs before AI coding runs.
 
 ## Current verified product
 
@@ -48,24 +47,29 @@ The current product is an open-source, local-first M1 implementation:
 - public website on `agentrail.id`;
 - guided read-only dashboard demo using synthetic data;
 - SDK package `@agentrail-sdk/sdk` published on npm;
+- Context Relay packages `@agentrail-sdk/context` and `@agentrail-sdk/cli`
+  published on npm;
 - MCP package `@agentrail-sdk/mcp` published on npm;
 - Apache-2.0 license;
 - local Docker-oriented architecture and AWS reference mapping.
 
 ## Context Relay milestone status
 
-Context Relay is planned and specified, but it is not a completed hosted
-feature. It will let a developer request a bounded local Context Pack before an
-AI agent run, then link that pack to later forensic traces. The milestone is
-useful for the product because it shifts AgentRail from "what happened after the
-run" toward "what context should the agent use before the run".
+Context Relay is implemented locally through `@agentrail-sdk/context` and
+`@agentrail-sdk/cli`, but it is not a completed hosted feature. It lets a
+developer request a bounded local Context Pack before an AI agent run, then
+record local receipts for later review. The MCP Context profile is implemented
+in source version `@agentrail-sdk/mcp@0.1.2`; it should be advertised as a live
+`npx` setup path only after the public registry shows that version.
 
-| Claim                                                | Evidence                                                                     | Status         | Owner   |
-| ---------------------------------------------------- | ---------------------------------------------------------------------------- | -------------- | ------- |
-| Context Relay design exists.                         | `docs/superpowers/specs/2026-07-29-agentrail-context-relay-design.md`        | verified       | Founder |
-| End-to-end Context Relay implementation is complete. | Not implemented in M0.                                                       | pending        | Founder |
-| Context Pack outcomes from testers exist.            | Intake and interview loop are ready; tester responses are not collected yet. | pending        | Founder |
-| Hosted multi-tenant service exists.                  | AgentRail is currently local-first and public demo only.                     | not-applicable | Founder |
+| Claim                                                     | Evidence                                                                     | Status         | Owner   |
+| --------------------------------------------------------- | ---------------------------------------------------------------------------- | -------------- | ------- |
+| Context Relay design exists.                              | `docs/superpowers/specs/2026-07-29-agentrail-context-relay-design.md`        | verified       | Founder |
+| Local Context Relay CLI implementation is complete.        | `packages/context`, `packages/cli`, and `tests/npm/release-smoke.test.ts`     | verified       | Founder |
+| MCP Context profile is ready in source.                    | `packages/mcp` source version `0.1.2`                                         | verified       | Founder |
+| MCP Context profile is available from public npm registry. | `npm view @agentrail-sdk/mcp version` must return `0.1.2`.                   | pending        | Founder |
+| Context Pack outcomes from testers exist.                 | Intake and interview loop are ready; tester responses are not collected yet. | pending        | Founder |
+| Hosted multi-tenant service exists.                       | AgentRail is currently local-first and public demo only.                     | not-applicable | Founder |
 
 ## Target user
 
@@ -83,10 +87,11 @@ docs, and direct founding-tester outreach.
 
 | Claim                                                 | Evidence                                                             | Status   | Owner   |
 | ----------------------------------------------------- | -------------------------------------------------------------------- | -------- | ------- |
-| SDK package is published.                             | `npm view @agentrail-sdk/sdk version` and README install section     | verified | Founder |
-| MCP package is published.                             | `npm view @agentrail-sdk/mcp version` and `docs/operations/mcp.md`   | verified | Founder |
-| The unscoped `agentrail` package is not this project. | README package naming section                                        | verified | Founder |
-| GitHub repository is public.                          | Source URL must be configured in `NEXT_PUBLIC_AGENTRAIL_SOURCE_URL`. | pending  | Founder |
+| SDK package is published.                             | `npm view @agentrail-sdk/sdk version` and README install section       | verified | Founder |
+| Context CLI package is published.                     | `npm view @agentrail-sdk/cli version` and README install section       | verified | Founder |
+| MCP package is published.                             | `npm view @agentrail-sdk/mcp version` and `docs/operations/mcp.md`     | verified | Founder |
+| The unscoped `agentrail` package is not this project. | README package naming section                                          | verified | Founder |
+| GitHub repository is public.                          | Source URL must be configured in `NEXT_PUBLIC_AGENTRAIL_SOURCE_URL`.   | pending  | Founder |
 
 ## Founding-tester validation plan
 
@@ -97,7 +102,7 @@ and useful enough to keep.
 Evidence to collect:
 
 - installation completed;
-- first Context Pack created or blocked before Context Relay availability;
+- first Context Pack created or exact blocker recorded;
 - returned within seven days;
 - uninstall reason;
 - one concrete workflow category per tester;
@@ -137,7 +142,7 @@ Summary:
 
 | Risk                                                        | Mitigation                                                                                                      |
 | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| Developers do not want to instrument AI workflows manually. | Add MCP-first local Context Relay so value appears inside their existing AI client.                             |
+| Developers do not want to instrument AI workflows manually. | Lead with Context CLI today, then finish MCP Context profile registry publish and client setup hardening.      |
 | Sensitive evidence should not leave the developer machine.  | Keep local-first default, make S3 evidence opt-in, and never give browser direct bucket access.                 |
 | AWS costs grow before validation.                           | Use AWS Budgets, CloudWatch alarms, reserved concurrency, lifecycle policies, and a small non-production stack. |
 | Application reviewers see unsupported traction claims.      | Keep traction fields pending until evidence exists.                                                             |
@@ -148,7 +153,7 @@ Summary:
 | ----------------------------- | --------------------- | -------------- |
 | Paying users                  | 0                     | pending        |
 | Founding testers completed    | 0                     | pending        |
-| Public npm packages           | SDK and MCP available | verified       |
+| Public npm packages           | SDK, Context CLI, and MCP reader available | verified       |
 | AWS deployed production stack | Not deployed          | not-applicable |
 | Funding received              | None claimed          | not-applicable |
 

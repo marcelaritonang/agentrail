@@ -50,10 +50,12 @@ AgentRail is an open-source flight recorder for AI agents. It records traces, to
 - guided sample mode for explaining the trace archive, Trace Rail, Evidence Drawer, and Action Ledger
 - landing page with optional source controls for public deployments
 - `@agentrail-sdk/mcp` read-only MCP server for inspecting traces from Codex-style developer workflows
+- `@agentrail-sdk/context` local Context Relay engine for bounded source packs
+- `@agentrail-sdk/cli` commands for `doctor`, `context`, local MCP setup, and uninstall
 
 ## Local quickstart
 
-Prerequisites: Node.js 24, pnpm 11 through Corepack, and Docker Desktop or Docker Engine with Compose.
+Prerequisites for repository development: Node.js 24, pnpm 11 through Corepack, and Docker Desktop or Docker Engine with Compose. Published CLI packages support Node.js `>=20.16`.
 
 ```bash
 corepack enable
@@ -150,6 +152,8 @@ AgentRail is published on npm under the scoped `@agentrail-sdk` namespace. Use t
 | `@agentrail-sdk/contracts` | `0.1.1` | Shared span and trace contracts.                          |
 | `@agentrail-sdk/db`        | `0.1.0` | Database schema and repository helpers.                   |
 | `@agentrail-sdk/sdk`       | `0.1.0` | TypeScript SDK for recording agent traces.                |
+| `@agentrail-sdk/context`   | `0.1.1` | Local Context Relay engine for bounded source packs.      |
+| `@agentrail-sdk/cli`       | `0.1.1` | Local CLI for context, doctor, setup, and uninstall.      |
 | `@agentrail-sdk/mcp`       | `0.1.1` | Read-only local MCP server for forensic trace inspection. |
 
 Live install commands:
@@ -157,14 +161,29 @@ Live install commands:
 ```bash
 npm install @agentrail-sdk/sdk
 
+npm install -D @agentrail-sdk/cli
+npx -y @agentrail-sdk/cli context --root . --task "Audit this change" --token-budget 4000 --json
+
 npx -y @agentrail-sdk/mcp
 ```
+
+The MCP Context profile is implemented in source version `@agentrail-sdk/mcp@0.1.2`, but the public registry still needs that MCP version to be published before `npx -y @agentrail-sdk/mcp --profile context` is advertised as a live Codex setup path.
 
 Local source checkout remains the recommended path for running the full ingestion API, worker, PostgreSQL, Redis, MinIO, and dashboard stack. See [NPM release checklist](docs/operations/npm-release.md) for the release verification process.
 
 ## MCP integration
 
 `@agentrail-sdk/mcp` lets MCP-capable developer tools inspect AgentRail traces without adding mutation features or exposing raw evidence payloads. See [AgentRail MCP operations](docs/operations/mcp.md) for Codex config, demo mode, and local database setup.
+
+## Context Relay CLI
+
+`@agentrail-sdk/cli` can create a local Context Pack without sending source code to a hosted service:
+
+```bash
+npx -y @agentrail-sdk/cli context --root . --task "Audit this change" --token-budget 4000 --json
+```
+
+The command writes a local receipt under `.agentrail/receipts/v1/` and keeps source snippets on the developer machine. This is the first daily-use path for developers who want tighter AI coding context before the hosted product exists.
 
 ## Quality gates
 

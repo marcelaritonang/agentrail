@@ -53,13 +53,18 @@ const testerProfiles = [
 ] as const;
 
 const npmStatus = [
-  ["Available today", "Public npm packages + source checkout"],
+  ["Available today", "SDK, Context CLI, MCP reader"],
   [
     "Published packages",
-    "@agentrail-sdk/contracts@0.1.1, @agentrail-sdk/db@0.1.0, @agentrail-sdk/sdk@0.1.0, @agentrail-sdk/mcp@0.1.1",
+    "@agentrail-sdk/contracts@0.1.1, @agentrail-sdk/db@0.1.0, @agentrail-sdk/sdk@0.1.0, @agentrail-sdk/context@0.1.1, @agentrail-sdk/cli@0.1.1, @agentrail-sdk/mcp@0.1.1",
   ],
   ["SDK path", "npm install @agentrail-sdk/sdk for TypeScript AI applications"],
-  ["MCP path", "npx -y @agentrail-sdk/mcp for read-only local inspection"],
+  ["Context CLI", "npm install -D @agentrail-sdk/cli for local Context Packs"],
+  ["MCP path", "npx -y @agentrail-sdk/mcp for read-only trace inspection"],
+  [
+    "Registry gap",
+    "MCP Context profile 0.1.2 is source-ready and waits for npm registry publish",
+  ],
 ] as const;
 
 const npmCommands = [
@@ -69,7 +74,18 @@ const npmCommands = [
     description: "Add AgentRail tracing to a TypeScript AI application.",
   },
   {
-    label: "MCP reader",
+    label: "Context CLI",
+    command: "npm install -D @agentrail-sdk/cli",
+    description: "Install the local Context Relay command in a project.",
+  },
+  {
+    label: "Create Context Pack",
+    command:
+      'npx -y @agentrail-sdk/cli context --root . --task "Audit this change" --token-budget 4000 --json',
+    description: "Fetch a bounded local context pack before an AI coding run.",
+  },
+  {
+    label: "MCP trace reader",
     command: "npx -y @agentrail-sdk/mcp",
     description: "Open read-only trace lookup from Codex-style tools.",
   },
@@ -245,9 +261,10 @@ export default function LandingPage() {
             ))}
           </dl>
           <p className="landing-status-note">
-            Current boundary: SDK recording and read-only MCP forensic
-            inspection. Context Relay is the next verified milestone, not an
-            active hosted feature.
+            Current boundary: SDK recording, local Context CLI packs, and
+            read-only MCP forensic inspection. MCP Context profile 0.1.2 is
+            source-ready and needs registry publish before it is a live Codex
+            setup path.
           </p>
         </div>
         <div className="landing-code-stack">
