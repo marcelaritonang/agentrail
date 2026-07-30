@@ -76,8 +76,22 @@ describe("InstallAgentRailCard", () => {
     await waitFor(() =>
       expect(writeText).toHaveBeenCalledWith("npx -y @agentrail-sdk/mcp"),
     );
-    expect(screen.getByRole("status")).toHaveTextContent(
-      "Copied npx -y @agentrail-sdk/mcp",
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "Copy npx -y @agentrail-sdk/mcp --profile context",
+      }),
     );
+
+    await waitFor(() =>
+      expect(writeText).toHaveBeenCalledWith(
+        "npx -y @agentrail-sdk/mcp --profile context",
+      ),
+    );
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Copied npx -y @agentrail-sdk/mcp --profile context",
+    );
+    expect(screen.queryByText(/source-ready/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/registry shows 0\.1\.2/i)).not.toBeInTheDocument();
   });
 });

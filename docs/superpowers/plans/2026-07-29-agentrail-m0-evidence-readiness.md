@@ -279,7 +279,7 @@ Registry mode installs:
 @agentrail-sdk/contracts@0.1.1
 @agentrail-sdk/db@0.1.0
 @agentrail-sdk/sdk@0.1.0
-@agentrail-sdk/mcp@0.1.1
+@agentrail-sdk/mcp@0.1.2
 ```
 
 Add root scripts:

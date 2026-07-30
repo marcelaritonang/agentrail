@@ -14,7 +14,7 @@ Every application claim must map to evidence. Status values are limited to
 | Founding-tester intake exists.                | `.github/ISSUE_TEMPLATE/founding-tester.yml` and `/founding-testers`         | verified       | Founder |
 | Founding-tester results exist.                | Interview records are not collected yet.                                     | pending        | Founder |
 | Context Relay CLI is implemented end to end.  | `packages/context`, `packages/cli`, and local npm smoke tests                | verified       | Founder |
-| MCP Context profile is live on npm.           | `npm view @agentrail-sdk/mcp version` must return `0.1.2`.                  | pending        | Founder |
+| MCP Context profile is live on npm.           | `npm view @agentrail-sdk/mcp version` returns `0.1.2` for `@agentrail-sdk/mcp`. | verified    | Founder |
 | AWS deployment exists.                        | AWS docs are reference mapping only.                                         | not-applicable | Founder |
 | AWS acceptance or credit award exists.        | No acceptance or award is claimed.                                           | not-applicable | Founder |
 | Production HTTP verifier exists.              | `scripts/verify-production.ts` and `tests/smoke/production-contract.test.ts` | verified       | Founder |

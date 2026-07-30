@@ -84,7 +84,7 @@ describe("AgentRail landing page", () => {
     expect(screen.queryByText("Publish blocker")).not.toBeInTheDocument();
     expect(screen.getByText(/Published packages/i)).toBeInTheDocument();
     expect(
-      screen.getByText(/@agentrail-sdk\/mcp@0\.1\.1/i),
+      screen.getByText(/@agentrail-sdk\/mcp@0\.1\.2/i),
     ).toBeInTheDocument();
     expect(
       screen.getByText(/@agentrail-sdk\/context@0\.1\.1/i),
@@ -99,6 +99,9 @@ describe("AgentRail landing page", () => {
       screen.queryByText(/npm auth and @agentrail-sdk scope/i),
     ).not.toBeInTheDocument();
     expect(screen.getAllByText(/MCP Context profile 0\.1\.2/i).length).toBeGreaterThan(0);
+    expect(screen.queryByText(/source-ready/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/waits for npm registry publish/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/needs registry publish/i)).not.toBeInTheDocument();
     expect(screen.getAllByText(/published on npm/i).length).toBeGreaterThan(0);
 
     expect(

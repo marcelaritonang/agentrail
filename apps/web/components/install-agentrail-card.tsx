@@ -27,6 +27,11 @@ const npmCommands = [
     command: "npx -y @agentrail-sdk/mcp",
     description: "Inspect AgentRail traces from Codex-style local tools.",
   },
+  {
+    label: "MCP Context profile",
+    command: "npx -y @agentrail-sdk/mcp --profile context",
+    description: "Expose Context Relay tools to MCP-capable local agents.",
+  },
 ] as const;
 
 export function InstallAgentRailCard({
@@ -98,8 +103,8 @@ pnpm bootstrap:local`}</code>
             ))}
           </div>
           <small>
-            MCP Context profile 0.1.2 is source-ready but should be used through
-            npx only after the registry shows 0.1.2.
+            MCP Context profile 0.1.2 is published on npm and can be started
+            through npx.
           </small>
         </div>
       </div>

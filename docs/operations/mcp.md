@@ -6,7 +6,7 @@ The goal is simple: while working in Codex, a developer can ask for recent Agent
 
 ## NPM status
 
-The scoped MCP package is published on npm as `@agentrail-sdk/mcp`. The unscoped npm command `npm install agentrail` is not this project.
+The scoped MCP package is published on npm as `@agentrail-sdk/mcp@0.1.2`. The unscoped npm command `npm install agentrail` is not this project.
 
 Use this command for the local read-only MCP server:
 
@@ -14,7 +14,7 @@ Use this command for the local read-only MCP server:
 npx -y @agentrail-sdk/mcp
 ```
 
-MCP Context profile 0.1.2 is implemented in this repository and wired to the local Context Relay tools. Use it from source checkout now, or through `npx` only after `npm view @agentrail-sdk/mcp version` returns `0.1.2`.
+MCP Context profile 0.1.2 is published on npm and wired to the local Context Relay tools. Start it with:
 
 ```bash
 npx -y @agentrail-sdk/mcp --profile context
@@ -111,9 +111,9 @@ env = {
 
 Keep this server local unless you have reviewed authentication, network exposure, and data-handling requirements for your own environment.
 
-## Context profile from source checkout
+## Context profile development from source
 
-When running from source before the `0.1.2` registry publish, build the context and MCP packages and start the context profile locally:
+When developing AgentRail itself, build the context and MCP packages and start the context profile locally:
 
 ```bash
 pnpm --filter @agentrail-sdk/context build
