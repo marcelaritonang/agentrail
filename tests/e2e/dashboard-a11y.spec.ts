@@ -80,6 +80,19 @@ test("has logical headings, named controls, and zero Axe violations on the index
   await expectNoAxeViolations(page);
 });
 
+test("has logical headings, named controls, and zero Axe violations on hosted login", async ({
+  page,
+}) => {
+  await page.goto("/login");
+
+  await expectNamedControls(page);
+  expect(await page.locator("main h1").count()).toBe(1);
+  await expect(
+    page.getByRole("button", { name: "Continue with GitHub" }),
+  ).toBeVisible();
+  await expectNoAxeViolations(page);
+});
+
 test("has logical headings, named controls, and zero Axe violations on detail", async ({
   page,
 }) => {
