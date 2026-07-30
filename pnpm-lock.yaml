@@ -149,7 +149,22 @@ importers:
         specifier: ^3.1091.0
         version: 3.1091.0
 
+  packages/cli:
+    dependencies:
+      '@agentrail-sdk/context':
+        specifier: workspace:0.1.0
+        version: link:../context
+
   packages/config: {}
+
+  packages/context:
+    dependencies:
+      ignore:
+        specifier: ^7.0.0
+        version: 7.0.6
+      zod:
+        specifier: ^4.1.0
+        version: 4.4.3
 
   packages/contracts:
     dependencies:
@@ -172,6 +187,9 @@ importers:
 
   packages/mcp:
     dependencies:
+      '@agentrail-sdk/context':
+        specifier: workspace:0.1.0
+        version: link:../context
       '@agentrail-sdk/db':
         specifier: workspace:0.1.0
         version: link:../db
@@ -1891,6 +1909,10 @@ packages:
   iconv-lite@0.7.3:
     resolution: {integrity: sha512-IKXpvIzjnC9XTAUbVBcMfGS0EPaIXtW6v+zr+RRp+hqULEpo0owZax6wyRwPOJbWbzjYspQwusTsfVr0ifh4uQ==}
     engines: {node: '>=0.10.0'}
+
+  ignore@7.0.6:
+    resolution: {integrity: sha512-BAg6QkE8W+TuQLrrw0Ugr7HegXduRuuj8/ti2kSOc+jz1dmx8/WNcjr6XGnq5YpDWxFwwaavqD0+jIUOKelTsw==}
+    engines: {node: '>= 4'}
 
   indent-string@4.0.0:
     resolution: {integrity: sha512-EdDDZu4A2OyIK7Lr/2zG+w5jmbuk1DVBnEwREQvBzspBJkCEbRa8GxU1lghYcaGJCnRWibjDXlq779X1/y5xwg==}
@@ -3979,6 +4001,8 @@ snapshots:
   iconv-lite@0.7.3:
     dependencies:
       safer-buffer: 2.1.2
+
+  ignore@7.0.6: {}
 
   indent-string@4.0.0: {}
 

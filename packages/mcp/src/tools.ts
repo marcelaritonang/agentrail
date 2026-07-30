@@ -14,6 +14,8 @@ export const AGENTRAIL_MCP_TOOL_NAMES = [
   "agentrail_open_dashboard",
 ] as const;
 
+export const AGENTRAIL_FORENSICS_TOOL_NAMES = AGENTRAIL_MCP_TOOL_NAMES;
+
 export type AgentRailMcpToolName = (typeof AGENTRAIL_MCP_TOOL_NAMES)[number];
 
 export type AgentRailToolHandlers = Record<

@@ -22,6 +22,7 @@ export type ReleaseSmokeResult = {
   mode: ReleaseSmokeMode;
   sdkImport: true;
   mcpInitialize: true;
+  cliHelp: true;
   toolNames: readonly string[];
   unresolvedWorkspaceDependencies: readonly string[];
 };
@@ -62,8 +63,10 @@ const releasePackages = [
     version: "0.1.1",
   },
   { directory: "db", name: "@agentrail-sdk/db", version: "0.1.0" },
+  { directory: "context", name: "@agentrail-sdk/context", version: "0.1.0" },
   { directory: "sdk", name: "@agentrail-sdk/sdk", version: "0.1.0" },
   { directory: "mcp", name: "@agentrail-sdk/mcp", version: "0.1.1" },
+  { directory: "cli", name: "@agentrail-sdk/cli", version: "0.1.0" },
 ] as const;
 const commandTimeoutMs = 120_000;
 const mcpRequestTimeoutMs = 15_000;
@@ -347,6 +350,25 @@ async function verifySdkImport(consumerRoot: string): Promise<true> {
   return true;
 }
 
+async function verifyCliHelp(consumerRoot: string): Promise<true> {
+  const cliEntry = join(
+    consumerRoot,
+    "node_modules",
+    "@agentrail-sdk",
+    "cli",
+    "dist",
+    "main.js",
+  );
+  const result = await runCommand(process.execPath, [cliEntry, "--help"], {
+    cwd: consumerRoot,
+    env: releaseChildEnvironment(),
+  });
+  if (!/AgentRail CLI/.test(result.stdout)) {
+    throw new Error("Clean consumer could not run AgentRail CLI help");
+  }
+  return true;
+}
+
 function jsonRpcResult(response: JsonRpcResponse): Record<string, unknown> {
   if (response.error !== undefined) {
     throw new Error(
@@ -605,6 +627,7 @@ export async function verifyNpmRelease(
     const unresolvedWorkspaceDependencies =
       await findUnresolvedWorkspaceDependencies(consumerRoot);
     const sdkImport = await verifySdkImport(consumerRoot);
+    const cliHelp = await verifyCliHelp(consumerRoot);
     const mcpManifest = JSON.parse(
       await readFile(
         join(
@@ -626,6 +649,7 @@ export async function verifyNpmRelease(
       mode: input.mode,
       sdkImport,
       mcpInitialize: mcp.mcpInitialize,
+      cliHelp,
       toolNames: mcp.toolNames,
       unresolvedWorkspaceDependencies,
     };
@@ -651,6 +675,7 @@ function assertSuccessfulResult(result: ReleaseSmokeResult): void {
   if (
     result.sdkImport !== true ||
     result.mcpInitialize !== true ||
+    result.cliHelp !== true ||
     result.unresolvedWorkspaceDependencies.length > 0
   ) {
     throw new Error("Npm release smoke assertions failed");

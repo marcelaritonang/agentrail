@@ -15,6 +15,12 @@ export default defineConfig({
       "@agentrail-sdk/contracts": fileURLToPath(
         new URL("./packages/contracts/src/index.ts", import.meta.url),
       ),
+      "@agentrail-sdk/context": fileURLToPath(
+        new URL("./packages/context/src/index.ts", import.meta.url),
+      ),
+      "@agentrail-sdk/cli": fileURLToPath(
+        new URL("./packages/cli/src/index.ts", import.meta.url),
+      ),
       "@agentrail-sdk/db": fileURLToPath(
         new URL("./packages/db/src/index.ts", import.meta.url),
       ),

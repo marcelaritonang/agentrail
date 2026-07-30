@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { AgentRailReadModel, AgentRailToolResult } from "./types";
 import { AGENTRAIL_MCP_TOOL_NAMES } from "./tools";
+import { CONTEXT_TOOL_NAMES } from "./profile";
 import { registerAgentRailMcpTools } from "./server";
 
 const readModel: AgentRailReadModel = {
@@ -48,6 +49,48 @@ describe("AgentRail MCP server registration", () => {
     );
     expect(
       registered.every((tool) => /read-only/i.test(tool.description)),
+    ).toBe(true);
+  });
+
+  it("registers exactly context tools for the context profile", () => {
+    const registered: {
+      name: string;
+      description: string;
+      handler: (input: Record<string, unknown>) => Promise<AgentRailToolResult>;
+    }[] = [];
+
+    registerAgentRailMcpTools(
+      {
+        registerTool(name, config, handler) {
+          registered.push({
+            name,
+            description: config.description,
+            handler,
+          });
+        },
+      },
+      {
+        relay: {
+          async prepareContext() {
+            throw new Error("not needed");
+          },
+          async recall() {
+            return [];
+          },
+          async remember() {
+            throw new Error("not needed");
+          },
+          async reportOutcome() {
+            throw new Error("not needed");
+          },
+        },
+      },
+      "context",
+    );
+
+    expect(registered.map((tool) => tool.name)).toEqual(CONTEXT_TOOL_NAMES);
+    expect(
+      registered.some((tool) => /read-only/i.test(tool.description)),
     ).toBe(true);
   });
 });

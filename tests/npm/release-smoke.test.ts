@@ -21,13 +21,13 @@ describe("npm release smoke", () => {
 
     expect(result.sdkImport).toBe(true);
     expect(result.mcpInitialize).toBe(true);
+    expect(result.cliHelp).toBe(true);
     expect(result.unresolvedWorkspaceDependencies).toEqual([]);
     expect(result.toolNames).toEqual([
-      "agentrail_list_traces",
-      "agentrail_get_trace",
-      "agentrail_get_actions",
-      "agentrail_get_payload_status",
-      "agentrail_open_dashboard",
+      "agentrail_prepare_context",
+      "agentrail_recall",
+      "agentrail_remember",
+      "agentrail_report_outcome",
     ]);
   }, 120_000);
 });

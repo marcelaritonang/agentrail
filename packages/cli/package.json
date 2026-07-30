@@ -1,7 +1,7 @@
 {
-  "name": "@agentrail-sdk/mcp",
-  "version": "0.1.1",
-  "description": "Read-only MCP server for inspecting AgentRail traces from Codex-style developer tools.",
+  "name": "@agentrail-sdk/cli",
+  "version": "0.1.0",
+  "description": "AgentRail CLI for local Context Relay setup and diagnostics.",
   "private": false,
   "type": "module",
   "license": "Apache-2.0",
@@ -12,13 +12,13 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/marcelaritonang/agentrail.git",
-    "directory": "packages/mcp"
+    "directory": "packages/cli"
   },
   "publishConfig": {
     "access": "public"
   },
   "bin": {
-    "agentrail-mcp": "./dist/index.js"
+    "agentrail": "./dist/main.js"
   },
   "files": [
     "dist"
@@ -34,12 +34,12 @@
     "prepack": "pnpm run build",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "tsc -p tsconfig.json --noEmit",
-    "start": "node ./dist/index.js"
+    "start": "node ./dist/main.js"
   },
   "dependencies": {
-    "@agentrail-sdk/context": "workspace:0.1.0",
-    "@agentrail-sdk/db": "workspace:0.1.0",
-    "@modelcontextprotocol/sdk": "1.30.0",
-    "zod": "^4.1.0"
+    "@agentrail-sdk/context": "workspace:0.1.0"
+  },
+  "engines": {
+    "node": ">=24 <25"
   }
 }
