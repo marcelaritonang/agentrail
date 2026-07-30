@@ -53,20 +53,46 @@ beforeAll(async () => {
   }
 
   database = createDatabase(TEST_POSTGRES_URL);
-  const migration = await readFile(
-    new URL("../migrations/0000_agentrail_m1.sql", import.meta.url),
-    "utf8",
-  );
+  const migrations = await Promise.all([
+    readFile(
+      new URL("../migrations/0000_agentrail_m1.sql", import.meta.url),
+      "utf8",
+    ),
+    readFile(
+      new URL("../migrations/0001_context_control_plane.sql", import.meta.url),
+      "utf8",
+    ),
+  ]);
 
   await database.sql.unsafe(
     "DROP SCHEMA public CASCADE; CREATE SCHEMA public;",
   );
-  await database.sql.unsafe(migration);
+  for (const migration of migrations) {
+    if (migration.trim().length > 0) {
+      await database.sql.unsafe(migration);
+    }
+  }
   repository = createSpanRepository(database.db);
 });
 
 beforeEach(async () => {
-  await database.sql`TRUNCATE TABLE spans, traces, api_keys, projects CASCADE`;
+  await database.sql`
+    TRUNCATE TABLE
+      daily_usage,
+      context_packs,
+      usage_events,
+      installations,
+      device_codes,
+      sessions,
+      accounts,
+      verifications,
+      users,
+      spans,
+      traces,
+      api_keys,
+      projects
+    CASCADE
+  `;
   await repository.createProject({
     projectId: PROJECT_ID,
     name: "AgentRail test",
