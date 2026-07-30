@@ -1,6 +1,11 @@
-import { createDatabase, createSpanRepository } from "@agentrail-sdk/db";
+import {
+  createControlRepository,
+  createDatabase,
+  createSpanRepository,
+} from "@agentrail-sdk/db";
 import { createRedisStreamsQueue } from "@agentrail-sdk/queue";
 import { createIngestApp } from "./app.js";
+import { createInMemoryDeviceIssueLimiter } from "./device.js";
 import { serveIngestApp } from "./server.js";
 
 function required(name: string): string {
@@ -13,6 +18,7 @@ function required(name: string): string {
 
 const database = createDatabase(required("DATABASE_URL"));
 const repository = createSpanRepository(database.db);
+const controlRepository = createControlRepository(database.db);
 const queue = await createRedisStreamsQueue({
   url: required("REDIS_URL"),
   stream: process.env.AGENTRAIL_STREAM ?? "agentrail:spans",
@@ -24,6 +30,15 @@ const app = createIngestApp({
   apiKeyPepper: required("API_KEY_PEPPER"),
   apiKeys: repository,
   queue,
+  deviceCodes: controlRepository,
+  installationCredentialPepper: required("INSTALLATION_CREDENTIAL_PEPPER"),
+  activationBaseUrl:
+    process.env.AGENTRAIL_ACTIVATION_BASE_URL ??
+    "http://localhost:3000/activate",
+  deviceIssueRateLimit: createInMemoryDeviceIssueLimiter({
+    maxPerWindow: 20,
+    windowMs: 60_000,
+  }),
 });
 const server = serveIngestApp(app, Number(process.env.INGEST_PORT ?? "3001"));
 

@@ -801,6 +801,96 @@ select {
   padding-top: 14px;
 }
 
+.activation-panel {
+  background: var(--surface-panel);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  display: grid;
+  gap: 18px;
+  padding: 18px;
+}
+
+.activation-panel h1 {
+  font-size: clamp(30px, 8vw, 52px);
+  font-weight: 610;
+  letter-spacing: -0.05em;
+  line-height: 1;
+  margin: 0;
+}
+
+.activation-panel p {
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 12px 0 0;
+}
+
+.activation-code-field {
+  display: grid;
+  gap: 8px;
+}
+
+.activation-code-field span {
+  color: var(--text-muted);
+  font-family: var(--font-jetbrains), monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.activation-code-field input {
+  background: var(--surface-inset);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-jetbrains), monospace;
+  font-size: 18px;
+  letter-spacing: 0.08em;
+  min-height: 48px;
+  padding: 0 14px;
+}
+
+.activation-submit {
+  background: var(--signal-action);
+  border: 1px solid var(--signal-action);
+  border-radius: var(--radius-sm);
+  color: var(--surface-canvas);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 650;
+  min-height: 44px;
+  padding: 0 16px;
+}
+
+.activation-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.54;
+}
+
+.activation-state {
+  border: 1px solid var(--line-subtle);
+  border-left: 3px solid var(--signal-action);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+}
+
+.activation-state strong {
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.activation-state p {
+  margin-top: 6px;
+}
+
+.activation-state-invalid,
+.activation-state-expired,
+.activation-state-login_required,
+.activation-state-revoked,
+.activation-state-service_unavailable {
+  border-left-color: var(--signal-error);
+}
+
 .public-action-panel {
   border: 1px solid var(--line-subtle);
   padding: 18px;

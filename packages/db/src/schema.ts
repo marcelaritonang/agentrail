@@ -181,6 +181,10 @@ export const deviceCodes = pgTable(
       withTimezone: true,
       mode: "date",
     }),
+    lastPolledAt: timestamp("last_polled_at", {
+      withTimezone: true,
+      mode: "date",
+    }),
   },
   (table) => [
     uniqueIndex("device_codes_device_code_digest_unique").on(
