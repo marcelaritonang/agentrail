@@ -27,6 +27,9 @@ type PackageJson = {
   dependencies?: Record<string, string>;
   optionalDependencies?: Record<string, string>;
   peerDependencies?: Record<string, string>;
+  engines?: {
+    node?: string;
+  };
 };
 
 type RootPackageJson = {
@@ -45,10 +48,10 @@ const publishablePackages = [
 const expectedPackageVersions = {
   contracts: "0.1.1",
   db: "0.1.0",
-  context: "0.1.0",
+  context: "0.1.1",
   sdk: "0.1.0",
-  mcp: "0.1.1",
-  cli: "0.1.0",
+  mcp: "0.1.2",
+  cli: "0.1.1",
 } as const;
 
 const expectedInternalWorkspaceDependencies = {
@@ -57,10 +60,10 @@ const expectedInternalWorkspaceDependencies = {
   },
   "@agentrail-sdk/mcp": {
     "@agentrail-sdk/db": "workspace:0.1.0",
-    "@agentrail-sdk/context": "workspace:0.1.0",
+    "@agentrail-sdk/context": "workspace:0.1.1",
   },
   "@agentrail-sdk/cli": {
-    "@agentrail-sdk/context": "workspace:0.1.0",
+    "@agentrail-sdk/context": "workspace:0.1.1",
   },
 } satisfies Record<string, Record<string, string>>;
 
@@ -153,6 +156,14 @@ describe("npm package readiness", () => {
     expect(manifest.bin).toEqual({
       agentrail: "./dist/main.js",
     });
+  });
+
+  it("keeps end-user CLI and MCP packages compatible with active LTS Node", () => {
+    for (const packageName of ["context", "cli", "mcp"] as const) {
+      const manifest = readPackageJson(packageName);
+
+      expect(manifest.engines?.node).toBe(">=20.16");
+    }
   });
 
   it("exposes repeatable tarball and registry smoke commands", () => {
