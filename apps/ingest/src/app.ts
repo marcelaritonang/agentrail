@@ -2,7 +2,10 @@ import { randomUUID } from "node:crypto";
 import { Hono, type Context } from "hono";
 import { bodyLimit } from "hono/body-limit";
 
-import { MAX_INGEST_BODY_BYTES } from "@agentrail-sdk/config";
+import {
+  MAX_INGEST_BODY_BYTES,
+  MAX_USAGE_EVENTS_BODY_BYTES,
+} from "@agentrail-sdk/config";
 import {
   DeviceCodeRequestSchema,
   DeviceTokenRequestSchema,
@@ -14,7 +17,7 @@ import type {
   NewInstallationCredential,
   StoredDeviceCode,
 } from "@agentrail-sdk/db";
-import type { SpanQueue } from "@agentrail-sdk/queue";
+import type { SpanQueue, UsageEventQueue } from "@agentrail-sdk/queue";
 import { apiKeyPrefix, verifyApiKey } from "./api-key.js";
 import {
   createDeviceCode,
@@ -24,6 +27,8 @@ import {
   digestDeviceCode,
   issueRateLimitIdentity,
 } from "./device.js";
+import type { InstallationAuthRepository } from "./installation-auth.js";
+import { handleUsageEvents } from "./usage-events.js";
 
 type ApiKeyRecord = {
   projectId: string;
@@ -48,7 +53,9 @@ export type IngestDependencies = {
   apiKeyPepper: string;
   apiKeys: ApiKeyRepository;
   queue: SpanQueue;
+  usageQueue?: UsageEventQueue;
   deviceCodes?: DeviceCodeRepository;
+  installations?: InstallationAuthRepository;
   activationBaseUrl?: string;
   installationCredentialPepper?: string;
   requestId?: () => string;
@@ -357,6 +364,32 @@ export function createIngestApp(dependencies: IngestDependencies) {
         202,
       );
     },
+  );
+
+  app.post(
+    "/v1/events",
+    bodyLimit({
+      maxSize: MAX_USAGE_EVENTS_BODY_BYTES,
+      onError: (context) =>
+        context.json(
+          {
+            error: {
+              code: "body_too_large",
+              message: "Request body exceeds the usage-event limit",
+              request_id: context.get("requestId"),
+              retryable: false,
+            },
+          },
+          413,
+        ),
+    }),
+    (context) =>
+      handleUsageEvents(context, {
+        installationCredentialPepper: dependencies.installationCredentialPepper,
+        installations: dependencies.installations,
+        usageQueue: dependencies.usageQueue,
+        now,
+      }),
   );
 
   return app;

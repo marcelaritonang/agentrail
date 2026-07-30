@@ -3,7 +3,10 @@ import {
   createDatabase,
   createSpanRepository,
 } from "@agentrail-sdk/db";
-import { createRedisStreamsQueue } from "@agentrail-sdk/queue";
+import {
+  createRedisStreamsQueue,
+  createRedisUsageEventQueue,
+} from "@agentrail-sdk/queue";
 import { createIngestApp } from "./app.js";
 import { createInMemoryDeviceIssueLimiter } from "./device.js";
 import { serveIngestApp } from "./server.js";
@@ -26,11 +29,21 @@ const queue = await createRedisStreamsQueue({
   consumer: `ingest-${process.pid}`,
   blockMs: 100,
 });
+const usageQueue = await createRedisUsageEventQueue({
+  url: required("REDIS_URL"),
+  stream: process.env.AGENTRAIL_USAGE_STREAM ?? "agentrail:usage-events",
+  group:
+    process.env.AGENTRAIL_USAGE_CONSUMER_GROUP ?? "agentrail-usage-workers",
+  consumer: `ingest-usage-${process.pid}`,
+  blockMs: 100,
+});
 const app = createIngestApp({
   apiKeyPepper: required("API_KEY_PEPPER"),
   apiKeys: repository,
   queue,
+  usageQueue,
   deviceCodes: controlRepository,
+  installations: controlRepository,
   installationCredentialPepper: required("INSTALLATION_CREDENTIAL_PEPPER"),
   activationBaseUrl:
     process.env.AGENTRAIL_ACTIVATION_BASE_URL ??
@@ -47,6 +60,7 @@ async function shutdown(): Promise<void> {
     server.close((error) => (error === undefined ? resolve() : reject(error)));
   });
   queue.close();
+  usageQueue.close();
   await database.close();
 }
 

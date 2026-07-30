@@ -1,3 +1,4 @@
 export const TRACE_INCOMPLETE_AFTER_MS = 900_000;
 export const MAX_INGEST_BODY_BYTES = 240 * 1024;
+export const MAX_USAGE_EVENTS_BODY_BYTES = 240 * 1024;
 export const MAX_SPANS_PER_BATCH = 100;
