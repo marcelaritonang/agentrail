@@ -58,6 +58,9 @@ const expectedInternalWorkspaceDependencies = {
   "@agentrail-sdk/sdk": {
     "@agentrail-sdk/contracts": "workspace:0.1.1",
   },
+  "@agentrail-sdk/context": {
+    "@agentrail-sdk/contracts": "workspace:0.1.1",
+  },
   "@agentrail-sdk/mcp": {
     "@agentrail-sdk/db": "workspace:0.1.0",
     "@agentrail-sdk/context": "workspace:0.1.1",

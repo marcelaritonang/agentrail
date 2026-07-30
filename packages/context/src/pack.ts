@@ -2,8 +2,17 @@ import { createHash, randomUUID } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
+import type { UsageEvent } from "@agentrail-sdk/contracts";
+
 import { chunkTextFile, type SourceChunk } from "./chunker.js";
 import { scanWorkspace } from "./scanner.js";
+import {
+  createFileUsageSpool,
+  createUsageFlushScheduler,
+  readRestrictedFileCredential,
+  type UsageFlushScheduler,
+  type UsageSpool,
+} from "./spool-flush.js";
 import { estimateTokens } from "./tokens.js";
 import {
   ContextPackRequestSchema,
@@ -20,7 +29,11 @@ export type ContextRelayOptions = {
   client: string;
   packageVersion: string;
   installationId?: string;
+  apiUrl?: string;
   dashboardUrl?: string;
+  credential?: string;
+  usageSpool?: UsageSpool;
+  fetch?: typeof fetch;
   now?: () => Date;
 };
 
@@ -58,9 +71,11 @@ export type ContextRelay = {
 
 export function createContextRelay(options: ContextRelayOptions): ContextRelay {
   const now = options.now ?? (() => new Date());
+  let usageFlushScheduler: UsageFlushScheduler | null = null;
 
   return {
     async prepareContext(request) {
+      const startTimeMs = Date.now();
       const parsedRequest = ContextPackRequestSchema.parse(request);
       const root = await resolveWorkspaceRoot(options.workspaceRoot);
       const scan = await scanWorkspace({
@@ -99,8 +114,9 @@ export function createContextRelay(options: ContextRelayOptions): ContextRelay {
       const packId = sha256(
         `${parsedRequest.task}:${now().toISOString()}:${randomUUID()}`,
       );
+      const stablePackId = `cp_${packId.slice(0, 32)}`;
       await writeLocalReceipt(root, {
-        packId,
+        packId: stablePackId,
         requestedAt: now().toISOString(),
         request: parsedRequest,
         context,
@@ -111,8 +127,8 @@ export function createContextRelay(options: ContextRelayOptions): ContextRelay {
         privacyMode: options.privacyMode,
       });
 
-      return {
-        packId,
+      const pack: ContextPack = {
+        packId: stablePackId,
         status:
           context.length === 0 ? "empty" : scan.complete ? "ready" : "partial",
         context,
@@ -136,6 +152,21 @@ export function createContextRelay(options: ContextRelayOptions): ContextRelay {
         },
         receiptUrl: null,
       };
+      await recordUsageEvent({
+        root,
+        pack,
+        event: {
+          eventType: "context_pack_created",
+          latencyMs: Math.max(0, Date.now() - startTimeMs),
+        },
+        options,
+        scheduler: () => usageFlushScheduler,
+        setScheduler: (scheduler) => {
+          usageFlushScheduler = scheduler;
+        },
+        now,
+      });
+      return pack;
     },
     recall(input) {
       return recallMemory({
@@ -170,13 +201,117 @@ export function createContextRelay(options: ContextRelayOptions): ContextRelay {
             : boundedString(input.reason, 1_000, "reason"),
       };
       await appendJsonLine(outcomePath(root), receipt);
+      await recordUsageEvent({
+        root,
+        pack: {
+          packId: receipt.packId,
+          status: "ready",
+          context: [],
+          decisions: [],
+          warnings: [],
+          measurement: {
+            candidateTokensEstimate: 0,
+            returnedTokensEstimate: 0,
+            contextReductionEstimate: 0,
+            method: "heuristic-v1",
+            confidence: "estimated",
+          },
+          receiptUrl: null,
+        },
+        event: {
+          eventType: "context_outcome_reported",
+          latencyMs: 0,
+          outcome: mapOutcome(input.outcome),
+          reasonCode: input.reason ?? input.outcome,
+        },
+        options,
+        scheduler: () => usageFlushScheduler,
+        setScheduler: (scheduler) => {
+          usageFlushScheduler = scheduler;
+        },
+        now,
+      });
       return receipt;
     },
   };
 }
 
+async function recordUsageEvent(input: {
+  root: string;
+  pack: ContextPack;
+  event: {
+    eventType: UsageEvent["event_type"];
+    latencyMs: number;
+    outcome?: NonNullable<UsageEvent["safe_attributes"]["outcome"]>;
+    reasonCode?: string;
+  };
+  options: ContextRelayOptions;
+  scheduler: () => UsageFlushScheduler | null;
+  setScheduler: (scheduler: UsageFlushScheduler) => void;
+  now: () => Date;
+}): Promise<void> {
+  if (
+    input.options.privacyMode === "local-only" ||
+    input.options.installationId === undefined
+  ) {
+    return;
+  }
+
+  const spool = input.options.usageSpool ?? createFileUsageSpool(input.root);
+  const event: UsageEvent = {
+    schema_version: 1,
+    event_id: `ev_${randomUUID().replaceAll("-", "")}`,
+    pack_id: input.pack.packId,
+    event_type: input.event.eventType,
+    occurred_at: input.now().toISOString(),
+    safe_attributes: {
+      client: input.options.client,
+      package_version: input.options.packageVersion,
+      status: input.pack.status,
+      latency_ms: input.event.latencyMs,
+      candidate_tokens_estimate: input.pack.measurement.candidateTokensEstimate,
+      returned_tokens_estimate: input.pack.measurement.returnedTokensEstimate,
+      source_counts: sourceCountsFor(input.pack.context),
+      warning_codes: input.pack.warnings.map((warning) => warning.code),
+      ...(input.event.outcome === undefined
+        ? {}
+        : { outcome: input.event.outcome }),
+      ...(input.event.reasonCode === undefined
+        ? {}
+        : { reason_code: input.event.reasonCode.slice(0, 50) }),
+    },
+  };
+  await spool.append(event);
+
+  const apiUrl = input.options.apiUrl ?? input.options.dashboardUrl;
+  if (apiUrl === undefined) return;
+
+  const credential =
+    input.options.credential ??
+    (await readRestrictedFileCredential({ root: input.root }));
+  if (credential === null) return;
+
+  let scheduler = input.scheduler();
+  if (scheduler === null) {
+    scheduler = createUsageFlushScheduler({
+      spool,
+      endpoint: new URL("/v1/events", apiUrl),
+      credential,
+      fetch: input.options.fetch ?? fetch,
+      now: input.now,
+    });
+    input.setScheduler(scheduler);
+  }
+  scheduler.schedule();
+}
+
 async function chunksFromFiles(
-  files: readonly { relativePath: string; absolutePath: string; trust: SourceChunk["trust"]; modifiedAt: string }[],
+  files: readonly {
+    relativePath: string;
+    absolutePath: string;
+    trust: SourceChunk["trust"];
+    modifiedAt: string;
+  }[],
 ): Promise<SourceChunk[]> {
   const chunks: SourceChunk[] = [];
   for (const file of files) {
@@ -254,8 +389,12 @@ async function recallMemory(input: {
 }): Promise<readonly ProjectMemoryRecord[]> {
   const root = await resolveWorkspaceRoot(input.root);
   const records = await readJsonLines<ProjectMemoryRecord>(memoryPath(root));
-  const terms = tokenize(`${input.input.query ?? ""} ${(input.input.tags ?? []).join(" ")}`);
-  const tags = new Set((input.input.tags ?? []).map((tag) => tag.toLowerCase()));
+  const terms = tokenize(
+    `${input.input.query ?? ""} ${(input.input.tags ?? []).join(" ")}`,
+  );
+  const tags = new Set(
+    (input.input.tags ?? []).map((tag) => tag.toLowerCase()),
+  );
   const limit = Math.max(1, Math.min(25, Math.floor(input.input.limit ?? 10)));
 
   return records
@@ -283,7 +422,10 @@ async function writeLocalReceipt(
   const directory = resolve(root, ".agentrail", "receipts", "v1");
   await mkdir(directory, { recursive: true });
   const packId = String(receipt.packId ?? "unknown");
-  await writeFile(resolve(directory, `${packId}.json`), `${JSON.stringify(receipt, null, 2)}\n`);
+  await writeFile(
+    resolve(directory, `${packId}.json`),
+    `${JSON.stringify(receipt, null, 2)}\n`,
+  );
 }
 
 async function appendJsonLine(path: string, value: unknown): Promise<void> {
@@ -340,8 +482,10 @@ function tokenize(text: string): readonly string[] {
 
 function scoreChunk(chunk: SourceChunk, terms: readonly string[]): number {
   return (
-    scoreText(`${chunk.relativePath}\n${chunk.symbol ?? ""}\n${chunk.text}`, terms) +
-    trustWeight(chunk.trust)
+    scoreText(
+      `${chunk.relativePath}\n${chunk.symbol ?? ""}\n${chunk.text}`,
+      terms,
+    ) + trustWeight(chunk.trust)
   );
 }
 
@@ -365,6 +509,31 @@ function trustWeight(trust: SourceChunk["trust"]): number {
       return 2;
     case "untrusted_content":
       return 1;
+  }
+}
+
+function sourceCountsFor(
+  context: readonly ContextItem[],
+): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const item of context) {
+    counts[item.trust] = (counts[item.trust] ?? 0) + 1;
+  }
+  return counts;
+}
+
+function mapOutcome(
+  outcome: OutcomeRequest["outcome"],
+): NonNullable<UsageEvent["safe_attributes"]["outcome"]> {
+  switch (outcome) {
+    case "accepted":
+      return "helpful";
+    case "changed":
+      return "partial";
+    case "rejected":
+      return "missed";
+    case "unknown":
+      return "partial";
   }
 }
 
