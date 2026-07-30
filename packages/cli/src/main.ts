@@ -1,8 +1,23 @@
 #!/usr/bin/env node
+import { join } from "node:path";
+
 import { createContextRelay } from "@agentrail-sdk/context";
 
 import { parseAgentRailCommand } from "./args.js";
-import { setupClient, uninstallClient } from "./clients.js";
+import {
+  setupClient,
+  uninstallClient,
+  updateClientIdentity,
+} from "./clients.js";
+import { runDoctorCommand } from "./commands/doctor.js";
+import {
+  createHttpDeviceApi,
+  credentialProjectKey,
+  openExternalBrowser,
+  runLoginCommand,
+} from "./commands/login.js";
+import { runLogoutCommand } from "./commands/logout.js";
+import { selectCredentialStore } from "./credentials/platform-store.js";
 import type { CommandResult } from "./types.js";
 import { resolveWorkspaceRoot } from "@agentrail-sdk/context";
 
@@ -27,26 +42,7 @@ export async function runAgentRailCommand(
       case "help":
         return { exitCode: 0, stdout: usage(), stderr: "" };
       case "doctor": {
-        await resolveWorkspaceRoot(command.root);
-        const checks = [
-          {
-            id: "workspace",
-            status: "pass",
-            detail: `Workspace root is readable.`,
-            remediation: null,
-          },
-          {
-            id: "privacy_mode",
-            status: "pass",
-            detail: "Local-only mode requires no login.",
-            remediation: null,
-          },
-        ];
-        return jsonOrText(
-          command.json,
-          { ok: true, checks },
-          "AgentRail doctor passed.\n",
-        );
+        return runDoctorCommand(command);
       }
       case "context": {
         const relay = createContextRelay({
@@ -103,6 +99,44 @@ export async function runAgentRailCommand(
           stderr: "",
         };
       }
+      case "login": {
+        const root = await resolveWorkspaceRoot(command.root);
+        const store = await selectCredentialStore({
+          directory: join(root, ".agentrail", "credentials"),
+        });
+        const projectKey = command.projectKey ?? credentialProjectKey(root);
+        return runLoginCommand({
+          api: createHttpDeviceApi({ baseUrl: command.apiUrl }),
+          apiUrl: command.apiUrl,
+          client: command.client,
+          packageVersion: CLI_PACKAGE_VERSION,
+          projectKey,
+          store,
+          openBrowser: command.openBrowser
+            ? openExternalBrowser
+            : async () => {},
+          sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+          updateManagedClient: (identity) =>
+            updateClientIdentity({
+              client: command.client,
+              root,
+              identity,
+              ...(command.codexConfig === undefined
+                ? {}
+                : { codexConfig: command.codexConfig }),
+            }).then(() => undefined),
+        });
+      }
+      case "logout": {
+        const root = await resolveWorkspaceRoot(command.root);
+        const store = await selectCredentialStore({
+          directory: join(root, ".agentrail", "credentials"),
+        });
+        return runLogoutCommand({
+          store,
+          projectKey: command.projectKey ?? credentialProjectKey(root),
+        });
+      }
     }
   } catch (error) {
     return { exitCode: 1, stdout: "", stderr: `${errorMessage(error)}\n` };
@@ -135,8 +169,10 @@ function usage(): string {
     "Usage:",
     "  agentrail setup --client codex --root <workspace>",
     "  agentrail setup --client claude --root <workspace>",
+    "  agentrail login --client codex --root <workspace> --api-url https://agentrail.id",
     "  agentrail doctor --root <workspace> --json",
     "  agentrail context --root <workspace> --task <task> --token-budget <n> --json",
+    "  agentrail logout --root <workspace>",
     "  agentrail uninstall --client codex --root <workspace>",
     "",
   ].join("\n");
