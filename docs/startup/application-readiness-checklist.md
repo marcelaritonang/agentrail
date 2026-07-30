@@ -22,9 +22,9 @@ pending rather than being turned into claims.
 - [ ] README install command uses `npm install @agentrail-sdk/sdk`.
 - [ ] Context CLI command uses `npm install -D @agentrail-sdk/cli` and
       `npx -y @agentrail-sdk/cli context`.
-- [ ] MCP setup uses `npx -y @agentrail-sdk/mcp`.
-- [ ] MCP Context profile is advertised as live only after the registry shows
-      `@agentrail-sdk/mcp@0.1.2`.
+- [x] MCP setup uses `npx -y @agentrail-sdk/mcp`.
+- [x] MCP Context profile uses live `npx -y @agentrail-sdk/mcp --profile
+      context` from `@agentrail-sdk/mcp@0.1.2`.
 - [ ] Security, privacy, terms, architecture, and AWS reference docs are linked.
 
 ## Application content

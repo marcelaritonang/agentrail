@@ -154,7 +154,7 @@ AgentRail is published on npm under the scoped `@agentrail-sdk` namespace. Use t
 | `@agentrail-sdk/sdk`       | `0.1.0` | TypeScript SDK for recording agent traces.                |
 | `@agentrail-sdk/context`   | `0.1.1` | Local Context Relay engine for bounded source packs.      |
 | `@agentrail-sdk/cli`       | `0.1.1` | Local CLI for context, doctor, setup, and uninstall.      |
-| `@agentrail-sdk/mcp`       | `0.1.1` | Read-only local MCP server for forensic trace inspection. |
+| `@agentrail-sdk/mcp`       | `0.1.2` | Read-only local MCP server and Context profile.           |
 
 Live install commands:
 
@@ -165,9 +165,10 @@ npm install -D @agentrail-sdk/cli
 npx -y @agentrail-sdk/cli context --root . --task "Audit this change" --token-budget 4000 --json
 
 npx -y @agentrail-sdk/mcp
+npx -y @agentrail-sdk/mcp --profile context
 ```
 
-The MCP Context profile is implemented in source version `@agentrail-sdk/mcp@0.1.2`, but the public registry still needs that MCP version to be published before `npx -y @agentrail-sdk/mcp --profile context` is advertised as a live Codex setup path.
+The MCP Context profile is live in `@agentrail-sdk/mcp@0.1.2` and exposes local Context Relay tools to MCP-capable agent clients.
 
 Local source checkout remains the recommended path for running the full ingestion API, worker, PostgreSQL, Redis, MinIO, and dashboard stack. See [NPM release checklist](docs/operations/npm-release.md) for the release verification process.
 

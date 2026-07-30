@@ -58,16 +58,15 @@ The current product is an open-source, local-first M1 implementation:
 Context Relay is implemented locally through `@agentrail-sdk/context` and
 `@agentrail-sdk/cli`, but it is not a completed hosted feature. It lets a
 developer request a bounded local Context Pack before an AI agent run, then
-record local receipts for later review. The MCP Context profile is implemented
-in source version `@agentrail-sdk/mcp@0.1.2`; it should be advertised as a live
-`npx` setup path only after the public registry shows that version.
+record local receipts for later review. The MCP Context profile is live in
+`@agentrail-sdk/mcp@0.1.2` and can be started with
+`npx -y @agentrail-sdk/mcp --profile context`.
 
 | Claim                                                     | Evidence                                                                     | Status         | Owner   |
 | --------------------------------------------------------- | ---------------------------------------------------------------------------- | -------------- | ------- |
 | Context Relay design exists.                              | `docs/superpowers/specs/2026-07-29-agentrail-context-relay-design.md`        | verified       | Founder |
 | Local Context Relay CLI implementation is complete.        | `packages/context`, `packages/cli`, and `tests/npm/release-smoke.test.ts`     | verified       | Founder |
-| MCP Context profile is ready in source.                    | `packages/mcp` source version `0.1.2`                                         | verified       | Founder |
-| MCP Context profile is available from public npm registry. | `npm view @agentrail-sdk/mcp version` must return `0.1.2`.                   | pending        | Founder |
+| MCP Context profile is live on npm.                        | `npm view @agentrail-sdk/mcp version` returns `0.1.2` and `docs/operations/mcp.md` | verified  | Founder |
 | Context Pack outcomes from testers exist.                 | Intake and interview loop are ready; tester responses are not collected yet. | pending        | Founder |
 | Hosted multi-tenant service exists.                       | AgentRail is currently local-first and public demo only.                     | not-applicable | Founder |
 
@@ -142,7 +141,7 @@ Summary:
 
 | Risk                                                        | Mitigation                                                                                                      |
 | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| Developers do not want to instrument AI workflows manually. | Lead with Context CLI today, then finish MCP Context profile registry publish and client setup hardening.      |
+| Developers do not want to instrument AI workflows manually. | Lead with Context CLI and MCP Context profile today, then harden client setup and tester onboarding.          |
 | Sensitive evidence should not leave the developer machine.  | Keep local-first default, make S3 evidence opt-in, and never give browser direct bucket access.                 |
 | AWS costs grow before validation.                           | Use AWS Budgets, CloudWatch alarms, reserved concurrency, lifecycle policies, and a small non-production stack. |
 | Application reviewers see unsupported traction claims.      | Keep traction fields pending until evidence exists.                                                             |

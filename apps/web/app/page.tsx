@@ -56,14 +56,14 @@ const npmStatus = [
   ["Available today", "SDK, Context CLI, MCP reader"],
   [
     "Published packages",
-    "@agentrail-sdk/contracts@0.1.1, @agentrail-sdk/db@0.1.0, @agentrail-sdk/sdk@0.1.0, @agentrail-sdk/context@0.1.1, @agentrail-sdk/cli@0.1.1, @agentrail-sdk/mcp@0.1.1",
+    "@agentrail-sdk/contracts@0.1.1, @agentrail-sdk/db@0.1.0, @agentrail-sdk/sdk@0.1.0, @agentrail-sdk/context@0.1.1, @agentrail-sdk/cli@0.1.1, @agentrail-sdk/mcp@0.1.2",
   ],
   ["SDK path", "npm install @agentrail-sdk/sdk for TypeScript AI applications"],
   ["Context CLI", "npm install -D @agentrail-sdk/cli for local Context Packs"],
   ["MCP path", "npx -y @agentrail-sdk/mcp for read-only trace inspection"],
   [
-    "Registry gap",
-    "MCP Context profile 0.1.2 is source-ready and waits for npm registry publish",
+    "MCP Context profile",
+    "npx -y @agentrail-sdk/mcp --profile context for local Context Relay tools",
   ],
 ] as const;
 
@@ -88,6 +88,11 @@ const npmCommands = [
     label: "MCP trace reader",
     command: "npx -y @agentrail-sdk/mcp",
     description: "Open read-only trace lookup from Codex-style tools.",
+  },
+  {
+    label: "MCP Context profile",
+    command: "npx -y @agentrail-sdk/mcp --profile context",
+    description: "Expose Context Relay tools to MCP-capable local agents.",
   },
 ] as const;
 
@@ -263,8 +268,7 @@ export default function LandingPage() {
           <p className="landing-status-note">
             Current boundary: SDK recording, local Context CLI packs, and
             read-only MCP forensic inspection. MCP Context profile 0.1.2 is
-            source-ready and needs registry publish before it is a live Codex
-            setup path.
+            published on npm for MCP-capable local agent clients.
           </p>
         </div>
         <div className="landing-code-stack">
