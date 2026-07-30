@@ -1,14 +1,29 @@
 import { randomUUID } from "node:crypto";
-import { Hono } from "hono";
+import { Hono, type Context } from "hono";
 import { bodyLimit } from "hono/body-limit";
 
 import { MAX_INGEST_BODY_BYTES } from "@agentrail-sdk/config";
 import {
+  DeviceCodeRequestSchema,
+  DeviceTokenRequestSchema,
   IngestSpanBatchSchema,
   type CanonicalSpanBatch,
 } from "@agentrail-sdk/contracts";
+import type {
+  DeviceConsumeResult,
+  NewInstallationCredential,
+  StoredDeviceCode,
+} from "@agentrail-sdk/db";
 import type { SpanQueue } from "@agentrail-sdk/queue";
 import { apiKeyPrefix, verifyApiKey } from "./api-key.js";
+import {
+  createDeviceCode,
+  createInstallationCredential,
+  DEVICE_CODE_TTL_MS,
+  DEVICE_POLL_INTERVAL_SECONDS,
+  digestDeviceCode,
+  issueRateLimitIdentity,
+} from "./device.js";
 
 type ApiKeyRecord = {
   projectId: string;
@@ -19,12 +34,30 @@ export type ApiKeyRepository = {
   findActiveByPrefix(prefix: string): Promise<ApiKeyRecord | null>;
 };
 
+export type DeviceCodeRepository = {
+  issueDeviceCode(input: StoredDeviceCode): Promise<void>;
+  consumeApprovedDeviceCode(input: {
+    deviceCodeDigest: string;
+    now: Date;
+    credential: NewInstallationCredential;
+    minimumPollIntervalSeconds: number;
+  }): Promise<DeviceConsumeResult>;
+};
+
 export type IngestDependencies = {
   apiKeyPepper: string;
   apiKeys: ApiKeyRepository;
   queue: SpanQueue;
+  deviceCodes?: DeviceCodeRepository;
+  activationBaseUrl?: string;
+  installationCredentialPepper?: string;
   requestId?: () => string;
+  now?: () => Date;
   rateLimit?: (projectId: string) => Promise<boolean>;
+  deviceIssueRateLimit?: (input: {
+    clientType: "codex" | "claude";
+    ipHash: string;
+  }) => Promise<boolean>;
 };
 
 type IngestEnvironment = {
@@ -39,9 +72,22 @@ function bearerToken(header: string | undefined): string | null {
   return match?.[1] ?? null;
 }
 
+function requestIp(headers: Headers): string {
+  const forwardedFor = headers.get("x-forwarded-for")?.split(",")[0]?.trim();
+  return (
+    headers.get("cf-connecting-ip") ??
+    forwardedFor ??
+    headers.get("x-real-ip") ??
+    "unknown"
+  );
+}
+
 export function createIngestApp(dependencies: IngestDependencies) {
   const app = new Hono<IngestEnvironment>();
   const nextRequestId = dependencies.requestId ?? randomUUID;
+  const now = dependencies.now ?? (() => new Date());
+  const activationBaseUrl =
+    dependencies.activationBaseUrl ?? "http://localhost:3000/activate";
 
   app.use("*", async (context, next) => {
     context.set("requestId", nextRequestId());
@@ -51,6 +97,117 @@ export function createIngestApp(dependencies: IngestDependencies) {
   app.get("/healthz", (context) =>
     context.json({ status: "ok", service: "agentrail-ingest" }),
   );
+
+  app.post("/v1/device/code", async (context) => {
+    const requestId = context.get("requestId");
+    if (dependencies.deviceCodes === undefined) {
+      return context.json(
+        { status: "service_unavailable", request_id: requestId },
+        503,
+      );
+    }
+
+    let body: unknown;
+    try {
+      body = await context.req.json();
+    } catch {
+      return context.json(
+        { status: "invalid_request", request_id: requestId },
+        400,
+      );
+    }
+
+    const parsed = DeviceCodeRequestSchema.safeParse(body);
+    if (!parsed.success) {
+      return context.json(
+        { status: "invalid_request", request_id: requestId },
+        400,
+      );
+    }
+
+    const rateLimitIdentity = issueRateLimitIdentity({
+      clientType: parsed.data.client_type,
+      ipAddress: requestIp(context.req.raw.headers),
+    });
+
+    if (
+      dependencies.deviceIssueRateLimit !== undefined &&
+      !(await dependencies.deviceIssueRateLimit(rateLimitIdentity))
+    ) {
+      return context.json(
+        {
+          status: "slow_down",
+          request_id: requestId,
+        },
+        429,
+        { "Retry-After": "60" },
+      );
+    }
+
+    const generated = createDeviceCode();
+    const issuedAt = now();
+    await dependencies.deviceCodes.issueDeviceCode({
+      deviceCodeId: randomUUID(),
+      deviceCodeDigest: generated.deviceCodeDigest,
+      userCodeDigest: generated.userCodeDigest,
+      clientType: parsed.data.client_type,
+      packageVersion: parsed.data.package_version,
+      createdAt: issuedAt,
+      expiresAt: new Date(issuedAt.getTime() + DEVICE_CODE_TTL_MS),
+    });
+
+    return context.json({
+      device_code: generated.deviceCode,
+      user_code: generated.userCode,
+      verification_uri: activationBaseUrl,
+      verification_uri_complete: `${activationBaseUrl}?code=${encodeURIComponent(generated.userCode)}`,
+      expires_in: DEVICE_CODE_TTL_MS / 1_000,
+      interval: DEVICE_POLL_INTERVAL_SECONDS,
+      request_id: requestId,
+    });
+  });
+
+  app.post("/v1/device/token", async (context) => {
+    const requestId = context.get("requestId");
+    if (
+      dependencies.deviceCodes === undefined ||
+      dependencies.installationCredentialPepper === undefined
+    ) {
+      return context.json(
+        { status: "service_unavailable", request_id: requestId },
+        503,
+      );
+    }
+
+    let body: unknown;
+    try {
+      body = await context.req.json();
+    } catch {
+      return context.json(
+        { status: "invalid_request", request_id: requestId },
+        400,
+      );
+    }
+
+    const parsed = DeviceTokenRequestSchema.safeParse(body);
+    if (!parsed.success) {
+      return context.json(
+        { status: "invalid_request", request_id: requestId },
+        400,
+      );
+    }
+
+    const result = await dependencies.deviceCodes.consumeApprovedDeviceCode({
+      deviceCodeDigest: digestDeviceCode(parsed.data.device_code),
+      now: now(),
+      credential: createInstallationCredential(
+        dependencies.installationCredentialPepper,
+      ),
+      minimumPollIntervalSeconds: DEVICE_POLL_INTERVAL_SECONDS,
+    });
+
+    return devicePollResponse(context, requestId, result);
+  });
 
   app.post(
     "/v1/spans",
@@ -203,4 +360,50 @@ export function createIngestApp(dependencies: IngestDependencies) {
   );
 
   return app;
+}
+
+function devicePollResponse(
+  context: Context<IngestEnvironment>,
+  requestId: string,
+  result: DeviceConsumeResult,
+) {
+  switch (result.status) {
+    case "authorization_pending":
+      return context.json(
+        {
+          status: "authorization_pending",
+          interval: DEVICE_POLL_INTERVAL_SECONDS,
+          request_id: requestId,
+        },
+        202,
+      );
+    case "slow_down":
+      return context.json(
+        {
+          status: "slow_down",
+          interval: DEVICE_POLL_INTERVAL_SECONDS,
+          request_id: requestId,
+        },
+        429,
+        { "Retry-After": String(DEVICE_POLL_INTERVAL_SECONDS) },
+      );
+    case "expired_token":
+      return context.json(
+        { status: "expired_token", request_id: requestId },
+        400,
+      );
+    case "access_denied":
+      return context.json(
+        { status: "access_denied", request_id: requestId },
+        403,
+      );
+    case "approved":
+      return context.json({
+        status: "approved",
+        project_id: result.projectId,
+        installation_id: result.installationId,
+        credential: result.credential.raw,
+        request_id: requestId,
+      });
+  }
 }

@@ -62,7 +62,8 @@ CREATE TABLE "device_codes" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"expires_at" timestamp with time zone NOT NULL,
 	"approved_at" timestamp with time zone,
-	"consumed_at" timestamp with time zone
+	"consumed_at" timestamp with time zone,
+	"last_polled_at" timestamp with time zone
 );
 --> statement-breakpoint
 CREATE TABLE "installations" (

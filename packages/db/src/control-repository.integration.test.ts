@@ -198,6 +198,7 @@ describe("ControlRepository", () => {
         deviceCodeDigest: "dc_valid",
         now: NOW,
         credential,
+        minimumPollIntervalSeconds: 5,
       }),
     ).resolves.toMatchObject({
       status: "approved",
@@ -224,8 +225,49 @@ describe("ControlRepository", () => {
         deviceCodeDigest: "dc_valid",
         now: NOW,
         credential: fixtureCredential({ raw: "ar_should_not_return" }),
+        minimumPollIntervalSeconds: 5,
       }),
     ).resolves.toMatchObject({ status: "access_denied" });
+  });
+
+  it("stores device poll timestamps and returns slow_down before the interval elapses", async () => {
+    await insertUser(USER_A, "a@example.com");
+    await insertOwnedProject(PROJECT_A, USER_A);
+    await controlRepository.issueDeviceCode(fixtureDeviceCode());
+
+    await expect(
+      controlRepository.consumeApprovedDeviceCode({
+        deviceCodeDigest: "dc_valid",
+        now: NOW,
+        credential: fixtureCredential(),
+        minimumPollIntervalSeconds: 5,
+      }),
+    ).resolves.toMatchObject({ status: "authorization_pending" });
+
+    await expect(
+      controlRepository.consumeApprovedDeviceCode({
+        deviceCodeDigest: "dc_valid",
+        now: new Date("2026-07-29T10:00:02.000Z"),
+        credential: fixtureCredential(),
+        minimumPollIntervalSeconds: 5,
+      }),
+    ).resolves.toMatchObject({ status: "slow_down" });
+
+    await controlRepository.approveDeviceCode({
+      userCodeDigest: "uc_valid",
+      userId: USER_A,
+      projectId: PROJECT_A,
+      now: new Date("2026-07-29T10:00:06.000Z"),
+    });
+
+    await expect(
+      controlRepository.consumeApprovedDeviceCode({
+        deviceCodeDigest: "dc_valid",
+        now: new Date("2026-07-29T10:00:06.000Z"),
+        credential: fixtureCredential(),
+        minimumPollIntervalSeconds: 5,
+      }),
+    ).resolves.toMatchObject({ status: "approved", projectId: PROJECT_A });
   });
 
   it("keeps usage event idempotency from inflating daily aggregates", async () => {

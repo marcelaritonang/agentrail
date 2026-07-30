@@ -37,7 +37,13 @@ export type NewInstallationCredential = {
 };
 
 export type DeviceConsumeResult =
-  | { status: "authorization_pending" | "expired_token" | "access_denied" }
+  | {
+      status:
+        | "authorization_pending"
+        | "slow_down"
+        | "expired_token"
+        | "access_denied";
+    }
   | {
       status: "approved";
       projectId: string;
@@ -203,6 +209,7 @@ export function createControlRepository(db: AgentRailDatabase) {
       deviceCodeDigest: string;
       now: Date;
       credential: NewInstallationCredential;
+      minimumPollIntervalSeconds: number;
     }): Promise<DeviceConsumeResult> {
       return db.transaction(async (transaction) => {
         const [code] = await transaction
@@ -217,16 +224,28 @@ export function createControlRepository(db: AgentRailDatabase) {
         if (code.expiresAt.getTime() <= input.now.getTime()) {
           return { status: "expired_token" };
         }
-        if (code.approvedAt === null || code.projectId === null) {
-          return { status: "authorization_pending" };
-        }
         if (code.consumedAt !== null) {
           return { status: "access_denied" };
+        }
+        if (
+          code.lastPolledAt !== null &&
+          input.now.getTime() - code.lastPolledAt.getTime() <
+            input.minimumPollIntervalSeconds * 1_000
+        ) {
+          return { status: "slow_down" };
+        }
+        if (code.approvedAt === null || code.projectId === null) {
+          await transaction
+            .update(deviceCodes)
+            .set({ lastPolledAt: input.now })
+            .where(eq(deviceCodes.deviceCodeDigest, input.deviceCodeDigest));
+
+          return { status: "authorization_pending" };
         }
 
         const consumed = await transaction
           .update(deviceCodes)
-          .set({ consumedAt: input.now })
+          .set({ consumedAt: input.now, lastPolledAt: input.now })
           .where(
             and(
               eq(deviceCodes.deviceCodeDigest, input.deviceCodeDigest),
