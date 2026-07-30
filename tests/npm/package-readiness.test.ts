@@ -33,13 +33,22 @@ type RootPackageJson = {
   scripts?: Record<string, string>;
 };
 
-const publishablePackages = ["contracts", "db", "sdk", "mcp"] as const;
+const publishablePackages = [
+  "contracts",
+  "db",
+  "context",
+  "sdk",
+  "mcp",
+  "cli",
+] as const;
 
 const expectedPackageVersions = {
   contracts: "0.1.1",
   db: "0.1.0",
+  context: "0.1.0",
   sdk: "0.1.0",
   mcp: "0.1.1",
+  cli: "0.1.0",
 } as const;
 
 const expectedInternalWorkspaceDependencies = {
@@ -48,6 +57,10 @@ const expectedInternalWorkspaceDependencies = {
   },
   "@agentrail-sdk/mcp": {
     "@agentrail-sdk/db": "workspace:0.1.0",
+    "@agentrail-sdk/context": "workspace:0.1.0",
+  },
+  "@agentrail-sdk/cli": {
+    "@agentrail-sdk/context": "workspace:0.1.0",
   },
 } satisfies Record<string, Record<string, string>>;
 
@@ -131,6 +144,14 @@ describe("npm package readiness", () => {
 
     expect(manifest.bin).toEqual({
       "agentrail-mcp": "./dist/index.js",
+    });
+  });
+
+  it("keeps the CLI package executable through npx", () => {
+    const manifest = readPackageJson("cli");
+
+    expect(manifest.bin).toEqual({
+      agentrail: "./dist/main.js",
     });
   });
 

@@ -1,0 +1,373 @@
+import { createHash, randomUUID } from "node:crypto";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { resolve } from "node:path";
+
+import { chunkTextFile, type SourceChunk } from "./chunker.js";
+import { scanWorkspace } from "./scanner.js";
+import { estimateTokens } from "./tokens.js";
+import {
+  ContextPackRequestSchema,
+  type ContextItem,
+  type ContextPack,
+  type ContextPackRequest,
+  type ProjectMemoryRecord,
+} from "./types.js";
+import { resolveWorkspaceRoot } from "./workspace.js";
+
+export type ContextRelayOptions = {
+  workspaceRoot: string;
+  privacyMode: "local-only" | "metrics-only" | "evidence-sync";
+  client: string;
+  packageVersion: string;
+  installationId?: string;
+  dashboardUrl?: string;
+  now?: () => Date;
+};
+
+export type RecallRequest = {
+  query?: string;
+  tags?: readonly string[];
+  limit?: number;
+};
+
+export type RememberRequest = {
+  statement: string;
+  tags?: readonly string[];
+};
+
+export type OutcomeRequest = {
+  packId: string;
+  outcome: "accepted" | "rejected" | "changed" | "unknown";
+  reason?: string;
+};
+
+export type LocalContextReceipt = {
+  receiptId: string;
+  packId: string;
+  recordedAt: string;
+  outcome: OutcomeRequest["outcome"];
+  reason: string | null;
+};
+
+export type ContextRelay = {
+  prepareContext(request: ContextPackRequest): Promise<ContextPack>;
+  recall(input: RecallRequest): Promise<readonly ProjectMemoryRecord[]>;
+  remember(input: RememberRequest): Promise<ProjectMemoryRecord>;
+  reportOutcome(input: OutcomeRequest): Promise<LocalContextReceipt>;
+};
+
+export function createContextRelay(options: ContextRelayOptions): ContextRelay {
+  const now = options.now ?? (() => new Date());
+
+  return {
+    async prepareContext(request) {
+      const parsedRequest = ContextPackRequestSchema.parse(request);
+      const root = await resolveWorkspaceRoot(options.workspaceRoot);
+      const scan = await scanWorkspace({
+        root,
+        ...(parsedRequest.exclude === undefined
+          ? {}
+          : { exclude: parsedRequest.exclude }),
+      });
+      const chunks = await chunksFromFiles(scan.files);
+      const rankedChunks = rankChunks({
+        chunks,
+        task: parsedRequest.task,
+        focus: parsedRequest.focus ?? [],
+      });
+      const decisions = await recallMemory({
+        root,
+        input: {
+          query: parsedRequest.task,
+          ...(parsedRequest.focus === undefined
+            ? {}
+            : { tags: parsedRequest.focus }),
+          limit: 5,
+        },
+      });
+      const context = budgetChunks(rankedChunks, parsedRequest.tokenBudget);
+      const returnedTokensEstimate =
+        context.reduce((total, item) => total + item.estimatedTokens, 0) +
+        decisions.reduce(
+          (total, decision) => total + estimateTokens(decision.statement),
+          0,
+        );
+      const candidateTokensEstimate = chunks.reduce(
+        (total, chunk) => total + chunk.estimatedTokens,
+        0,
+      );
+      const packId = sha256(
+        `${parsedRequest.task}:${now().toISOString()}:${randomUUID()}`,
+      );
+      await writeLocalReceipt(root, {
+        packId,
+        requestedAt: now().toISOString(),
+        request: parsedRequest,
+        context,
+        decisions,
+        warnings: scan.warnings,
+        client: options.client,
+        packageVersion: options.packageVersion,
+        privacyMode: options.privacyMode,
+      });
+
+      return {
+        packId,
+        status:
+          context.length === 0 ? "empty" : scan.complete ? "ready" : "partial",
+        context,
+        decisions,
+        warnings: scan.warnings,
+        measurement: {
+          candidateTokensEstimate,
+          returnedTokensEstimate,
+          contextReductionEstimate:
+            candidateTokensEstimate === 0
+              ? 0
+              : Math.max(
+                  0,
+                  Math.round(
+                    (1 - returnedTokensEstimate / candidateTokensEstimate) *
+                      100,
+                  ),
+                ),
+          method: "heuristic-v1",
+          confidence: "estimated",
+        },
+        receiptUrl: null,
+      };
+    },
+    recall(input) {
+      return recallMemory({
+        root: options.workspaceRoot,
+        input,
+      });
+    },
+    async remember(input) {
+      const root = await resolveWorkspaceRoot(options.workspaceRoot);
+      const record: ProjectMemoryRecord = {
+        id: sha256(`${input.statement}:${now().toISOString()}:${randomUUID()}`),
+        recordedAt: now().toISOString(),
+        source: "user",
+        statement: boundedString(input.statement, 2_000, "statement"),
+        tags: normalizeTags(input.tags),
+      };
+      await appendJsonLine(memoryPath(root), record);
+      return record;
+    },
+    async reportOutcome(input) {
+      const root = await resolveWorkspaceRoot(options.workspaceRoot);
+      const receipt: LocalContextReceipt = {
+        receiptId: sha256(
+          `${input.packId}:${input.outcome}:${now().toISOString()}:${randomUUID()}`,
+        ),
+        packId: boundedString(input.packId, 200, "packId"),
+        recordedAt: now().toISOString(),
+        outcome: input.outcome,
+        reason:
+          input.reason === undefined
+            ? null
+            : boundedString(input.reason, 1_000, "reason"),
+      };
+      await appendJsonLine(outcomePath(root), receipt);
+      return receipt;
+    },
+  };
+}
+
+async function chunksFromFiles(
+  files: readonly { relativePath: string; absolutePath: string; trust: SourceChunk["trust"]; modifiedAt: string }[],
+): Promise<SourceChunk[]> {
+  const chunks: SourceChunk[] = [];
+  for (const file of files) {
+    const text = await readFile(file.absolutePath, "utf8");
+    chunks.push(
+      ...chunkTextFile({
+        relativePath: file.relativePath,
+        text,
+        trust: file.trust,
+        modifiedAt: file.modifiedAt,
+      }),
+    );
+  }
+  return chunks;
+}
+
+function rankChunks(input: {
+  chunks: readonly SourceChunk[];
+  task: string;
+  focus: readonly string[];
+}): SourceChunk[] {
+  const terms = tokenize(`${input.task} ${input.focus.join(" ")}`);
+  return [...input.chunks].sort((left, right) => {
+    const leftScore = scoreChunk(left, terms);
+    const rightScore = scoreChunk(right, terms);
+    return (
+      rightScore - leftScore ||
+      trustWeight(right.trust) - trustWeight(left.trust) ||
+      left.relativePath.localeCompare(right.relativePath) ||
+      left.startLine - right.startLine
+    );
+  });
+}
+
+function budgetChunks(
+  chunks: readonly SourceChunk[],
+  tokenBudget: number,
+): ContextItem[] {
+  const items: ContextItem[] = [];
+  let remaining = tokenBudget;
+  for (const chunk of chunks) {
+    if (chunk.estimatedTokens > remaining) continue;
+    const reasons = reasonsForChunk(chunk);
+    items.push({
+      sourceId: chunk.sourceId,
+      path: chunk.relativePath,
+      locator: {
+        startLine: chunk.startLine,
+        endLine: chunk.endLine,
+        symbol: chunk.symbol,
+      },
+      content: chunk.text,
+      contentHash: chunk.contentHash,
+      trust: chunk.trust,
+      reasons,
+      score: reasons.length + trustWeight(chunk.trust),
+      freshness: chunk.modifiedAt,
+      estimatedTokens: chunk.estimatedTokens,
+      truncated: false,
+    });
+    remaining -= chunk.estimatedTokens;
+  }
+  return items;
+}
+
+function reasonsForChunk(chunk: SourceChunk): readonly string[] {
+  const reasons = [`${chunk.trust} source`];
+  if (chunk.symbol !== null) reasons.push(`symbol:${chunk.symbol}`);
+  return reasons;
+}
+
+async function recallMemory(input: {
+  root: string;
+  input: RecallRequest;
+}): Promise<readonly ProjectMemoryRecord[]> {
+  const root = await resolveWorkspaceRoot(input.root);
+  const records = await readJsonLines<ProjectMemoryRecord>(memoryPath(root));
+  const terms = tokenize(`${input.input.query ?? ""} ${(input.input.tags ?? []).join(" ")}`);
+  const tags = new Set((input.input.tags ?? []).map((tag) => tag.toLowerCase()));
+  const limit = Math.max(1, Math.min(25, Math.floor(input.input.limit ?? 10)));
+
+  return records
+    .filter((record) => record.statement.trim().length > 0)
+    .map((record) => ({
+      record,
+      score:
+        scoreText(record.statement, terms) +
+        record.tags.filter((tag) => tags.has(tag.toLowerCase())).length * 3,
+    }))
+    .filter((entry) => terms.length === 0 || entry.score > 0)
+    .sort(
+      (left, right) =>
+        right.score - left.score ||
+        right.record.recordedAt.localeCompare(left.record.recordedAt),
+    )
+    .slice(0, limit)
+    .map((entry) => entry.record);
+}
+
+async function writeLocalReceipt(
+  root: string,
+  receipt: Record<string, unknown>,
+): Promise<void> {
+  const directory = resolve(root, ".agentrail", "receipts", "v1");
+  await mkdir(directory, { recursive: true });
+  const packId = String(receipt.packId ?? "unknown");
+  await writeFile(resolve(directory, `${packId}.json`), `${JSON.stringify(receipt, null, 2)}\n`);
+}
+
+async function appendJsonLine(path: string, value: unknown): Promise<void> {
+  await mkdir(resolve(path, ".."), { recursive: true });
+  await writeFile(path, `${JSON.stringify(value)}\n`, { flag: "a" });
+}
+
+async function readJsonLines<T>(path: string): Promise<T[]> {
+  let text: string;
+  try {
+    text = await readFile(path, "utf8");
+  } catch {
+    return [];
+  }
+  return text
+    .split("\n")
+    .filter((line) => line.trim().length > 0)
+    .flatMap((line) => {
+      try {
+        return [JSON.parse(line) as T];
+      } catch {
+        return [];
+      }
+    });
+}
+
+function memoryPath(root: string): string {
+  return resolve(root, ".agentrail", "memory", "v1.jsonl");
+}
+
+function outcomePath(root: string): string {
+  return resolve(root, ".agentrail", "receipts", "outcomes.v1.jsonl");
+}
+
+function boundedString(input: string, max: number, field: string): string {
+  const trimmed = input.trim();
+  if (trimmed.length === 0 || trimmed.length > max) {
+    throw new Error(`${field} must be between 1 and ${max} characters.`);
+  }
+  return trimmed;
+}
+
+function normalizeTags(tags: readonly string[] | undefined): readonly string[] {
+  if (tags === undefined) return [];
+  return tags
+    .map((tag) => tag.trim().toLowerCase())
+    .filter((tag) => tag.length > 0)
+    .slice(0, 20);
+}
+
+function tokenize(text: string): readonly string[] {
+  return [...new Set(text.toLowerCase().match(/[a-z0-9_.$-]{3,}/g) ?? [])];
+}
+
+function scoreChunk(chunk: SourceChunk, terms: readonly string[]): number {
+  return (
+    scoreText(`${chunk.relativePath}\n${chunk.symbol ?? ""}\n${chunk.text}`, terms) +
+    trustWeight(chunk.trust)
+  );
+}
+
+function scoreText(text: string, terms: readonly string[]): number {
+  const haystack = text.toLowerCase();
+  return terms.reduce(
+    (score, term) => score + (haystack.includes(term) ? 1 : 0),
+    0,
+  );
+}
+
+function trustWeight(trust: SourceChunk["trust"]): number {
+  switch (trust) {
+    case "trusted_instruction":
+      return 5;
+    case "project_source":
+      return 4;
+    case "project_documentation":
+      return 3;
+    case "project_memory":
+      return 2;
+    case "untrusted_content":
+      return 1;
+  }
+}
+
+function sha256(input: string): string {
+  return createHash("sha256").update(input).digest("hex");
+}

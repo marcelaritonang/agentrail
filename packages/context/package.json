@@ -1,0 +1,42 @@
+{
+  "name": "@agentrail-sdk/context",
+  "version": "0.1.0",
+  "description": "Local Context Relay engine for AgentRail MCP and CLI integrations.",
+  "private": false,
+  "type": "module",
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/marcelaritonang/agentrail#readme",
+  "bugs": {
+    "url": "https://github.com/marcelaritonang/agentrail/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marcelaritonang/agentrail.git",
+    "directory": "packages/context"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "prepack": "pnpm run build",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "ignore": "^7.0.0",
+    "zod": "^4.1.0"
+  },
+  "engines": {
+    "node": ">=24 <25"
+  }
+}
