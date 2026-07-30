@@ -146,6 +146,7 @@ export default function LandingPage() {
           <Link href="/traces">Dashboard</Link>
           <Link href="/about">About</Link>
           <Link href="/architecture">Architecture</Link>
+          <Link href="/login">Sign in</Link>
           {sourceUrl === null ? null : (
             <a href={sourceUrl} target="_blank" rel="noreferrer">
               Source
