@@ -41,11 +41,40 @@ describe("AgentRail CLI args", () => {
       json: true,
     });
 
-    expect(parseAgentRailCommand(["uninstall", "--client", "codex"]))
-      .toMatchObject({
-        name: "uninstall",
-        clients: ["codex"],
-      });
+    expect(
+      parseAgentRailCommand(["uninstall", "--client", "codex"]),
+    ).toMatchObject({
+      name: "uninstall",
+      clients: ["codex"],
+    });
+  });
+
+  it("parses hosted login and logout commands without requiring cloud mode", () => {
+    expect(
+      parseAgentRailCommand([
+        "login",
+        "--client",
+        "codex",
+        "--root",
+        "D:\\work\\agent-app",
+        "--api-url",
+        "https://agentrail.id",
+        "--no-open",
+      ]),
+    ).toMatchObject({
+      name: "login",
+      client: "codex",
+      root: "D:\\work\\agent-app",
+      apiUrl: "https://agentrail.id",
+      openBrowser: false,
+    });
+
+    expect(
+      parseAgentRailCommand(["logout", "--root", "D:\\work\\agent-app"]),
+    ).toMatchObject({
+      name: "logout",
+      root: "D:\\work\\agent-app",
+    });
   });
 
   it("rejects unknown flags and missing required command input", () => {

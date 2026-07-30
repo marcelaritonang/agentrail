@@ -21,6 +21,20 @@ export type AgentRailCommand =
       root: string;
       codexConfig?: string;
     }
+  | {
+      name: "login";
+      client: AgentRailClient;
+      root: string;
+      apiUrl: string;
+      openBrowser: boolean;
+      codexConfig?: string;
+      projectKey?: string;
+    }
+  | {
+      name: "logout";
+      root: string;
+      projectKey?: string;
+    }
   | { name: "help" };
 
 export type CommandResult = {
@@ -34,4 +48,10 @@ export type ClientMutationResult = {
   configPath: string;
   backupPath: string | null;
   status: "installed" | "already_configured" | "removed" | "not_configured";
+};
+
+export type ManagedClientIdentity = {
+  installationId: string;
+  apiUrl: string;
+  privacyMode: "metrics-only";
 };
