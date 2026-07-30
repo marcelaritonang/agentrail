@@ -89,7 +89,9 @@ pnpm bootstrap:local`}</code>
             {npmCommands.map((item) => (
               <div className="install-agentrail-command" key={item.command}>
                 <span>{item.label}</span>
-                <code>{item.command}</code>
+                <code aria-label={`${item.label} command`} tabIndex={0}>
+                  {item.command}
+                </code>
                 <p>{item.description}</p>
                 <button
                   aria-describedby={statusId}
