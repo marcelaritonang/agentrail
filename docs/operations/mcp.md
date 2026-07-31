@@ -123,12 +123,12 @@ pnpm --filter @agentrail-sdk/mcp start -- --profile context
 
 The default Context Relay profile exposes four tools:
 
-| Tool                           | Purpose                                               |
-| ------------------------------ | ----------------------------------------------------- |
-| `agentrail_prepare_context`    | Create a bounded local Context Pack for a task.       |
-| `agentrail_recall`             | Recall local project memory records.                  |
-| `agentrail_remember`           | Save a local project memory record.                   |
-| `agentrail_report_outcome`     | Record whether a Context Pack helped or missed.       |
+| Tool                        | Purpose                                         |
+| --------------------------- | ----------------------------------------------- |
+| `agentrail_prepare_context` | Create a bounded local Context Pack for a task. |
+| `agentrail_recall`          | Recall local project memory records.            |
+| `agentrail_remember`        | Save a local project memory record.             |
+| `agentrail_report_outcome`  | Record whether a Context Pack helped or missed. |
 
 ## Privacy notes
 

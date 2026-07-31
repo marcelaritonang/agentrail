@@ -12,6 +12,8 @@
     "typecheck": "turbo run typecheck",
     "test": "vitest run",
     "test:e2e": "playwright test",
+    "test:e2e:cli": "vitest run packages/cli/src/commands.test.ts packages/cli/src/commands/login.test.ts packages/cli/src/commands/logout.test.ts packages/mcp/src/context-tools.test.ts packages/mcp/src/server.test.ts",
+    "test:e2e:cloud": "vitest run tests/e2e-cloud",
     "test:infra": "vitest run infra/aws/tests/template.test.ts apps/ingest/src/lambda.test.ts",
     "infra:validate": "sam validate --lint --template-file infra/aws/template.yaml",
     "test:production": "tsx scripts/verify-production.ts",

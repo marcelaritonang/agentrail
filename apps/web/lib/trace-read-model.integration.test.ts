@@ -55,17 +55,37 @@ beforeAll(async () => {
     throw new Error("Integration tests require the agentrail_test database");
   }
   database = createDatabase(TEST_POSTGRES_URL);
-  const migration = await readFile(
-    new URL(
-      "../../../packages/db/migrations/0000_agentrail_m1.sql",
-      import.meta.url,
+  const migrations = await Promise.all([
+    readFile(
+      new URL(
+        "../../../packages/db/migrations/0000_agentrail_m1.sql",
+        import.meta.url,
+      ),
+      "utf8",
     ),
-    "utf8",
-  );
+    readFile(
+      new URL(
+        "../../../packages/db/migrations/0001_context_control_plane.sql",
+        import.meta.url,
+      ),
+      "utf8",
+    ),
+    readFile(
+      new URL(
+        "../../../packages/db/migrations/0002_installation_usage_lifecycle.sql",
+        import.meta.url,
+      ),
+      "utf8",
+    ),
+  ]);
   await database.sql.unsafe(
     "DROP SCHEMA public CASCADE; CREATE SCHEMA public;",
   );
-  await database.sql.unsafe(migration);
+  for (const migration of migrations) {
+    if (migration.trim()) {
+      await database.sql.unsafe(migration);
+    }
+  }
 });
 
 beforeEach(async () => {

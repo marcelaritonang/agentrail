@@ -89,8 +89,8 @@ describe("AgentRail MCP server registration", () => {
     );
 
     expect(registered.map((tool) => tool.name)).toEqual(CONTEXT_TOOL_NAMES);
-    expect(
-      registered.some((tool) => /read-only/i.test(tool.description)),
-    ).toBe(true);
+    expect(registered.some((tool) => /read-only/i.test(tool.description))).toBe(
+      true,
+    );
   });
 });

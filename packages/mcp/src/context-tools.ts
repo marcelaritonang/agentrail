@@ -33,7 +33,12 @@ export function createAgentRailContextToolHandlers(
       const exclude = stringList(input.exclude, "exclude");
       const request: ContextPackRequest = {
         task: requiredString(input.task, "task", 2_000),
-        tokenBudget: integerInRange(input.tokenBudget, "tokenBudget", 256, 32_000),
+        tokenBudget: integerInRange(
+          input.tokenBudget,
+          "tokenBudget",
+          256,
+          32_000,
+        ),
         ...(focus === undefined ? {} : { focus }),
         ...(exclude === undefined ? {} : { exclude }),
       };
@@ -111,7 +116,10 @@ function optionalString(
   return trimmed;
 }
 
-function stringList(input: unknown, field: string): readonly string[] | undefined {
+function stringList(
+  input: unknown,
+  field: string,
+): readonly string[] | undefined {
   if (input === undefined || input === null) return undefined;
   if (!Array.isArray(input)) {
     throw new Error(`${field} must be an array`);

@@ -24,7 +24,7 @@ pending rather than being turned into claims.
       `npx -y @agentrail-sdk/cli context`.
 - [x] MCP setup uses `npx -y @agentrail-sdk/mcp`.
 - [x] MCP Context profile uses live `npx -y @agentrail-sdk/mcp --profile
-      context` from `@agentrail-sdk/mcp@0.1.2`.
+context` from `@agentrail-sdk/mcp@0.1.2`.
 - [ ] Security, privacy, terms, architecture, and AWS reference docs are linked.
 
 ## Application content

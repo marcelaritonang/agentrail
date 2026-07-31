@@ -75,4 +75,6 @@ jobs:
       - uses: aws-actions/setup-sam@v2
       - run: sam validate --lint --template-file infra/aws/template.yaml
       - run: pnpm test:e2e
+      - run: pnpm test:e2e:cli
+      - run: pnpm test:e2e:cloud
       - run: pnpm test:npm:tarball

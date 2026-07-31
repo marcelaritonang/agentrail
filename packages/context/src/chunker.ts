@@ -74,7 +74,10 @@ function markdownUnits(lines: readonly string[]): readonly ChunkUnit[] {
         symbol: match[2] ?? null,
       };
     })
-    .filter((start): start is { line: number; symbol: string | null } => start !== null);
+    .filter(
+      (start): start is { line: number; symbol: string | null } =>
+        start !== null,
+    );
 
   if (starts.length === 0) return paragraphUnits(lines);
 
@@ -91,15 +94,17 @@ function codeUnits(lines: readonly string[]): readonly ChunkUnit[] {
       const match =
         /^(?:export\s+)?(?:async\s+)?(?:function|class|interface|type|enum)\s+([A-Za-z_$][\w$]*)/.exec(
           line.trim(),
-        ) ??
-        /^(?:export\s+)?const\s+([A-Za-z_$][\w$]*)\s*=/.exec(line.trim());
+        ) ?? /^(?:export\s+)?const\s+([A-Za-z_$][\w$]*)\s*=/.exec(line.trim());
       if (match === null) return null;
       return {
         line: index + 1,
         symbol: match[1] ?? null,
       };
     })
-    .filter((start): start is { line: number; symbol: string | null } => start !== null);
+    .filter(
+      (start): start is { line: number; symbol: string | null } =>
+        start !== null,
+    );
 
   if (starts.length === 0) return paragraphUnits(lines);
 

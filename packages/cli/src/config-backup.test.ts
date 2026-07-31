@@ -18,8 +18,9 @@ describe("configuration backups", () => {
     const configPath = join(root, "config.toml");
     try {
       await writeFile(configPath, "original");
-      const backup = await createTimestampedBackup(configPath, () =>
-        new Date("2026-07-30T00:00:00.000Z"),
+      const backup = await createTimestampedBackup(
+        configPath,
+        () => new Date("2026-07-30T00:00:00.000Z"),
       );
       expect(backup.sourceExisted).toBe(true);
       expect(backup.backupPath).not.toBeNull();

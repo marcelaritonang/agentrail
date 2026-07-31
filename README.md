@@ -147,14 +147,14 @@ NEXT_PUBLIC_AGENTRAIL_SOURCE_URL=https://example.com/your-org/agentrail
 
 AgentRail is published on npm under the scoped `@agentrail-sdk` namespace. Use these scoped packages; the unscoped npm command `npm install agentrail` is not this project and belongs to another maintainer.
 
-| Package                    | Version | Purpose                                                   |
-| -------------------------- | ------- | --------------------------------------------------------- |
-| `@agentrail-sdk/contracts` | `0.1.1` | Shared span and trace contracts.                          |
-| `@agentrail-sdk/db`        | `0.1.0` | Database schema and repository helpers.                   |
-| `@agentrail-sdk/sdk`       | `0.1.0` | TypeScript SDK for recording agent traces.                |
-| `@agentrail-sdk/context`   | `0.1.1` | Local Context Relay engine for bounded source packs.      |
-| `@agentrail-sdk/cli`       | `0.1.1` | Local CLI for context, doctor, setup, and uninstall.      |
-| `@agentrail-sdk/mcp`       | `0.1.2` | Read-only local MCP server and Context profile.           |
+| Package                    | Version | Purpose                                              |
+| -------------------------- | ------- | ---------------------------------------------------- |
+| `@agentrail-sdk/contracts` | `0.1.1` | Shared span and trace contracts.                     |
+| `@agentrail-sdk/db`        | `0.1.0` | Database schema and repository helpers.              |
+| `@agentrail-sdk/sdk`       | `0.1.0` | TypeScript SDK for recording agent traces.           |
+| `@agentrail-sdk/context`   | `0.1.1` | Local Context Relay engine for bounded source packs. |
+| `@agentrail-sdk/cli`       | `0.1.1` | Local CLI for context, doctor, setup, and uninstall. |
+| `@agentrail-sdk/mcp`       | `0.1.2` | Read-only local MCP server and Context profile.      |
 
 Live install commands:
 

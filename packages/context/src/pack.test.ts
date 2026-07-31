@@ -56,7 +56,11 @@ describe("Context Relay pack service", () => {
         1_500,
       );
       expect(pack.context.map((item) => item.path)).toEqual(
-        expect.arrayContaining(["AGENTS.md", "src/auth.ts", "src/auth.test.ts"]),
+        expect.arrayContaining([
+          "AGENTS.md",
+          "src/auth.ts",
+          "src/auth.test.ts",
+        ]),
       );
       expect(pack.context.every((item) => item.reasons.length > 0)).toBe(true);
       expect(pack.context.every((item) => !isAbsolute(item.path))).toBe(true);

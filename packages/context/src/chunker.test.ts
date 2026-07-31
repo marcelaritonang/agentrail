@@ -30,7 +30,9 @@ describe("source chunking", () => {
     expect(chunks.map((chunk) => chunk.symbol)).toEqual(
       expect.arrayContaining(["createSession", "revokeSession"]),
     );
-    expect(chunks.every((chunk) => chunk.startLine <= chunk.endLine)).toBe(true);
+    expect(chunks.every((chunk) => chunk.startLine <= chunk.endLine)).toBe(
+      true,
+    );
     expect(chunks.every((chunk) => chunk.estimatedTokens <= 1_024)).toBe(true);
     expect(new Set(chunks.map((chunk) => chunk.sourceId)).size).toBe(
       chunks.length,

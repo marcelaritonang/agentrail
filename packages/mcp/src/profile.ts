@@ -28,7 +28,9 @@ export function profileIncludesContext(profile: AgentRailMcpProfile): boolean {
   return profile === "context" || profile === "context+forensics";
 }
 
-export function profileIncludesForensics(profile: AgentRailMcpProfile): boolean {
+export function profileIncludesForensics(
+  profile: AgentRailMcpProfile,
+): boolean {
   return profile === "forensics" || profile === "context+forensics";
 }
 

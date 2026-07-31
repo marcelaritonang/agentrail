@@ -62,13 +62,13 @@ record local receipts for later review. The MCP Context profile is live in
 `@agentrail-sdk/mcp@0.1.2` and can be started with
 `npx -y @agentrail-sdk/mcp --profile context`.
 
-| Claim                                                     | Evidence                                                                     | Status         | Owner   |
-| --------------------------------------------------------- | ---------------------------------------------------------------------------- | -------------- | ------- |
-| Context Relay design exists.                              | `docs/superpowers/specs/2026-07-29-agentrail-context-relay-design.md`        | verified       | Founder |
-| Local Context Relay CLI implementation is complete.        | `packages/context`, `packages/cli`, and `tests/npm/release-smoke.test.ts`     | verified       | Founder |
-| MCP Context profile is live on npm.                        | `npm view @agentrail-sdk/mcp version` returns `0.1.2` and `docs/operations/mcp.md` | verified  | Founder |
-| Context Pack outcomes from testers exist.                 | Intake and interview loop are ready; tester responses are not collected yet. | pending        | Founder |
-| Hosted multi-tenant service exists.                       | AgentRail is currently local-first and public demo only.                     | not-applicable | Founder |
+| Claim                                               | Evidence                                                                           | Status         | Owner   |
+| --------------------------------------------------- | ---------------------------------------------------------------------------------- | -------------- | ------- |
+| Context Relay design exists.                        | `docs/superpowers/specs/2026-07-29-agentrail-context-relay-design.md`              | verified       | Founder |
+| Local Context Relay CLI implementation is complete. | `packages/context`, `packages/cli`, and `tests/npm/release-smoke.test.ts`          | verified       | Founder |
+| MCP Context profile is live on npm.                 | `npm view @agentrail-sdk/mcp version` returns `0.1.2` and `docs/operations/mcp.md` | verified       | Founder |
+| Context Pack outcomes from testers exist.           | Intake and interview loop are ready; tester responses are not collected yet.       | pending        | Founder |
+| Hosted multi-tenant service exists.                 | AgentRail is currently local-first and public demo only.                           | not-applicable | Founder |
 
 ## Target user
 
@@ -86,11 +86,11 @@ docs, and direct founding-tester outreach.
 
 | Claim                                                 | Evidence                                                             | Status   | Owner   |
 | ----------------------------------------------------- | -------------------------------------------------------------------- | -------- | ------- |
-| SDK package is published.                             | `npm view @agentrail-sdk/sdk version` and README install section       | verified | Founder |
-| Context CLI package is published.                     | `npm view @agentrail-sdk/cli version` and README install section       | verified | Founder |
-| MCP package is published.                             | `npm view @agentrail-sdk/mcp version` and `docs/operations/mcp.md`     | verified | Founder |
-| The unscoped `agentrail` package is not this project. | README package naming section                                          | verified | Founder |
-| GitHub repository is public.                          | Source URL must be configured in `NEXT_PUBLIC_AGENTRAIL_SOURCE_URL`.   | pending  | Founder |
+| SDK package is published.                             | `npm view @agentrail-sdk/sdk version` and README install section     | verified | Founder |
+| Context CLI package is published.                     | `npm view @agentrail-sdk/cli version` and README install section     | verified | Founder |
+| MCP package is published.                             | `npm view @agentrail-sdk/mcp version` and `docs/operations/mcp.md`   | verified | Founder |
+| The unscoped `agentrail` package is not this project. | README package naming section                                        | verified | Founder |
+| GitHub repository is public.                          | Source URL must be configured in `NEXT_PUBLIC_AGENTRAIL_SOURCE_URL`. | pending  | Founder |
 
 ## Founding-tester validation plan
 
@@ -141,20 +141,20 @@ Summary:
 
 | Risk                                                        | Mitigation                                                                                                      |
 | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| Developers do not want to instrument AI workflows manually. | Lead with Context CLI and MCP Context profile today, then harden client setup and tester onboarding.          |
+| Developers do not want to instrument AI workflows manually. | Lead with Context CLI and MCP Context profile today, then harden client setup and tester onboarding.            |
 | Sensitive evidence should not leave the developer machine.  | Keep local-first default, make S3 evidence opt-in, and never give browser direct bucket access.                 |
 | AWS costs grow before validation.                           | Use AWS Budgets, CloudWatch alarms, reserved concurrency, lifecycle policies, and a small non-production stack. |
 | Application reviewers see unsupported traction claims.      | Keep traction fields pending until evidence exists.                                                             |
 
 ## Truthful traction fields
 
-| Field                         | Current value         | Status         |
-| ----------------------------- | --------------------- | -------------- |
-| Paying users                  | 0                     | pending        |
-| Founding testers completed    | 0                     | pending        |
+| Field                         | Current value                              | Status         |
+| ----------------------------- | ------------------------------------------ | -------------- |
+| Paying users                  | 0                                          | pending        |
+| Founding testers completed    | 0                                          | pending        |
 | Public npm packages           | SDK, Context CLI, and MCP reader available | verified       |
-| AWS deployed production stack | Not deployed          | not-applicable |
-| Funding received              | None claimed          | not-applicable |
+| AWS deployed production stack | Not deployed                               | not-applicable |
+| Funding received              | None claimed                               | not-applicable |
 
 ## Account and identity checklist
 

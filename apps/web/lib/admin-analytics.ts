@@ -65,12 +65,10 @@ type ProjectRow = {
 };
 
 const NPM_DOWNLOAD_CACHE_MS = 24 * 60 * 60 * 1_000;
-let npmDownloadCache:
-  | {
-      expiresAt: number;
-      downloads: NpmDownloads;
-    }
-  | null = null;
+let npmDownloadCache: {
+  expiresAt: number;
+  downloads: NpmDownloads;
+} | null = null;
 
 export function createAdminAnalyticsReadModel(
   db: AgentRailDatabase,
@@ -79,9 +77,7 @@ export function createAdminAnalyticsReadModel(
   } = {},
 ) {
   return {
-    async getFounderAnalytics(input: {
-      now: Date;
-    }): Promise<FounderAnalytics> {
+    async getFounderAnalytics(input: { now: Date }): Promise<FounderAnalytics> {
       const thirtyDaysAgo = daysBefore(input.now, 30);
       const currentWeekStart = daysBefore(input.now, 7);
       const priorWeekStart = daysBefore(input.now, 14);
@@ -172,9 +168,8 @@ export function createAdminAnalyticsReadModel(
       );
 
       return {
-        authenticatedUsers: new Set(
-          accountRows.map((account) => account.id),
-        ).size,
+        authenticatedUsers: new Set(accountRows.map((account) => account.id))
+          .size,
         activatedInstallations: activatedInstallations.length,
         activeUsers7d: activeUsers7d.size,
         activeUsers30d: activeUsers30d.size,
@@ -357,7 +352,10 @@ function percentile95(values: readonly number[]): number | null {
     return null;
   }
   const sorted = [...values].sort((left, right) => left - right);
-  const index = Math.min(sorted.length - 1, Math.ceil(sorted.length * 0.95) - 1);
+  const index = Math.min(
+    sorted.length - 1,
+    Math.ceil(sorted.length * 0.95) - 1,
+  );
   return sorted[index] ?? null;
 }
 
