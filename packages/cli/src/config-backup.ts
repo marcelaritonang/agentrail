@@ -20,7 +20,10 @@ export async function createTimestampedBackup(
   return { sourcePath: path, backupPath, sourceExisted: true };
 }
 
-export async function atomicReplace(path: string, contents: string): Promise<void> {
+export async function atomicReplace(
+  path: string,
+  contents: string,
+): Promise<void> {
   await mkdir(dirname(path), { recursive: true });
   const tempPath = `${path}.agentrail-${process.pid}-${Date.now()}.tmp`;
   await writeFile(tempPath, contents);

@@ -146,18 +146,18 @@ describe("admin analytics read model", () => {
       }),
     });
 
-    await expect(model.getFounderAnalytics({ now: NOW })).resolves.toMatchObject(
-      {
-        activeUsers7d: 0,
-        activeUsers30d: 0,
-        weeklyRetention: null,
-        npmDownloads: {
-          value: 999999,
-          period: "last-week",
-          source: "npm",
-        },
+    await expect(
+      model.getFounderAnalytics({ now: NOW }),
+    ).resolves.toMatchObject({
+      activeUsers7d: 0,
+      activeUsers30d: 0,
+      weeklyRetention: null,
+      npmDownloads: {
+        value: 999999,
+        period: "last-week",
+        source: "npm",
       },
-    );
+    });
   });
 
   it("checks admin authorization before analytics queries are executed", async () => {

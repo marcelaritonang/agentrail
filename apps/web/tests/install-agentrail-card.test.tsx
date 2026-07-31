@@ -92,6 +92,8 @@ describe("InstallAgentRailCard", () => {
       "Copied npx -y @agentrail-sdk/mcp --profile context",
     );
     expect(screen.queryByText(/source-ready/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/registry shows 0\.1\.2/i)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/registry shows 0\.1\.2/i),
+    ).not.toBeInTheDocument();
   });
 });

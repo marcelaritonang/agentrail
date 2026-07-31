@@ -8,7 +8,10 @@ import { createContextRelay } from "@agentrail-sdk/context";
 import { createAgentRailContextToolHandlers } from "./context-tools.js";
 
 async function makeFixture(): Promise<string> {
-  const root = join(tmpdir(), `agentrail-mcp-context-${process.pid}-${Date.now()}`);
+  const root = join(
+    tmpdir(),
+    `agentrail-mcp-context-${process.pid}-${Date.now()}`,
+  );
   await mkdir(join(root, "src"), { recursive: true });
   await writeFile(join(root, "AGENTS.md"), "# Rules\n\nKeep auth stable.\n");
   await writeFile(

@@ -8,8 +8,10 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createS3BlobStore } from "./s3.js";
 
 const bucket = `agentrail-test-${process.pid}-${Date.now()}`;
+const minioEndpoint = process.env.TEST_MINIO_ENDPOINT;
+const describeS3 = minioEndpoint ? describe : describe.skip;
 const client = new S3Client({
-  endpoint: process.env.TEST_MINIO_ENDPOINT ?? "http://localhost:9000",
+  endpoint: minioEndpoint ?? "http://localhost:9000",
   region: "us-east-1",
   forcePathStyle: true,
   credentials: {
@@ -28,7 +30,7 @@ afterAll(() => {
   client.destroy();
 });
 
-describe("S3BlobStore", () => {
+describeS3("S3BlobStore", () => {
   it("stores and retrieves bytes by opaque reference without returning a URL", async () => {
     const reference = "payload/project/trace/span.json";
     const content = new TextEncoder().encode('{"query":"safe"}');

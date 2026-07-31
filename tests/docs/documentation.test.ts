@@ -270,6 +270,8 @@ describe("public AgentRail documentation", () => {
     expect(evidence).toMatch(
       /\|\s*MCP Context profile is live on npm\.\s*\|[^|]*@agentrail-sdk\/mcp[^|]*0\.1\.2[^|]*\|\s*verified\s*\|/i,
     );
-    expect(application).not.toMatch(/MCP Context profile is available from public npm registry\.[\s\S]*\|\s*pending\s*\|/i);
+    expect(application).not.toMatch(
+      /MCP Context profile is available from public npm registry\.[\s\S]*\|\s*pending\s*\|/i,
+    );
   });
 });

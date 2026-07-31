@@ -7,7 +7,10 @@ import { describe, expect, it } from "vitest";
 import { runAgentRailCommand } from "./main.js";
 
 async function fixtureRoot(): Promise<string> {
-  const root = join(tmpdir(), `agentrail-cli-commands-${process.pid}-${Date.now()}`);
+  const root = join(
+    tmpdir(),
+    `agentrail-cli-commands-${process.pid}-${Date.now()}`,
+  );
   await mkdir(join(root, "src"), { recursive: true });
   await writeFile(join(root, "src", "app.ts"), "export const app = true;\n");
   return root;

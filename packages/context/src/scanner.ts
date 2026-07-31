@@ -1,10 +1,4 @@
-import {
-  lstat,
-  opendir,
-  readFile,
-  realpath,
-  stat,
-} from "node:fs/promises";
+import { lstat, opendir, readFile, realpath, stat } from "node:fs/promises";
 import { relative, resolve, sep } from "node:path";
 
 import { createWorkspaceIgnore, isSecretPath } from "./ignore.js";
@@ -62,7 +56,9 @@ export async function scanWorkspace(input: {
   };
 
   const gitignore = await readOptionalText(resolve(root, ".gitignore"));
-  const agentrailignore = await readOptionalText(resolve(root, ".agentrailignore"));
+  const agentrailignore = await readOptionalText(
+    resolve(root, ".agentrailignore"),
+  );
   const ignoreRules = createWorkspaceIgnore({
     ...(gitignore === undefined ? {} : { gitignore }),
     ...(agentrailignore === undefined ? {} : { agentrailignore }),
@@ -246,7 +242,10 @@ async function readOptionalText(path: string): Promise<string | undefined> {
   }
 }
 
-function toRelativeContextPath(root: string, absolutePath: string): string | null {
+function toRelativeContextPath(
+  root: string,
+  absolutePath: string,
+): string | null {
   const relativePath = relative(root, absolutePath).replaceAll("\\", "/");
   try {
     return relativeContextPath(relativePath);
@@ -255,7 +254,9 @@ function toRelativeContextPath(root: string, absolutePath: string): string | nul
   }
 }
 
-function normalizeFilters(filters: readonly string[] | undefined): readonly string[] {
+function normalizeFilters(
+  filters: readonly string[] | undefined,
+): readonly string[] {
   if (filters === undefined) return [];
   return filters
     .map((filter) => filter.replaceAll("\\", "/").replace(/^\/+/, ""))
@@ -268,7 +269,8 @@ function matchesInclude(
 ): boolean {
   if (includePrefixes.length === 0) return true;
   return includePrefixes.some(
-    (prefix) => relativePath === prefix || relativePath.startsWith(`${prefix}/`),
+    (prefix) =>
+      relativePath === prefix || relativePath.startsWith(`${prefix}/`),
   );
 }
 

@@ -79,7 +79,10 @@ export function AnalyticsLedger({
       </section>
 
       <section className="admin-panel-grid" aria-label="Distribution metrics">
-        <BucketPanel title="Client distribution" buckets={analytics.clientDistribution} />
+        <BucketPanel
+          title="Client distribution"
+          buckets={analytics.clientDistribution}
+        />
         <BucketPanel
           title="Package versions"
           buckets={analytics.versionDistribution}
