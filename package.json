@@ -17,7 +17,8 @@
     "test:npm:tarball": "tsx scripts/verify-npm-release.ts --mode tarball",
     "test:watch": "vitest",
     "lint": "turbo run lint",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "admin:grant": "tsx scripts/grant-admin.ts"
   },
   "devDependencies": {
     "@agentrail-sdk/db": "workspace:*",
