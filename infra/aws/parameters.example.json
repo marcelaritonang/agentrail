@@ -1,0 +1,66 @@
+[
+  {
+    "ParameterKey": "EnvironmentName",
+    "ParameterValue": "beta"
+  },
+  {
+    "ParameterKey": "StageName",
+    "ParameterValue": "v1"
+  },
+  {
+    "ParameterKey": "DomainName",
+    "ParameterValue": "api.agentrail.id"
+  },
+  {
+    "ParameterKey": "VpcSubnetIds",
+    "ParameterValue": "subnet-private-a,subnet-private-b"
+  },
+  {
+    "ParameterKey": "LambdaSecurityGroupIds",
+    "ParameterValue": "sg-lambda-egress"
+  },
+  {
+    "ParameterKey": "DatabaseSubnetIds",
+    "ParameterValue": "subnet-db-a,subnet-db-b"
+  },
+  {
+    "ParameterKey": "DatabaseSecurityGroupIds",
+    "ParameterValue": "sg-rds-private"
+  },
+  {
+    "ParameterKey": "DatabasePasswordSecretName",
+    "ParameterValue": "agentrail/beta/database"
+  },
+  {
+    "ParameterKey": "DatabaseUrlSecretName",
+    "ParameterValue": "agentrail/beta/database-url"
+  },
+  {
+    "ParameterKey": "ApiKeyPepperSecretName",
+    "ParameterValue": "agentrail/beta/api-key-pepper"
+  },
+  {
+    "ParameterKey": "InstallationCredentialPepperSecretName",
+    "ParameterValue": "agentrail/beta/installation-pepper"
+  },
+  {
+    "ParameterKey": "BetterAuthSecretName",
+    "ParameterValue": "agentrail/beta/better-auth"
+  },
+  {
+    "ParameterKey": "GitHubClientIdSecretName",
+    "ParameterValue": "agentrail/beta/github-client-id"
+  },
+  {
+    "ParameterKey": "GitHubClientSecretSecretName",
+    "ParameterValue": "agentrail/beta/github-client-secret"
+  },
+  {
+    "ParameterKey": "BudgetEmail",
+    "ParameterValue": "founder@agentrail.id"
+  },
+  {
+    "ParameterKey": "MonthlyBudgetAmount",
+    "ParameterValue": "25"
+  }
+]
