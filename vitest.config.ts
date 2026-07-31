@@ -48,6 +48,7 @@ export default defineConfig({
             "packages/**/*.test.tsx",
             "apps/**/*.test.ts",
             "apps/**/*.test.tsx",
+            "infra/**/*.test.ts",
             "tests/**/*.test.ts",
             "tests/**/*.test.tsx",
           ],

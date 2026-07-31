@@ -1,0 +1,513 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: AgentRail optional hosted control plane for activation, ingestion, queues, metrics, and evidence storage.
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    Default: beta
+    AllowedPattern: "^[a-z0-9-]+$"
+  StageName:
+    Type: String
+    Default: v1
+  DomainName:
+    Type: String
+    Default: api.agentrail.id
+  VpcSubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Private subnet IDs for Lambda networking.
+  LambdaSecurityGroupIds:
+    Type: List<AWS::EC2::SecurityGroup::Id>
+    Description: Security groups allowing Lambda egress to RDS and AWS endpoints.
+  DatabaseSubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Private subnet IDs for RDS PostgreSQL.
+  DatabaseSecurityGroupIds:
+    Type: List<AWS::EC2::SecurityGroup::Id>
+    Description: Security groups attached to RDS PostgreSQL.
+  DatabaseName:
+    Type: String
+    Default: agentrail
+  DatabaseUsername:
+    Type: String
+    Default: agentrail
+  DatabaseInstanceClass:
+    Type: String
+    Default: db.t4g.micro
+  DatabaseAllocatedStorage:
+    Type: Number
+    Default: 20
+  DatabasePasswordSecretName:
+    Type: String
+    NoEcho: true
+    Description: Secrets Manager secret name containing SecretString key password.
+  DatabaseUrlSecretName:
+    Type: String
+    NoEcho: true
+    Description: Secrets Manager secret name containing SecretString key value with the full PostgreSQL URL.
+  ApiKeyPepperSecretName:
+    Type: String
+    NoEcho: true
+  InstallationCredentialPepperSecretName:
+    Type: String
+    NoEcho: true
+  BetterAuthSecretName:
+    Type: String
+    NoEcho: true
+  GitHubClientIdSecretName:
+    Type: String
+    NoEcho: true
+  GitHubClientSecretSecretName:
+    Type: String
+    NoEcho: true
+  BudgetEmail:
+    Type: String
+    Description: Email address receiving AWS Budget alerts before beta traffic.
+  MonthlyBudgetAmount:
+    Type: Number
+    Default: 25
+
+Globals:
+  Function:
+    Runtime: nodejs24.x
+    Architectures:
+      - arm64
+    MemorySize: 512
+    Timeout: 15
+    Tracing: Active
+    VpcConfig:
+      SecurityGroupIds:
+        Ref: LambdaSecurityGroupIds
+      SubnetIds:
+        Ref: VpcSubnetIds
+    Environment:
+      Variables:
+        NODE_OPTIONS: --enable-source-maps
+        AGENTRAIL_ACTIVATION_BASE_URL:
+          Fn::Sub: "https://${DomainName}/activate"
+        DATABASE_URL:
+          Fn::Sub: "{{resolve:secretsmanager:${DatabaseUrlSecretName}:SecretString:value}}"
+        BETTER_AUTH_SECRET:
+          Fn::Sub: "{{resolve:secretsmanager:${BetterAuthSecretName}:SecretString:value}}"
+        GITHUB_CLIENT_ID:
+          Fn::Sub: "{{resolve:secretsmanager:${GitHubClientIdSecretName}:SecretString:value}}"
+        GITHUB_CLIENT_SECRET:
+          Fn::Sub: "{{resolve:secretsmanager:${GitHubClientSecretSecretName}:SecretString:value}}"
+
+Resources:
+  AgentRailHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName:
+        Ref: StageName
+      CorsConfiguration:
+        AllowMethods:
+          - POST
+          - GET
+          - OPTIONS
+        AllowOrigins:
+          - Fn::Sub: "https://${DomainName}"
+          - https://agentrail.id
+        AllowHeaders:
+          - authorization
+          - content-type
+          - x-agentrail-client
+
+  SpanDlq:
+    Type: AWS::SQS::Queue
+    Properties:
+      KmsMasterKeyId: alias/aws/sqs
+      MessageRetentionPeriod: 1209600
+
+  SpanQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      KmsMasterKeyId: alias/aws/sqs
+      VisibilityTimeout: 90
+      RedrivePolicy:
+        deadLetterTargetArn:
+          Fn::GetAtt:
+            - SpanDlq
+            - Arn
+        maxReceiveCount: 5
+
+  UsageDlq:
+    Type: AWS::SQS::Queue
+    Properties:
+      KmsMasterKeyId: alias/aws/sqs
+      MessageRetentionPeriod: 1209600
+
+  UsageQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      KmsMasterKeyId: alias/aws/sqs
+      VisibilityTimeout: 90
+      RedrivePolicy:
+        deadLetterTargetArn:
+          Fn::GetAtt:
+            - UsageDlq
+            - Arn
+        maxReceiveCount: 5
+
+  EvidenceBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      LifecycleConfiguration:
+        Rules:
+          - Id: expire-beta-evidence-after-90-days
+            Status: Enabled
+            ExpirationInDays: 90
+
+  DatabaseSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Private subnets for AgentRail PostgreSQL
+      SubnetIds:
+        Ref: DatabaseSubnetIds
+
+  AgentRailDatabase:
+    Type: AWS::RDS::DBInstance
+    DeletionPolicy: Snapshot
+    UpdateReplacePolicy: Snapshot
+    Properties:
+      AllocatedStorage:
+        Ref: DatabaseAllocatedStorage
+      BackupRetentionPeriod: 7
+      DBInstanceClass:
+        Ref: DatabaseInstanceClass
+      DBName:
+        Ref: DatabaseName
+      DBSubnetGroupName:
+        Ref: DatabaseSubnetGroup
+      DeletionProtection: true
+      Engine: postgres
+      EngineVersion: "17.10"
+      MasterUsername:
+        Ref: DatabaseUsername
+      MasterUserPassword:
+        Fn::Sub: "{{resolve:secretsmanager:${DatabasePasswordSecretName}:SecretString:password}}"
+      MultiAZ: false
+      PubliclyAccessible: false
+      StorageEncrypted: true
+      VPCSecurityGroups:
+        Ref: DatabaseSecurityGroupIds
+
+  IngestFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName:
+        Fn::Sub: "${AWS::StackName}-ingest"
+      CodeUri: ../../apps/ingest/dist/
+      Handler: lambda.handler
+      ReservedConcurrentExecutions: 10
+      Environment:
+        Variables:
+          API_KEY_PEPPER:
+            Fn::Sub: "{{resolve:secretsmanager:${ApiKeyPepperSecretName}:SecretString:value}}"
+          INSTALLATION_CREDENTIAL_PEPPER:
+            Fn::Sub: "{{resolve:secretsmanager:${InstallationCredentialPepperSecretName}:SecretString:value}}"
+          AGENTRAIL_SPAN_QUEUE_URL:
+            Ref: SpanQueue
+          AGENTRAIL_USAGE_QUEUE_URL:
+            Ref: UsageQueue
+      Events:
+        DeviceCode:
+          Type: HttpApi
+          Properties:
+            ApiId:
+              Ref: AgentRailHttpApi
+            Method: POST
+            Path: /v1/device/code
+        DeviceToken:
+          Type: HttpApi
+          Properties:
+            ApiId:
+              Ref: AgentRailHttpApi
+            Method: POST
+            Path: /v1/device/token
+        UsageEvents:
+          Type: HttpApi
+          Properties:
+            ApiId:
+              Ref: AgentRailHttpApi
+            Method: POST
+            Path: /v1/events
+        SpanIngestion:
+          Type: HttpApi
+          Properties:
+            ApiId:
+              Ref: AgentRailHttpApi
+            Method: POST
+            Path: /v1/spans
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Statement:
+            - Effect: Allow
+              Action:
+                - sqs:SendMessage
+              Resource:
+                - Fn::GetAtt:
+                    - SpanQueue
+                    - Arn
+                - Fn::GetAtt:
+                    - UsageQueue
+                    - Arn
+            - Effect: Allow
+              Action:
+                - secretsmanager:GetSecretValue
+              Resource:
+                - Fn::Sub: "arn:${AWS::Partition}:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${ApiKeyPepperSecretName}*"
+                - Fn::Sub: "arn:${AWS::Partition}:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${InstallationCredentialPepperSecretName}*"
+                - Fn::Sub: "arn:${AWS::Partition}:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${DatabasePasswordSecretName}*"
+                - Fn::Sub: "arn:${AWS::Partition}:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${DatabaseUrlSecretName}*"
+            - Effect: Allow
+              Action:
+                - kms:Decrypt
+              Resource:
+                Fn::Sub: "arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:alias/aws/secretsmanager"
+
+  SpanWorkerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName:
+        Fn::Sub: "${AWS::StackName}-span-worker"
+      CodeUri: ../../apps/worker/dist/
+      Handler: runtime.handler
+      Timeout: 60
+      ReservedConcurrentExecutions: 2
+      Environment:
+        Variables:
+          API_KEY_PEPPER:
+            Fn::Sub: "{{resolve:secretsmanager:${ApiKeyPepperSecretName}:SecretString:value}}"
+          S3_BUCKET:
+            Ref: EvidenceBucket
+      Events:
+        SpanQueueEvent:
+          Type: SQS
+          Properties:
+            Queue:
+              Fn::GetAtt:
+                - SpanQueue
+                - Arn
+            BatchSize: 5
+            FunctionResponseTypes:
+              - ReportBatchItemFailures
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Statement:
+            - Effect: Allow
+              Action:
+                - sqs:ReceiveMessage
+                - sqs:DeleteMessage
+                - sqs:ChangeMessageVisibility
+                - sqs:GetQueueAttributes
+              Resource:
+                Fn::GetAtt:
+                  - SpanQueue
+                  - Arn
+            - Effect: Allow
+              Action:
+                - s3:GetObject
+                - s3:PutObject
+              Resource:
+                Fn::Sub: "${EvidenceBucket.Arn}/evidence/*"
+            - Effect: Allow
+              Action:
+                - secretsmanager:GetSecretValue
+              Resource:
+                Fn::Sub: "arn:${AWS::Partition}:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${DatabasePasswordSecretName}*"
+            - Effect: Allow
+              Action:
+                - secretsmanager:GetSecretValue
+              Resource:
+                Fn::Sub: "arn:${AWS::Partition}:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${DatabaseUrlSecretName}*"
+
+  UsageWorkerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName:
+        Fn::Sub: "${AWS::StackName}-usage-worker"
+      CodeUri: ../../apps/worker/dist/
+      Handler: usage-lambda.handler
+      Timeout: 60
+      ReservedConcurrentExecutions: 4
+      Events:
+        UsageQueueEvent:
+          Type: SQS
+          Properties:
+            Queue:
+              Fn::GetAtt:
+                - UsageQueue
+                - Arn
+            BatchSize: 10
+            FunctionResponseTypes:
+              - ReportBatchItemFailures
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Statement:
+            - Effect: Allow
+              Action:
+                - sqs:ReceiveMessage
+                - sqs:DeleteMessage
+                - sqs:ChangeMessageVisibility
+                - sqs:GetQueueAttributes
+              Resource:
+                Fn::GetAtt:
+                  - UsageQueue
+                  - Arn
+            - Effect: Allow
+              Action:
+                - secretsmanager:GetSecretValue
+              Resource:
+                Fn::Sub: "arn:${AWS::Partition}:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${DatabasePasswordSecretName}*"
+            - Effect: Allow
+              Action:
+                - secretsmanager:GetSecretValue
+              Resource:
+                Fn::Sub: "arn:${AWS::Partition}:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${DatabaseUrlSecretName}*"
+
+  IngestLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName:
+        Fn::Sub: "/aws/lambda/${AWS::StackName}-ingest"
+      RetentionInDays: 30
+
+  SpanWorkerLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName:
+        Fn::Sub: "/aws/lambda/${AWS::StackName}-span-worker"
+      RetentionInDays: 30
+
+  UsageWorkerLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName:
+        Fn::Sub: "/aws/lambda/${AWS::StackName}-usage-worker"
+      RetentionInDays: 30
+
+  Api5xxAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: API Gateway 5xx rate exceeded beta guardrail.
+      Namespace: AWS/ApiGateway
+      MetricName: 5xx
+      Statistic: Sum
+      Period: 60
+      EvaluationPeriods: 5
+      Threshold: 5
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+
+  ApiLatencyAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: API Gateway p95 latency exceeded ingestion budget.
+      Namespace: AWS/ApiGateway
+      MetricName: Latency
+      ExtendedStatistic: p95
+      Period: 60
+      EvaluationPeriods: 5
+      Threshold: 1000
+      ComparisonOperator: GreaterThanThreshold
+
+  SpanQueueAgeAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      Namespace: AWS/SQS
+      MetricName: ApproximateAgeOfOldestMessage
+      Statistic: Maximum
+      Period: 60
+      EvaluationPeriods: 5
+      Threshold: 300
+      ComparisonOperator: GreaterThanThreshold
+
+  UsageQueueAgeAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      Namespace: AWS/SQS
+      MetricName: ApproximateAgeOfOldestMessage
+      Statistic: Maximum
+      Period: 60
+      EvaluationPeriods: 5
+      Threshold: 300
+      ComparisonOperator: GreaterThanThreshold
+
+  QueueDepthAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      Namespace: AWS/SQS
+      MetricName: ApproximateNumberOfMessagesVisible
+      Statistic: Maximum
+      Period: 60
+      EvaluationPeriods: 5
+      Threshold: 1000
+      ComparisonOperator: GreaterThanThreshold
+
+  DlqMessagesAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      Namespace: AWS/SQS
+      MetricName: ApproximateNumberOfMessagesVisible
+      Statistic: Maximum
+      Period: 60
+      EvaluationPeriods: 1
+      Threshold: 0
+      ComparisonOperator: GreaterThanThreshold
+
+  WorkerErrorsAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      Namespace: AWS/Lambda
+      MetricName: Errors
+      Statistic: Sum
+      Period: 60
+      EvaluationPeriods: 3
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+
+  BetaMonthlyBudget:
+    Type: AWS::Budgets::Budget
+    Properties:
+      Budget:
+        BudgetLimit:
+          Amount:
+            Ref: MonthlyBudgetAmount
+          Unit: USD
+        BudgetName:
+          Fn::Sub: "${AWS::StackName}-beta-monthly-budget"
+        BudgetType: COST
+        TimeUnit: MONTHLY
+      NotificationsWithSubscribers:
+        - Notification:
+            ComparisonOperator: GREATER_THAN
+            NotificationType: ACTUAL
+            Threshold: 80
+            ThresholdType: PERCENTAGE
+          Subscribers:
+            - SubscriptionType: EMAIL
+              Address:
+                Ref: BudgetEmail
+
+Outputs:
+  HttpApiId:
+    Value:
+      Ref: AgentRailHttpApi
+  SpanQueueUrl:
+    Value:
+      Ref: SpanQueue
+  UsageQueueUrl:
+    Value:
+      Ref: UsageQueue
+  EvidenceBucketName:
+    Value:
+      Ref: EvidenceBucket

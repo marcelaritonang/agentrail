@@ -1,6 +1,6 @@
 # AWS Reference Mapping
 
-This document is an evidence-based **reference mapping** from the verified local Milestone 1 architecture to AWS services. It is not Infrastructure as Code, has not been deployed in an AWS account, and does not guarantee AWS program acceptance, credits, funding, uptime, security certification, compliance, or production readiness.
+This document is an evidence-based **reference mapping** from the verified local architecture to AWS services. The concrete SAM reference lives in `infra/aws/template.yaml` and is described in `docs/deployment/aws-control-plane.md`. It has not yet been deployed in an AWS account and does not guarantee AWS program acceptance, credits, funding, uptime, security certification, compliance, or production readiness.
 
 ## Recommended target
 
@@ -65,14 +65,13 @@ Official references: [Secrets Manager with Lambda](https://docs.aws.amazon.com/l
 
 Use separate least-privilege roles for ingestion, worker, dashboard backend, migration job, and CI deployment. No browser role receives data-plane S3 access.
 
-## Work not yet implemented
+## Work not yet deployed
 
-- AWS CDK, Terraform, or CloudFormation
-- Lambda entrypoints and partial-batch response adapter
-- SQS redrive/DLQ resources and CloudWatch alarms
+- SAM template validation in a real AWS account
+- production artifact packaging for Lambda zip bundles
 - ECS dashboard image and deployment pipeline
-- private VPC/RDS/RDS Proxy configuration
 - Secrets Manager rotation
 - load, failure-injection, restore, security, and cost testing in AWS
 
-These gaps should be shown honestly in an AWS startup application as the next funded milestone, alongside the locally verified core evidence.
+These gaps should be shown honestly in startup materials as the next funded
+milestone, alongside the locally verified core evidence.

@@ -12,6 +12,8 @@
     "typecheck": "turbo run typecheck",
     "test": "vitest run",
     "test:e2e": "playwright test",
+    "test:infra": "vitest run infra/aws/tests/template.test.ts apps/ingest/src/lambda.test.ts",
+    "infra:validate": "sam validate --lint --template-file infra/aws/template.yaml",
     "test:production": "tsx scripts/verify-production.ts",
     "test:npm:registry": "tsx scripts/verify-npm-release.ts --mode registry",
     "test:npm:tarball": "tsx scripts/verify-npm-release.ts --mode tarball",
@@ -21,8 +23,8 @@
     "admin:grant": "tsx scripts/grant-admin.ts"
   },
   "devDependencies": {
-    "@agentrail-sdk/db": "workspace:*",
     "@agentrail-sdk/config": "workspace:*",
+    "@agentrail-sdk/db": "workspace:*",
     "@axe-core/playwright": "^4.12.1",
     "@playwright/test": "^1.61.1",
     "@types/node": "^24.0.0",
@@ -32,6 +34,7 @@
     "tsx": "^4.20.0",
     "turbo": "^2.5.0",
     "typescript": "^5.9.0",
-    "vitest": "^4.1.6"
+    "vitest": "^4.1.6",
+    "yaml": "2.4.2"
   }
 }
