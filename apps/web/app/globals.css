@@ -2677,6 +2677,129 @@ select {
   max-width: 100%;
 }
 
+.admin-frame {
+  min-height: 100dvh;
+}
+
+.admin-page {
+  gap: 20px;
+}
+
+.admin-analytics-ledger {
+  display: grid;
+  gap: 14px;
+}
+
+.admin-metric-strip,
+.admin-panel-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 1fr;
+}
+
+.admin-metric,
+.admin-panel {
+  background: var(--surface-panel);
+  border: 1px solid var(--line-subtle);
+  border-radius: var(--radius-sm);
+}
+
+.admin-metric {
+  min-height: 124px;
+  padding: 14px;
+}
+
+.admin-metric span,
+.admin-metric small,
+.admin-fact-list dt,
+.admin-bucket-list span,
+.admin-panel-note {
+  color: var(--text-muted);
+  font-family: var(--font-jetbrains), monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.admin-metric strong {
+  display: block;
+  font-family: var(--font-jetbrains), monospace;
+  font-size: clamp(30px, 8vw, 48px);
+  font-weight: 500;
+  letter-spacing: -0.06em;
+  line-height: 1;
+  margin: 16px 0 8px;
+}
+
+.admin-panel {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+}
+
+.admin-panel h2 {
+  font-size: 18px;
+  font-weight: 560;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.admin-fact-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.admin-fact-list div,
+.admin-bucket-list li {
+  align-items: center;
+  border-top: 1px solid var(--line-subtle);
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding-top: 10px;
+}
+
+.admin-fact-list dd {
+  color: var(--text-primary);
+  font-family: var(--font-jetbrains), monospace;
+  font-size: 13px;
+  margin: 0;
+  text-align: right;
+}
+
+.admin-bucket-list {
+  display: grid;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.admin-bucket-list strong {
+  color: var(--signal-action);
+  font-family: var(--font-jetbrains), monospace;
+  font-size: 13px;
+}
+
+.admin-panel-note {
+  line-height: 1.5;
+  margin: 0;
+  text-transform: none;
+}
+
+.product-error button {
+  background: transparent;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  cursor: pointer;
+  min-height: 36px;
+  padding: 0 12px;
+  width: max-content;
+}
+
 @media (max-width: 1023px) {
   .dashboard-brand,
   .dashboard-nav a,
@@ -2728,6 +2851,14 @@ select {
 
   .product-metric-strip {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .admin-metric-strip {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .admin-panel-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .product-panel {
