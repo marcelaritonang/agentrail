@@ -168,7 +168,7 @@ npx -y @agentrail-sdk/mcp
 npx -y @agentrail-sdk/mcp --profile context
 ```
 
-The MCP Context profile is live in `@agentrail-sdk/mcp@0.1.2` and exposes local Context Relay tools to MCP-capable agent clients.
+The MCP Context profile is live in `@agentrail-sdk/mcp@0.1.3` and exposes local Context Relay tools to MCP-capable agent clients.
 
 Local source checkout remains the recommended path for running the full ingestion API, worker, PostgreSQL, Redis, MinIO, and dashboard stack. See [NPM release checklist](docs/operations/npm-release.md) for the release verification process.
 

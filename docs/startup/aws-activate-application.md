@@ -59,7 +59,7 @@ Context Relay is implemented locally through `@agentrail-sdk/context` and
 `@agentrail-sdk/cli`, but it is not a completed hosted feature. It lets a
 developer request a bounded local Context Pack before an AI agent run, then
 record local receipts for later review. The MCP Context profile is live in
-`@agentrail-sdk/mcp@0.1.2` and can be started with
+`@agentrail-sdk/mcp@0.1.3` and can be started with
 `npx -y @agentrail-sdk/mcp --profile context`.
 
 | Claim                                               | Evidence                                                                           | Status         | Owner   |

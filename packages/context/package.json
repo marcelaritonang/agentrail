@@ -1,6 +1,6 @@
 {
   "name": "@agentrail-sdk/context",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Local Context Relay engine for AgentRail MCP and CLI integrations.",
   "private": false,
   "type": "module",

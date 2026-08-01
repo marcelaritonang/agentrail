@@ -149,11 +149,11 @@ describe("public AgentRail documentation", () => {
     expect(readme).toContain("0.1.0");
     expect(readme).toContain("@agentrail-sdk/sdk");
     expect(readme).toContain("@agentrail-sdk/mcp");
-    expect(readme).toContain("@agentrail-sdk/mcp@0.1.2");
+    expect(readme).toContain("@agentrail-sdk/mcp@0.1.3");
     expect(readme).toContain("@agentrail-sdk/context");
     expect(readme).toContain("@agentrail-sdk/cli");
     expect(mcp).toContain("npx -y @agentrail-sdk/mcp");
-    expect(mcp).toContain("MCP Context profile 0.1.2");
+    expect(mcp).toContain("MCP Context profile 0.1.3");
     expect(mcp).toMatch(/published on npm/i);
     expect(mcp).not.toMatch(/source checkout now/i);
     expect(mcp).not.toMatch(/registry publish/i);
@@ -268,7 +268,7 @@ describe("public AgentRail documentation", () => {
     expect(checklist).toContain("GitHub");
     expect(evidence).toContain("MCP Context profile is live on npm.");
     expect(evidence).toMatch(
-      /\|\s*MCP Context profile is live on npm\.\s*\|[^|]*@agentrail-sdk\/mcp[^|]*0\.1\.2[^|]*\|\s*verified\s*\|/i,
+      /\|\s*MCP Context profile is live on npm\.\s*\|[^|]*@agentrail-sdk\/mcp[^|]*0\.1\.3[^|]*\|\s*verified\s*\|/i,
     );
     expect(application).not.toMatch(
       /MCP Context profile is available from public npm registry\.[\s\S]*\|\s*pending\s*\|/i,
