@@ -71,6 +71,11 @@ for the hosted reference deployment, Vitest 4, Playwright 1.61, and
 | M3    | `2026-07-29-agentrail-m3-memory-receipts-trace-linking.md` | Hosted memory lifecycle, private receipts, and trace-linked proof | Valuable, not blocking         |
 | M4    | `2026-07-29-agentrail-m4-client-beta-hardening.md`         | More clients, benchmarks, privacy operations, beta hardening      | Not required                   |
 
+The five-feature product spine that connects hosted activation, Context Pack
+MCP, local memory, context receipts, and token budget reporting through their
+local and hosted API boundaries is documented in
+`2026-08-01-agentrail-activation-context-api-spine.md`.
+
 ## Approved Spec Coverage
 
 | Approved design area                         | Delivery owner | Acceptance evidence                                       |
