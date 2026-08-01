@@ -75,6 +75,10 @@ export function AnalyticsLedger({
             npm downloads are displayed as public distribution evidence only.
             They never count as active users.
           </p>
+          <p className="admin-panel-note">
+            Token and context reduction signals are estimated from local
+            heuristic Context Pack events, not guaranteed cost savings.
+          </p>
         </Panel>
       </section>
 

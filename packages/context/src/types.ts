@@ -69,6 +69,19 @@ export type ContextMeasurement = {
   confidence: "estimated";
 };
 
+export type ContextLocalEvidence = {
+  memory: {
+    path: ".agentrail/memory/v1.jsonl";
+    recordsUsed: number;
+    uploaded: false;
+  };
+  receipt: {
+    path: `.agentrail/receipts/v1/${string}.json`;
+    url: string | null;
+    uploaded: false;
+  };
+};
+
 export type ContextPack = {
   packId: string;
   status: "ready" | "partial" | "empty";
@@ -76,6 +89,7 @@ export type ContextPack = {
   decisions: readonly ProjectMemoryRecord[];
   warnings: readonly ContextWarning[];
   measurement: ContextMeasurement;
+  localEvidence: ContextLocalEvidence;
   receiptUrl: string | null;
 };
 

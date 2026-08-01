@@ -17,6 +17,7 @@ import { estimateTokens } from "./tokens.js";
 import {
   ContextPackRequestSchema,
   type ContextItem,
+  type ContextLocalEvidence,
   type ContextPack,
   type ContextPackRequest,
   type ProjectMemoryRecord,
@@ -150,6 +151,7 @@ export function createContextRelay(options: ContextRelayOptions): ContextRelay {
           method: "heuristic-v1",
           confidence: "estimated",
         },
+        localEvidence: localEvidenceFor(stablePackId, decisions.length),
         receiptUrl: null,
       };
       await recordUsageEvent({
@@ -216,6 +218,7 @@ export function createContextRelay(options: ContextRelayOptions): ContextRelay {
             method: "heuristic-v1",
             confidence: "estimated",
           },
+          localEvidence: localEvidenceFor(receipt.packId, 0),
           receiptUrl: null,
         },
         event: {
@@ -426,6 +429,24 @@ async function writeLocalReceipt(
     resolve(directory, `${packId}.json`),
     `${JSON.stringify(receipt, null, 2)}\n`,
   );
+}
+
+function localEvidenceFor(
+  packId: string,
+  recordsUsed: number,
+): ContextLocalEvidence {
+  return {
+    memory: {
+      path: ".agentrail/memory/v1.jsonl",
+      recordsUsed,
+      uploaded: false,
+    },
+    receipt: {
+      path: `.agentrail/receipts/v1/${packId}.json`,
+      url: null,
+      uploaded: false,
+    },
+  };
 }
 
 async function appendJsonLine(path: string, value: unknown): Promise<void> {

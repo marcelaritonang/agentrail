@@ -55,6 +55,14 @@ describe("Context Relay pack service", () => {
       expect(pack.measurement.returnedTokensEstimate).toBeLessThanOrEqual(
         1_500,
       );
+      expect(pack.measurement).toMatchObject({
+        method: "heuristic-v1",
+        confidence: "estimated",
+      });
+      expect(pack.measurement.candidateTokensEstimate).toBeGreaterThan(0);
+      expect(pack.measurement.contextReductionEstimate).toBeGreaterThanOrEqual(
+        0,
+      );
       expect(pack.context.map((item) => item.path)).toEqual(
         expect.arrayContaining([
           "AGENTS.md",
@@ -89,6 +97,48 @@ describe("Context Relay pack service", () => {
 
       expect(remembered.statement).toContain("Auth sessions");
       expect(recalled.map((record) => record.id)).toContain(remembered.id);
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("surfaces local memory and receipt evidence without hosted upload", async () => {
+    const root = await makeQualityFixture();
+    try {
+      const relay = createContextRelay({
+        workspaceRoot: root,
+        privacyMode: "local-only",
+        client: "vitest",
+        packageVersion: "0.1.0",
+        now: () => new Date("2026-07-30T00:00:00.000Z"),
+      });
+      await relay.remember({
+        statement: "OAuth work must preserve session cookies.",
+        tags: ["auth"],
+      });
+
+      const pack = await relay.prepareContext({
+        task: "Implement OAuth without breaking auth sessions",
+        tokenBudget: 1_500,
+        focus: ["auth"],
+      });
+
+      expect(pack.decisions.map((decision) => decision.statement)).toContain(
+        "OAuth work must preserve session cookies.",
+      );
+      expect(pack.localEvidence).toEqual({
+        memory: {
+          path: ".agentrail/memory/v1.jsonl",
+          recordsUsed: 1,
+          uploaded: false,
+        },
+        receipt: {
+          path: `.agentrail/receipts/v1/${pack.packId}.json`,
+          url: null,
+          uploaded: false,
+        },
+      });
+      expect(pack.receiptUrl).toBeNull();
     } finally {
       await rm(root, { recursive: true, force: true });
     }
