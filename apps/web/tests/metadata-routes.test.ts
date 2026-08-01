@@ -21,6 +21,9 @@ describe("public metadata routes", () => {
       "Local-first context and forensic evidence for developers building with AI agents.",
     );
     expect(metadata.alternates).toMatchObject({ canonical: "/" });
+    expect(metadata.icons).toMatchObject({
+      icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    });
     expect(metadata.openGraph).toMatchObject({
       type: "website",
       siteName: "AgentRail",
