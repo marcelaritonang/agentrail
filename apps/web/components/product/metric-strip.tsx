@@ -22,9 +22,9 @@ export function MetricStrip({ overview }: { overview: UserOverview }) {
       icon: ClockCounterClockwise,
     },
     {
-      label: "Context reduction",
+      label: "Estimated context reduction",
       value: `${overview.contextReductionEstimate30d}%`,
-      note: "estimated",
+      note: "Based on local heuristic token estimates from accepted Context Pack events.",
       icon: Gauge,
     },
     {

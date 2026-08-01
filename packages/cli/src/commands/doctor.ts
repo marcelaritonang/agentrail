@@ -83,7 +83,12 @@ export async function runDoctorCommand(
   return {
     exitCode: ok ? 0 : 1,
     stdout: ok
-      ? "AgentRail doctor passed.\n"
+      ? [
+          "AgentRail is installed.",
+          "Your AI can now call agentrail_prepare_context before a coding task.",
+          "Login is optional; local context still works offline.",
+          "",
+        ].join("\n")
       : "AgentRail doctor found issues. Run with --json for details.\n",
     stderr: "",
   };

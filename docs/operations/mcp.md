@@ -1,28 +1,68 @@
 # AgentRail MCP
 
-`@agentrail-sdk/mcp` exposes AgentRail traces to MCP-capable developer tools such as Codex. It is a local, read-only MCP server over stdio.
+`@agentrail-sdk/mcp` connects AgentRail to MCP-capable developer tools such as Codex and Claude. The default profile is context-first: your AI should call `agentrail_prepare_context` before a coding task so it receives a bounded local Context Pack instead of reading the whole repository blindly.
 
-The goal is simple: while working in Codex, a developer can ask for recent AgentRail runs, inspect one run, review action/tool spans, check whether recorded data exists, and get a dashboard link for deeper forensic review.
+Login is optional. The Context profile works offline, writes memory and receipts under `.agentrail/`, and does not upload source text, prompts, file paths, patches, environment values, or secrets by default. The forensic trace reader remains available as an additional profile when you want Codex to inspect AgentRail trace metadata.
 
 ## NPM status
 
 The scoped MCP package is published on npm as `@agentrail-sdk/mcp@0.1.2`. The unscoped npm command `npm install agentrail` is not this project.
 
-Use this command for the local read-only MCP server:
+Use this command for the default local Context profile:
 
 ```bash
 npx -y @agentrail-sdk/mcp
 ```
 
-MCP Context profile 0.1.2 is published on npm and wired to the local Context Relay tools. Start it with:
+This default exposes the Context Relay tools. You can also make the profile explicit:
 
 ```bash
 npx -y @agentrail-sdk/mcp --profile context
 ```
 
+Use the forensic trace reader only when you want read-only trace inspection:
+
+```bash
+npx -y @agentrail-sdk/mcp --profile forensics
+```
+
 Use the source-checkout quickstarts below when you are developing AgentRail itself or running the full local stack.
 
 ## What it enables
+
+### Default Context profile
+
+| Tool                        | Purpose                                                          |
+| --------------------------- | ---------------------------------------------------------------- |
+| `agentrail_prepare_context` | Create a bounded local Context Pack before a coding task.        |
+| `agentrail_recall`          | Recall local project memory records.                             |
+| `agentrail_remember`        | Save a local project memory record.                              |
+| `agentrail_report_outcome`  | Record whether a Context Pack helped, missed, or needed changes. |
+
+`agentrail_prepare_context` returns:
+
+- `packId`
+- selected local context chunks with relative paths only
+- `decisions` from local project memory
+- `warnings`
+- `measurement` with estimated token counts
+- `localEvidence.memory.path`, normally `.agentrail/memory/v1.jsonl`
+- `localEvidence.receipt.path`, normally `.agentrail/receipts/v1/<packId>.json`
+- `receiptUrl: null` unless a future explicit evidence-sync mode is enabled
+
+The token fields are estimates, not billing records:
+
+```json
+{
+  "candidateTokensEstimate": 12000,
+  "returnedTokensEstimate": 3000,
+  "contextReductionEstimate": 75,
+  "method": "heuristic-v1",
+  "confidence": "estimated"
+}
+```
+
+### Optional Forensics profile
 
 | Tool                           | Purpose                                                                  |
 | ------------------------------ | ------------------------------------------------------------------------ |
@@ -93,20 +133,15 @@ Add a local MCP server entry to your Codex configuration:
 [mcp_servers.agentrail]
 command = "npx"
 args = ["-y", "@agentrail-sdk/mcp"]
-env = {
-  DATABASE_URL = "postgresql://agentrail:agentrail@localhost:5433/agentrail_test",
-  AGENTRAIL_PROJECT_ID = "00000000-0000-4000-8000-000000000101",
-  AGENTRAIL_DASHBOARD_URL = "http://127.0.0.1:3000"
-}
 ```
 
-For demo mode, replace the database variables with:
+For read-only forensic trace inspection, use:
 
 ```toml
-env = {
-  AGENTRAIL_DEMO_MODE = "1",
-  AGENTRAIL_DASHBOARD_URL = "http://127.0.0.1:3000"
-}
+[mcp_servers.agentrail_forensics]
+command = "npx"
+args = ["-y", "@agentrail-sdk/mcp", "--profile", "forensics"]
+env = { AGENTRAIL_DEMO_MODE = "1", AGENTRAIL_DASHBOARD_URL = "http://127.0.0.1:3000" }
 ```
 
 Keep this server local unless you have reviewed authentication, network exposure, and data-handling requirements for your own environment.
