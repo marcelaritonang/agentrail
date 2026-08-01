@@ -176,7 +176,7 @@ importers:
   packages/cli:
     dependencies:
       '@agentrail-sdk/context':
-        specifier: workspace:0.1.1
+        specifier: workspace:0.1.2
         version: link:../context
 
   packages/config: {}
@@ -215,7 +215,7 @@ importers:
   packages/mcp:
     dependencies:
       '@agentrail-sdk/context':
-        specifier: workspace:0.1.1
+        specifier: workspace:0.1.2
         version: link:../context
       '@agentrail-sdk/db':
         specifier: workspace:0.1.0

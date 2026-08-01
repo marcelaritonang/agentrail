@@ -5,7 +5,7 @@ AgentRail should publish scoped packages only after the package graph is registr
 ## Current status
 
 - Available today: source checkout + local Docker setup from this repository.
-- Published on npm: `@agentrail-sdk/contracts@0.1.1`, `@agentrail-sdk/db@0.1.0`, `@agentrail-sdk/sdk@0.1.0`, `@agentrail-sdk/context@0.1.1`, `@agentrail-sdk/cli@0.1.1`, and `@agentrail-sdk/mcp@0.1.2`.
+- Published on npm: `@agentrail-sdk/contracts@0.1.1`, `@agentrail-sdk/db@0.1.0`, `@agentrail-sdk/sdk@0.1.0`, `@agentrail-sdk/context@0.1.2`, `@agentrail-sdk/cli@0.1.2`, and `@agentrail-sdk/mcp@0.1.3`.
 - NPM target: `@agentrail-sdk/sdk` for application instrumentation, `@agentrail-sdk/cli` for local Context Packs, and `@agentrail-sdk/mcp` for Codex-style trace lookup plus the MCP Context profile.
 - Package state: `pnpm pack` produces registry-safe tarballs for all publishable packages; local npm tarball install smoke tests pass.
 - Remaining release action: none for the M1.1 public npm package set. Continue using registry smoke tests before future version bumps.

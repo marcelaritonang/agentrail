@@ -105,7 +105,7 @@ pnpm bootstrap:local`}</code>
             ))}
           </div>
           <small>
-            MCP Context profile 0.1.2 is published on npm and can be started
+            MCP Context profile 0.1.3 is published on npm and can be started
             through npx.
           </small>
         </div>

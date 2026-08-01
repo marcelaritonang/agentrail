@@ -48,10 +48,10 @@ const publishablePackages = [
 const expectedPackageVersions = {
   contracts: "0.1.1",
   db: "0.1.0",
-  context: "0.1.1",
+  context: "0.1.2",
   sdk: "0.1.0",
-  mcp: "0.1.2",
-  cli: "0.1.1",
+  mcp: "0.1.3",
+  cli: "0.1.2",
 } as const;
 
 const expectedInternalWorkspaceDependencies = {
@@ -63,10 +63,10 @@ const expectedInternalWorkspaceDependencies = {
   },
   "@agentrail-sdk/mcp": {
     "@agentrail-sdk/db": "workspace:0.1.0",
-    "@agentrail-sdk/context": "workspace:0.1.1",
+    "@agentrail-sdk/context": "workspace:0.1.2",
   },
   "@agentrail-sdk/cli": {
-    "@agentrail-sdk/context": "workspace:0.1.1",
+    "@agentrail-sdk/context": "workspace:0.1.2",
   },
 } satisfies Record<string, Record<string, string>>;
 

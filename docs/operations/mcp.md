@@ -6,7 +6,7 @@ Login is optional. The Context profile works offline, writes memory and receipts
 
 ## NPM status
 
-The scoped MCP package is published on npm as `@agentrail-sdk/mcp@0.1.2`. The unscoped npm command `npm install agentrail` is not this project.
+The MCP Context profile 0.1.3 is published on npm as `@agentrail-sdk/mcp@0.1.3`. The unscoped npm command `npm install agentrail` is not this project.
 
 Use this command for the default local Context profile:
 
@@ -20,7 +20,7 @@ This default exposes the Context Relay tools. You can also make the profile expl
 npx -y @agentrail-sdk/mcp --profile context
 ```
 
-Use the forensic trace reader only when you want read-only trace inspection:
+Use the read-only MCP forensic trace reader only when you want trace inspection:
 
 ```bash
 npx -y @agentrail-sdk/mcp --profile forensics

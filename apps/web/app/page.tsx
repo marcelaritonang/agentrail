@@ -56,7 +56,7 @@ const npmStatus = [
   ["Available today", "SDK, Context CLI, MCP reader"],
   [
     "Published packages",
-    "@agentrail-sdk/contracts@0.1.1, @agentrail-sdk/db@0.1.0, @agentrail-sdk/sdk@0.1.0, @agentrail-sdk/context@0.1.1, @agentrail-sdk/cli@0.1.1, @agentrail-sdk/mcp@0.1.2",
+    "@agentrail-sdk/contracts@0.1.1, @agentrail-sdk/db@0.1.0, @agentrail-sdk/sdk@0.1.0, @agentrail-sdk/context@0.1.2, @agentrail-sdk/cli@0.1.2, @agentrail-sdk/mcp@0.1.3",
   ],
   ["SDK path", "npm install @agentrail-sdk/sdk for TypeScript AI applications"],
   ["Context CLI", "npm install -D @agentrail-sdk/cli for local Context Packs"],
@@ -268,7 +268,7 @@ export default function LandingPage() {
           </dl>
           <p className="landing-status-note">
             Current boundary: SDK recording, local Context CLI packs, and
-            read-only MCP forensic inspection. MCP Context profile 0.1.2 is
+            read-only MCP forensic inspection. MCP Context profile 0.1.3 is
             published on npm for MCP-capable local agent clients.
           </p>
         </div>

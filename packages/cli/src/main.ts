@@ -21,7 +21,7 @@ import { selectCredentialStore } from "./credentials/platform-store.js";
 import type { CommandResult } from "./types.js";
 import { resolveWorkspaceRoot } from "@agentrail-sdk/context";
 
-const CLI_PACKAGE_VERSION = "0.1.1";
+const CLI_PACKAGE_VERSION = "0.1.2";
 
 export async function runAgentRailCommand(
   argv: readonly string[],
