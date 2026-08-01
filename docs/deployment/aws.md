@@ -70,6 +70,9 @@ Use separate least-privilege roles for ingestion, worker, dashboard backend, mig
 - SAM template validation in a real AWS account
 - production artifact packaging for Lambda zip bundles
 - ECS dashboard image and deployment pipeline
+- production hosted activation environment for `https://agentrail.id/v1/*`
+  (`DATABASE_URL`, Better Auth, GitHub OAuth, installation pepper, API key
+  pepper, and Redis/SQS queue configuration)
 - Secrets Manager rotation
 - load, failure-injection, restore, security, and cost testing in AWS
 

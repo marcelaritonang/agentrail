@@ -15,6 +15,12 @@ type FetchResult = {
   detail: string;
 };
 
+type FetchTextOptions = {
+  method?: string;
+  headers?: HeadersInit;
+  body?: BodyInit;
+};
+
 const REQUEST_TIMEOUT_MS = 10_000;
 const MAX_REDIRECTS = 5;
 
@@ -50,12 +56,19 @@ function publicUrl(origin: URL, path: string): URL {
   return new URL(path, normalizeOrigin(origin));
 }
 
-async function fetchText(url: URL, redirectCount = 0): Promise<FetchResult> {
+async function fetchText(
+  url: URL,
+  options: FetchTextOptions = {},
+  redirectCount = 0,
+): Promise<FetchResult> {
   try {
     const response = await fetch(url, {
+      method: options.method,
       headers: {
         "user-agent": "AgentRail production verifier",
+        ...options.headers,
       },
+      body: options.body,
       redirect: "manual",
       signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     });
@@ -76,6 +89,7 @@ async function fetchText(url: URL, redirectCount = 0): Promise<FetchResult> {
 
       return fetchText(
         new URL(response.headers.get("location") ?? "", url),
+        options,
         redirectCount + 1,
       );
     }
@@ -155,6 +169,66 @@ function check(
   };
 }
 
+function jsonFromBody(body: string): unknown {
+  try {
+    return JSON.parse(body) as unknown;
+  } catch {
+    return null;
+  }
+}
+
+function statusField(value: unknown): string | null {
+  if (
+    typeof value === "object" &&
+    value !== null &&
+    "status" in value &&
+    typeof value.status === "string"
+  ) {
+    return value.status;
+  }
+
+  return null;
+}
+
+function errorCodeField(value: unknown): string | null {
+  if (
+    typeof value === "object" &&
+    value !== null &&
+    "error" in value &&
+    typeof value.error === "object" &&
+    value.error !== null &&
+    "code" in value.error &&
+    typeof value.error.code === "string"
+  ) {
+    return value.error.code;
+  }
+
+  return null;
+}
+
+function isConfigurationUnavailable(response: FetchResult): boolean {
+  const body = jsonFromBody(response.body);
+  return (
+    response.status === 503 &&
+    (statusField(body) === "service_unavailable" ||
+      errorCodeField(body) === "service_unavailable")
+  );
+}
+
+function statusIn(response: FetchResult, allowed: readonly number[]): boolean {
+  return response.status !== null && allowed.includes(response.status);
+}
+
+async function postJson(url: URL, body: unknown): Promise<FetchResult> {
+  return fetchText(url, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+}
+
 export async function verifyProduction(
   origin: URL,
 ): Promise<readonly ProductionCheck[]> {
@@ -220,12 +294,79 @@ export async function verifyProduction(
     ),
   );
 
+  const deviceCodeUrl = publicUrl(normalized, "/v1/device/code");
+  const deviceCode = await postJson(deviceCodeUrl, {
+    schema_version: 1,
+    client_type: "codex",
+    package_version: "production-smoke",
+  });
+  checks.push(
+    check(
+      "hosted-device-code:/v1/device/code",
+      deviceCodeUrl,
+      statusIn(deviceCode, [200, 429]) &&
+        !isConfigurationUnavailable(deviceCode),
+      deviceCode.status,
+      isConfigurationUnavailable(deviceCode)
+        ? "hosted device-code endpoint is not configured"
+        : deviceCode.detail,
+    ),
+  );
+
+  const deviceTokenUrl = publicUrl(normalized, "/v1/device/token");
+  const deviceToken = await postJson(deviceTokenUrl, {
+    schema_version: 1,
+    device_code: "production-smoke-invalid-device-code",
+  });
+  checks.push(
+    check(
+      "hosted-device-token:/v1/device/token",
+      deviceTokenUrl,
+      statusIn(deviceToken, [200, 202, 400, 403, 429]) &&
+        !isConfigurationUnavailable(deviceToken),
+      deviceToken.status,
+      isConfigurationUnavailable(deviceToken)
+        ? "hosted device-token endpoint is not configured"
+        : deviceToken.detail,
+    ),
+  );
+
+  const eventsUrl = publicUrl(normalized, "/v1/events");
+  const events = await postJson(eventsUrl, {
+    events: [],
+  });
+  checks.push(
+    check(
+      "hosted-events-auth:/v1/events",
+      eventsUrl,
+      events.status === 401 && !isConfigurationUnavailable(events),
+      events.status,
+      isConfigurationUnavailable(events)
+        ? "hosted usage-events endpoint is not configured"
+        : events.detail,
+    ),
+  );
+
   return checks;
 }
 
+export function productionOriginFromArgs(
+  args: readonly string[],
+  environmentUrl: string | undefined,
+): URL {
+  const urlIndex = args.indexOf("--url");
+  const explicitUrl =
+    urlIndex >= 0 && args[urlIndex + 1] !== undefined
+      ? args[urlIndex + 1]
+      : undefined;
+
+  return new URL(explicitUrl ?? environmentUrl ?? "https://agentrail.id");
+}
+
 async function main() {
-  const origin = new URL(
-    process.env.AGENTRAIL_WEB_URL ?? "https://agentrail.id",
+  const origin = productionOriginFromArgs(
+    process.argv.slice(2),
+    process.env.AGENTRAIL_WEB_URL,
   );
   const checks = await verifyProduction(origin);
 
