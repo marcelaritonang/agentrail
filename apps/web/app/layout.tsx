@@ -24,6 +24,9 @@ export const metadata: Metadata = {
   metadataBase: publicConfig.siteUrl,
   title: { default: "AgentRail", template: "%s | AgentRail" },
   description: siteDescription,
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+  },
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
