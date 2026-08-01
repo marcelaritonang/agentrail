@@ -64,7 +64,8 @@ Do not run migrations from every Lambda cold start.
 
 ## Vercel environment
 
-Set these server-only values on the web deployment:
+Set these server-only values on the web deployment if `agentrail.id` is serving
+the versioned `/v1` endpoints through the Next.js hosted ingest bridge:
 
 - `DATABASE_URL`
 - `BETTER_AUTH_SECRET`
@@ -72,7 +73,25 @@ Set these server-only values on the web deployment:
 - `GITHUB_CLIENT_ID`
 - `GITHUB_CLIENT_SECRET`
 - `INSTALLATION_CREDENTIAL_PEPPER`
-- `AGENTRAIL_INGEST_BASE_URL=https://api.agentrail.id`
+- `API_KEY_PEPPER`
+- `REDIS_URL` for the local/managed Redis span queue, or
+  `AGENTRAIL_SPAN_QUEUE_URL` plus `AWS_REGION` for SQS
+- `NEXT_PUBLIC_AGENTRAIL_SITE_URL=https://agentrail.id`
+- `AGENTRAIL_ACTIVATION_BASE_URL=https://agentrail.id/activate`
+
+With these values present, the production smoke expected behavior is:
+
+- `POST https://agentrail.id/v1/device/code` returns a device code or a
+  non-configuration rate-limit response.
+- `POST https://agentrail.id/v1/device/token` returns a valid polling response
+  for the supplied device code.
+- `POST https://agentrail.id/v1/events` without a bearer installation
+  credential returns `401 unauthorized`, not `503 service_unavailable`.
+
+If a separate API Gateway domain is used instead of the Next.js bridge, point
+the CLI `--api-url` and public setup copy to that API domain. Do not leave
+`https://agentrail.id/v1/*` advertised as production-ready until the production
+smoke passes.
 
 Browser code must not receive database URLs, credential peppers, queue URLs, S3
 bucket credentials, or credential digests.

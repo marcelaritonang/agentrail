@@ -7,7 +7,10 @@ import { AddressInfo } from "node:net";
 
 import { afterEach, describe, expect, it } from "vitest";
 
-import { verifyProduction } from "../../scripts/verify-production";
+import {
+  productionOriginFromArgs,
+  verifyProduction,
+} from "../../scripts/verify-production";
 
 type RouteMap = Record<
   string,
@@ -88,9 +91,49 @@ const goodRoutes: RouteMap = {
     type: "application/xml",
     body: "<urlset><url><loc>{{ORIGIN}}/</loc></url></urlset>",
   },
+  "/v1/device/code": {
+    type: "application/json",
+    body: JSON.stringify({
+      device_code: "device-code",
+      user_code: "ABCD-EFGH-JKLM",
+      verification_uri: "{{ORIGIN}}/activate",
+      verification_uri_complete: "{{ORIGIN}}/activate?code=ABCD-EFGH-JKLM",
+      expires_in: 600,
+      interval: 5,
+      request_id: "req_test",
+    }),
+  },
+  "/v1/device/token": {
+    status: 400,
+    type: "application/json",
+    body: JSON.stringify({
+      status: "expired_token",
+      request_id: "req_test",
+    }),
+  },
+  "/v1/events": {
+    status: 401,
+    type: "application/json",
+    body: JSON.stringify({
+      error: {
+        code: "unauthorized",
+        request_id: "req_test",
+        retryable: false,
+      },
+    }),
+  },
 };
 
 describe("production readiness verifier", () => {
+  it("uses --url before the environment default", () => {
+    expect(
+      productionOriginFromArgs(
+        ["--url", "https://preview.agentrail.id/path"],
+        "https://agentrail.id",
+      ).href,
+    ).toBe("https://preview.agentrail.id/path");
+  });
+
   it("accepts a site that satisfies the public M0 contract", async () => {
     await withServer(goodRoutes, async (origin) => {
       const checks = await verifyProduction(origin);
@@ -110,6 +153,9 @@ describe("production readiness verifier", () => {
         "canonical:/",
         "cta-empty-href",
         "synthetic-demo-label:/traces",
+        "hosted-device-code:/v1/device/code",
+        "hosted-device-token:/v1/device/token",
+        "hosted-events-auth:/v1/events",
       ]);
     });
   });
@@ -135,6 +181,53 @@ describe("production readiness verifier", () => {
           "canonical:/",
           "cta-empty-href",
           "synthetic-demo-label:/traces",
+        ]);
+      },
+    );
+  });
+
+  it("reports hosted control-plane configuration failures", async () => {
+    await withServer(
+      {
+        ...goodRoutes,
+        "/v1/device/code": {
+          status: 503,
+          type: "application/json",
+          body: JSON.stringify({
+            status: "service_unavailable",
+            request_id: "req_test",
+          }),
+        },
+        "/v1/device/token": {
+          status: 503,
+          type: "application/json",
+          body: JSON.stringify({
+            status: "service_unavailable",
+            request_id: "req_test",
+          }),
+        },
+        "/v1/events": {
+          status: 503,
+          type: "application/json",
+          body: JSON.stringify({
+            error: {
+              code: "service_unavailable",
+              request_id: "req_test",
+              retryable: true,
+            },
+          }),
+        },
+      },
+      async (origin) => {
+        const checks = await verifyProduction(origin);
+        const failures = checks
+          .filter((check) => !check.ok)
+          .map((check) => check.name);
+
+        expect(failures).toEqual([
+          "hosted-device-code:/v1/device/code",
+          "hosted-device-token:/v1/device/token",
+          "hosted-events-auth:/v1/events",
         ]);
       },
     );
