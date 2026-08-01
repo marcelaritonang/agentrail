@@ -87,7 +87,16 @@ importers:
       '@agentrail-sdk/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@agentrail-sdk/ingest':
+        specifier: workspace:*
+        version: link:../ingest
+      '@agentrail-sdk/queue':
+        specifier: workspace:*
+        version: link:../../packages/queue
       '@aws-sdk/client-s3':
+        specifier: ^3.1091.0
+        version: 3.1091.0
+      '@aws-sdk/client-sqs':
         specifier: ^3.1091.0
         version: 3.1091.0
       '@better-auth/drizzle-adapter':
