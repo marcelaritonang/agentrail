@@ -71,7 +71,7 @@ export type ContextMeasurement = {
 
 export type ContextLocalEvidence = {
   memory: {
-    path: ".agentrail/memory/v1.jsonl";
+    path: ".agentrail/memory/v2.json";
     recordsUsed: number;
     uploaded: false;
   };

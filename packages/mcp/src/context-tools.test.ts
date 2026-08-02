@@ -3,7 +3,10 @@ import { isAbsolute, join } from "node:path";
 import { tmpdir } from "node:os";
 
 import { describe, expect, it } from "vitest";
-import { createContextRelay } from "@agentrail-sdk/context";
+import {
+  createContextRelay,
+  createFileMemoryStore,
+} from "@agentrail-sdk/context";
 
 import { createAgentRailContextToolHandlers } from "./context-tools.js";
 
@@ -72,6 +75,8 @@ describe("AgentRail MCP context tools", () => {
 
       const remembered = await handlers.agentrail_remember({
         statement: "Auth must keep existing session semantics.",
+        type: "convention",
+        scope: "auth",
         tags: ["auth"],
       });
       const memory = parseResult<{ record: { id: string } }>(
@@ -94,6 +99,12 @@ describe("AgentRail MCP context tools", () => {
       expect(recalledValue.records.map((record) => record.id)).toContain(
         memory.record.id,
       );
+      const store = await createFileMemoryStore({ root });
+      expect(store.list({ includeInactive: true })[0]).toMatchObject({
+        memory_id: memory.record.id,
+        type: "convention",
+        scope: "auth",
+      });
       expect(outcomeValue.receipt.outcome).toBe("accepted");
     } finally {
       await rm(root, { recursive: true, force: true });

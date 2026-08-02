@@ -1,6 +1,7 @@
 import {
   createControlRepository,
   createDatabase,
+  createReceiptRepository,
   createSpanRepository,
 } from "@agentrail-sdk/db";
 import {
@@ -22,6 +23,7 @@ function required(name: string): string {
 const database = createDatabase(required("DATABASE_URL"));
 const repository = createSpanRepository(database.db);
 const controlRepository = createControlRepository(database.db);
+const receiptRepository = createReceiptRepository(database.db);
 const queue = await createRedisStreamsQueue({
   url: required("REDIS_URL"),
   stream: process.env.AGENTRAIL_STREAM ?? "agentrail:spans",
@@ -44,6 +46,24 @@ const app = createIngestApp({
   usageQueue,
   deviceCodes: controlRepository,
   installations: controlRepository,
+  memories: {
+    async upsert(input) {
+      return receiptRepository.upsertMemory({
+        projectId: input.projectId,
+        memoryId: input.memory_id,
+        revision: input.revision,
+        type: input.type,
+        status: input.status,
+        statementRedacted: input.statementRedacted,
+        scope: input.scope,
+        sourceKind: input.source_kind,
+        expiresAt:
+          input.expires_at === null ? null : new Date(input.expires_at),
+        updatedAt: new Date(input.updated_at),
+        tombstone: input.tombstone ?? null,
+      });
+    },
+  },
   installationCredentialPepper: required("INSTALLATION_CREDENTIAL_PEPPER"),
   activationBaseUrl:
     process.env.AGENTRAIL_ACTIVATION_BASE_URL ??

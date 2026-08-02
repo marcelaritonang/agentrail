@@ -18,6 +18,7 @@ import type {
   StoredDeviceCode,
 } from "@agentrail-sdk/db";
 import type { SpanQueue, UsageEventQueue } from "@agentrail-sdk/queue";
+import type { MemorySyncStore } from "./memory-sync.js";
 import { apiKeyPrefix, verifyApiKey } from "./api-key.js";
 import {
   createDeviceCode,
@@ -29,6 +30,8 @@ import {
 } from "./device.js";
 import type { InstallationAuthRepository } from "./installation-auth.js";
 import { handleUsageEvents } from "./usage-events.js";
+import { authenticateInstallationCredential } from "./installation-auth.js";
+import { syncMemory } from "./memory-sync.js";
 
 type ApiKeyRecord = {
   projectId: string;
@@ -56,6 +59,7 @@ export type IngestDependencies = {
   usageQueue?: UsageEventQueue;
   deviceCodes?: DeviceCodeRepository;
   installations?: InstallationAuthRepository;
+  memories?: MemorySyncStore;
   activationBaseUrl?: string;
   installationCredentialPepper?: string;
   requestId?: () => string;
@@ -214,6 +218,73 @@ export function createIngestApp(dependencies: IngestDependencies) {
     });
 
     return devicePollResponse(context, requestId, result);
+  });
+
+  app.post("/v1/memories", async (context) => {
+    const requestId = context.get("requestId");
+    if (
+      dependencies.installationCredentialPepper === undefined ||
+      dependencies.installations === undefined ||
+      dependencies.memories === undefined
+    ) {
+      return context.json(
+        { error: { code: "service_unavailable", request_id: requestId } },
+        503,
+      );
+    }
+
+    const auth = await authenticateInstallationCredential({
+      authorization: context.req.header("Authorization"),
+      pepper: dependencies.installationCredentialPepper,
+      repository: dependencies.installations,
+    });
+    if (auth.status !== "ok") {
+      return context.json(
+        {
+          error: {
+            code:
+              auth.status === "unauthorized"
+                ? "unauthorized"
+                : "authentication_unavailable",
+            request_id: requestId,
+          },
+        },
+        auth.status === "unauthorized" ? 401 : 503,
+      );
+    }
+
+    let body: unknown;
+    try {
+      body = await context.req.json();
+    } catch {
+      return context.json(
+        { error: { code: "invalid_json", request_id: requestId } },
+        400,
+      );
+    }
+
+    try {
+      const result = await syncMemory({
+        auth,
+        input: body,
+        store: dependencies.memories,
+      });
+      if (result.status === "conflict") {
+        return context.json(
+          { current_revision: result.currentRevision, request_id: requestId },
+          409,
+        );
+      }
+      return context.json(
+        { revision: result.revision, request_id: requestId },
+        200,
+      );
+    } catch {
+      return context.json(
+        { error: { code: "invalid_memory", request_id: requestId } },
+        400,
+      );
+    }
   });
 
   app.post(

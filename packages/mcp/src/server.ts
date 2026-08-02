@@ -123,6 +123,18 @@ export function registerAgentRailMcpTools(
           "Write local-only memory: persist a project decision for future Context Packs.",
         inputSchema: {
           statement: z.string().min(1).max(2_000),
+          type: z
+            .enum([
+              "architecture",
+              "constraint",
+              "convention",
+              "rejected_approach",
+              "risk",
+              "workaround",
+            ])
+            .optional(),
+          scope: z.string().min(1).max(200).optional(),
+          expiresAt: z.string().min(1).max(100).optional(),
           tags: z.array(z.string().min(1).max(100)).max(20).optional(),
         },
       },

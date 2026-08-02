@@ -77,6 +77,32 @@ describe("AgentRail CLI args", () => {
     });
   });
 
+  it("parses memory lifecycle commands", () => {
+    expect(
+      parseAgentRailCommand([
+        "memory",
+        "push",
+        "--root",
+        "D:\\work\\agent-app",
+        "--id",
+        "mem_aaaaaaaaaaaaaaaaaaaaaaaa",
+        "--api-url",
+        "http://localhost:3001",
+      ]),
+    ).toMatchObject({
+      name: "memory",
+      action: "push",
+      root: "D:\\work\\agent-app",
+      memoryId: "mem_aaaaaaaaaaaaaaaaaaaaaaaa",
+      apiUrl: "http://localhost:3001",
+    });
+
+    expect(parseAgentRailCommand(["memory", "list"])).toMatchObject({
+      name: "memory",
+      action: "list",
+    });
+  });
+
   it("rejects unknown flags and missing required command input", () => {
     expect(() => parseAgentRailCommand(["doctor", "--bad"])).toThrow(
       /unknown flag/i,

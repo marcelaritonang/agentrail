@@ -60,8 +60,14 @@ export function createAgentRailContextToolHandlers(
     },
     async agentrail_remember(input) {
       const tags = stringList(input.tags, "tags");
+      const type = optionalMemoryType(input.type);
+      const scope = optionalString(input.scope, "scope", 200);
+      const expiresAt = optionalString(input.expiresAt, "expiresAt", 100);
       const request: RememberRequest = {
         statement: requiredString(input.statement, "statement", 2_000),
+        ...(type === undefined ? {} : { type }),
+        ...(scope === undefined ? {} : { scope }),
+        ...(expiresAt === undefined ? {} : { expiresAt }),
         ...(tags === undefined ? {} : { tags }),
       };
       const record = await dependencies.relay.remember(request);
@@ -128,6 +134,21 @@ function stringList(
     throw new Error(`${field} can contain at most 20 items`);
   }
   return input.map((item) => requiredString(item, field, 100));
+}
+
+function optionalMemoryType(input: unknown): RememberRequest["type"] {
+  if (input === undefined || input === null) return undefined;
+  if (
+    input === "architecture" ||
+    input === "constraint" ||
+    input === "convention" ||
+    input === "rejected_approach" ||
+    input === "risk" ||
+    input === "workaround"
+  ) {
+    return input;
+  }
+  throw new Error("type must be a valid AgentRail memory type");
 }
 
 function integerInRange(

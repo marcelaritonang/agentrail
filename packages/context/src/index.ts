@@ -1,5 +1,6 @@
 export * from "./chunker.js";
 export * from "./ignore.js";
+export * from "./memory.js";
 export * from "./pack.js";
 export * from "./scanner.js";
 export * from "./spool-flush.js";

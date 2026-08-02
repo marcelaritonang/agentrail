@@ -22,6 +22,7 @@ import {
   type ContextPackRequest,
   type ProjectMemoryRecord,
 } from "./types.js";
+import { createFileMemoryStore, type LocalMemory } from "./memory.js";
 import { resolveWorkspaceRoot } from "./workspace.js";
 
 export type ContextRelayOptions = {
@@ -46,6 +47,9 @@ export type RecallRequest = {
 
 export type RememberRequest = {
   statement: string;
+  type?: LocalMemory["type"];
+  scope?: string;
+  expiresAt?: string | null;
   tags?: readonly string[];
 };
 
@@ -178,15 +182,19 @@ export function createContextRelay(options: ContextRelayOptions): ContextRelay {
     },
     async remember(input) {
       const root = await resolveWorkspaceRoot(options.workspaceRoot);
-      const record: ProjectMemoryRecord = {
-        id: sha256(`${input.statement}:${now().toISOString()}:${randomUUID()}`),
-        recordedAt: now().toISOString(),
-        source: "user",
+      const tags = normalizeTags(input.tags);
+      const store = await createFileMemoryStore({ root, now });
+      const memory = await store.remember({
+        memoryId: `mem_${sha256(`${input.statement}:${now().toISOString()}:${randomUUID()}`).slice(0, 32)}`,
         statement: boundedString(input.statement, 2_000, "statement"),
-        tags: normalizeTags(input.tags),
-      };
-      await appendJsonLine(memoryPath(root), record);
-      return record;
+        type: input.type ?? memoryTypeFromTags(tags),
+        scope:
+          input.scope === undefined
+            ? memoryScopeFromTags(tags)
+            : boundedString(input.scope, 200, "scope"),
+        expiresAt: input.expiresAt ?? null,
+      });
+      return projectMemoryRecordFromLocal(memory);
     },
     async reportOutcome(input) {
       const root = await resolveWorkspaceRoot(options.workspaceRoot);
@@ -391,7 +399,12 @@ async function recallMemory(input: {
   input: RecallRequest;
 }): Promise<readonly ProjectMemoryRecord[]> {
   const root = await resolveWorkspaceRoot(input.root);
-  const records = await readJsonLines<ProjectMemoryRecord>(memoryPath(root));
+  const store = await createFileMemoryStore({ root });
+  const localRecords = store.list().map(projectMemoryRecordFromLocal);
+  const legacyRecords = await readJsonLines<ProjectMemoryRecord>(
+    legacyMemoryPath(root),
+  );
+  const records = [...localRecords, ...legacyRecords];
   const terms = tokenize(
     `${input.input.query ?? ""} ${(input.input.tags ?? []).join(" ")}`,
   );
@@ -437,7 +450,7 @@ function localEvidenceFor(
 ): ContextLocalEvidence {
   return {
     memory: {
-      path: ".agentrail/memory/v1.jsonl",
+      path: ".agentrail/memory/v2.json",
       recordsUsed,
       uploaded: false,
     },
@@ -473,7 +486,7 @@ async function readJsonLines<T>(path: string): Promise<T[]> {
     });
 }
 
-function memoryPath(root: string): string {
+function legacyMemoryPath(root: string): string {
   return resolve(root, ".agentrail", "memory", "v1.jsonl");
 }
 
@@ -495,6 +508,38 @@ function normalizeTags(tags: readonly string[] | undefined): readonly string[] {
     .map((tag) => tag.trim().toLowerCase())
     .filter((tag) => tag.length > 0)
     .slice(0, 20);
+}
+
+function memoryTypeFromTags(tags: readonly string[]): LocalMemory["type"] {
+  for (const tag of tags) {
+    if (
+      tag === "architecture" ||
+      tag === "constraint" ||
+      tag === "convention" ||
+      tag === "rejected_approach" ||
+      tag === "risk" ||
+      tag === "workaround"
+    ) {
+      return tag;
+    }
+  }
+  return "constraint";
+}
+
+function memoryScopeFromTags(tags: readonly string[]): string {
+  return tags.length === 0 ? "repo" : tags.slice(0, 5).join(",");
+}
+
+function projectMemoryRecordFromLocal(
+  memory: LocalMemory,
+): ProjectMemoryRecord {
+  return {
+    id: memory.memory_id,
+    recordedAt: memory.updated_at,
+    source: "user",
+    statement: memory.statement,
+    tags: [...new Set([memory.type, memory.scope])],
+  };
 }
 
 function tokenize(text: string): readonly string[] {
