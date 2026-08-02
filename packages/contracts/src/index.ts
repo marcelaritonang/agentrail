@@ -19,6 +19,29 @@ export {
   UsageEventBatchSchema,
   UsageEventSchema,
 } from "./usage-event.js";
+export {
+  MemoryIdSchema,
+  MemoryStatusSchema,
+  MemoryTombstoneReasonSchema,
+  MemoryTypeSchema,
+  ProjectMemorySyncSchema,
+} from "./memory.js";
+export {
+  createEvidenceEnvelopeSchema,
+  EvidenceEnvelopeSchema,
+  EvidenceSourceSchema,
+  MAX_EVIDENCE_ENVELOPE_BYTES,
+  MAX_EVIDENCE_SOURCES,
+  TrustClassSchema,
+} from "./evidence.js";
+export {
+  ContextReceiptSchema,
+  OutcomeReasonCodeSchema,
+  OutcomeReportSchema,
+  ReceiptMeasurementSchema,
+  ReceiptShareReviewSchema,
+  ShareReviewFieldSchema,
+} from "./receipt.js";
 
 export type {
   CanonicalSpanBatch,
@@ -32,3 +55,10 @@ export type {
   PrivacyMode,
 } from "./device.js";
 export type { UsageEvent, UsageEventBatch } from "./usage-event.js";
+export type { ProjectMemorySync } from "./memory.js";
+export type { EvidenceEnvelope, EvidenceSource } from "./evidence.js";
+export type {
+  ContextReceipt,
+  OutcomeReport,
+  ReceiptShareReview,
+} from "./receipt.js";
