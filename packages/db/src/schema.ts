@@ -24,9 +24,45 @@ export type TraceCompletionState = "complete" | "incomplete";
 export type PrivacyMode = "local-only" | "metrics-only" | "evidence-sync";
 export type UserRole = "member" | "admin";
 export type ContextPackStatus = "ready" | "partial" | "empty";
+export type ReceiptStatus = ContextPackStatus | "failed";
 export type ContextOutcome = "helpful" | "partial" | "missed" | "failed";
 export type UsageEventType =
   "context_pack_created" | "context_outcome_reported";
+export type MemoryType =
+  | "architecture"
+  | "constraint"
+  | "convention"
+  | "rejected_approach"
+  | "risk"
+  | "workaround";
+export type MemoryStatus =
+  | "active"
+  | "superseded"
+  | "expired"
+  | "review_required"
+  | "deleted";
+export type MemorySourceKind = "explicit_tool" | "manual_dashboard" | "import";
+export type EvidenceMode = "metrics_only" | "redacted_evidence";
+export type EvidenceTrustClass =
+  | "trusted_instruction"
+  | "project_source"
+  | "project_documentation"
+  | "project_memory"
+  | "untrusted_content";
+export type OutcomeReasonCode =
+  | "solved_task"
+  | "missing_context"
+  | "wrong_file"
+  | "too_broad"
+  | "tool_failure"
+  | "unsafe"
+  | "other";
+export type ShareReviewField =
+  | "summary"
+  | "measurement"
+  | "warnings"
+  | "source_metadata"
+  | "outcome";
 
 export const users = pgTable("users", {
   id: text("id").primaryKey(),
@@ -356,6 +392,163 @@ export const dailyUsage = pgTable(
   ],
 );
 
+export const projectMemories = pgTable(
+  "project_memories",
+  {
+    projectId: uuid("project_id")
+      .notNull()
+      .references(() => projects.projectId, { onDelete: "cascade" }),
+    memoryId: text("memory_id").notNull(),
+    revision: integer("revision").notNull(),
+    type: text("type").$type<MemoryType>().notNull(),
+    status: text("status").$type<MemoryStatus>().notNull(),
+    statementRedacted: text("statement_redacted"),
+    scope: text("scope").notNull(),
+    sourceKind: text("source_kind").$type<MemorySourceKind>().notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true, mode: "date" }),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
+      .defaultNow()
+      .notNull(),
+    tombstone: jsonb("tombstone").$type<Record<string, unknown> | null>(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.projectId, table.memoryId] }),
+    index("project_memories_project_status_idx").on(
+      table.projectId,
+      table.status,
+    ),
+  ],
+);
+
+export const receipts = pgTable(
+  "receipts",
+  {
+    projectId: uuid("project_id")
+      .notNull()
+      .references(() => projects.projectId, { onDelete: "cascade" }),
+    receiptId: text("receipt_id").notNull(),
+    packId: text("pack_id").notNull(),
+    createdAt: timestamp("created_at", {
+      withTimezone: true,
+      mode: "date",
+    }).notNull(),
+    status: text("status").$type<ReceiptStatus>().notNull(),
+    candidateTokensEstimate: integer("candidate_tokens_estimate").notNull(),
+    returnedTokensEstimate: integer("returned_tokens_estimate").notNull(),
+    contextReductionEstimate: integer("context_reduction_estimate").notNull(),
+    measurementMethod: text("measurement_method").notNull(),
+    measurementConfidence: text("measurement_confidence").notNull(),
+    sourceCount: integer("source_count").notNull(),
+    warningCodes: jsonb("warning_codes")
+      .$type<string[]>()
+      .default([])
+      .notNull(),
+    evidenceMode: text("evidence_mode").$type<EvidenceMode>().notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.projectId, table.receiptId] }),
+    index("receipts_project_pack_idx").on(table.projectId, table.packId),
+    index("receipts_project_created_idx").on(table.projectId, table.createdAt),
+  ],
+);
+
+export const contextSources = pgTable(
+  "context_sources",
+  {
+    projectId: uuid("project_id").notNull(),
+    receiptId: text("receipt_id").notNull(),
+    sourceId: text("source_id").notNull(),
+    trustClass: text("trust_class").$type<EvidenceTrustClass>().notNull(),
+    relativePath: text("relative_path").notNull(),
+    locator: jsonb("locator")
+      .$type<{
+        startLine: number;
+        endLine: number;
+        symbol: string | null;
+      }>()
+      .notNull(),
+    contentHash: varchar("content_hash", { length: 64 }).notNull(),
+    selectionReasons: jsonb("selection_reasons")
+      .$type<string[]>()
+      .default([])
+      .notNull(),
+    excerptRedacted: text("excerpt_redacted"),
+  },
+  (table) => [
+    primaryKey({ columns: [table.projectId, table.receiptId, table.sourceId] }),
+    foreignKey({
+      columns: [table.projectId, table.receiptId],
+      foreignColumns: [receipts.projectId, receipts.receiptId],
+      name: "context_sources_receipt_fk",
+    }).onDelete("cascade"),
+    index("context_sources_project_receipt_idx").on(
+      table.projectId,
+      table.receiptId,
+    ),
+  ],
+);
+
+export const outcomeReports = pgTable(
+  "outcome_reports",
+  {
+    projectId: uuid("project_id").notNull(),
+    outcomeId: text("outcome_id").notNull(),
+    receiptId: text("receipt_id").notNull(),
+    packId: text("pack_id").notNull(),
+    outcome: text("outcome").$type<ContextOutcome>().notNull(),
+    reasonCode: text("reason_code").$type<OutcomeReasonCode>().notNull(),
+    reportedAt: timestamp("reported_at", {
+      withTimezone: true,
+      mode: "date",
+    }).notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.projectId, table.outcomeId] }),
+    foreignKey({
+      columns: [table.projectId, table.receiptId],
+      foreignColumns: [receipts.projectId, receipts.receiptId],
+      name: "outcome_reports_receipt_fk",
+    }).onDelete("cascade"),
+    index("outcome_reports_project_receipt_idx").on(
+      table.projectId,
+      table.receiptId,
+    ),
+  ],
+);
+
+export const sharedReceipts = pgTable(
+  "shared_receipts",
+  {
+    projectId: uuid("project_id").notNull(),
+    receiptId: text("receipt_id").notNull(),
+    shareTokenDigest: varchar("share_token_digest", { length: 128 }).notNull(),
+    fields: jsonb("fields").$type<ShareReviewField[]>().notNull(),
+    reviewedAt: timestamp("reviewed_at", {
+      withTimezone: true,
+      mode: "date",
+    }).notNull(),
+    expiresAt: timestamp("expires_at", {
+      withTimezone: true,
+      mode: "date",
+    }).notNull(),
+    revokedAt: timestamp("revoked_at", { withTimezone: true, mode: "date" }),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.projectId, table.receiptId] }),
+    uniqueIndex("shared_receipts_token_digest_unique").on(
+      table.shareTokenDigest,
+    ),
+    foreignKey({
+      columns: [table.projectId, table.receiptId],
+      foreignColumns: [receipts.projectId, receipts.receiptId],
+      name: "shared_receipts_receipt_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
 export const traces = pgTable(
   "traces",
   {
@@ -363,6 +556,7 @@ export const traces = pgTable(
       .notNull()
       .references(() => projects.projectId, { onDelete: "cascade" }),
     traceId: varchar("trace_id", { length: 32 }).notNull(),
+    packId: text("pack_id"),
     rootSpanId: varchar("root_span_id", { length: 16 }),
     name: text("name").notNull(),
     agentId: text("agent_id").notNull(),
@@ -387,6 +581,7 @@ export const traces = pgTable(
   (table) => [
     primaryKey({ columns: [table.projectId, table.traceId] }),
     index("traces_project_started_idx").on(table.projectId, table.startedAt),
+    index("traces_project_pack_idx").on(table.projectId, table.packId),
   ],
 );
 
