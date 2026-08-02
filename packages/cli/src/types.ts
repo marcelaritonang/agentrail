@@ -35,6 +35,13 @@ export type AgentRailCommand =
       root: string;
       projectKey?: string;
     }
+  | {
+      name: "memory";
+      action: "list" | "push" | "expire";
+      root: string;
+      memoryId?: string;
+      apiUrl?: string;
+    }
   | { name: "help" };
 
 export type CommandResult = {

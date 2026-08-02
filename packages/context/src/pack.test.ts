@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 
 import { describe, expect, it } from "vitest";
 
+import { createFileMemoryStore } from "./memory.js";
 import { createContextRelay } from "./pack.js";
 
 async function makeQualityFixture(): Promise<string> {
@@ -91,12 +92,21 @@ describe("Context Relay pack service", () => {
 
       const remembered = await relay.remember({
         statement: "Auth sessions must stay backwards compatible.",
+        type: "convention",
+        scope: "auth",
         tags: ["auth"],
       });
       const recalled = await relay.recall({ query: "auth session", limit: 5 });
+      const memoryStore = await createFileMemoryStore({ root });
 
       expect(remembered.statement).toContain("Auth sessions");
       expect(recalled.map((record) => record.id)).toContain(remembered.id);
+      expect(memoryStore.list({ includeInactive: true })[0]).toMatchObject({
+        memory_id: remembered.id,
+        status: "active",
+        type: "convention",
+        scope: "auth",
+      });
     } finally {
       await rm(root, { recursive: true, force: true });
     }
@@ -128,7 +138,7 @@ describe("Context Relay pack service", () => {
       );
       expect(pack.localEvidence).toEqual({
         memory: {
-          path: ".agentrail/memory/v1.jsonl",
+          path: ".agentrail/memory/v2.json",
           recordsUsed: 1,
           uploaded: false,
         },

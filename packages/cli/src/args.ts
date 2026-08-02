@@ -10,7 +10,7 @@ export function parseAgentRailCommand(
     return { name: "help" };
   }
 
-  const flags = parseFlags(rest);
+  const flags = parseFlags(command === "memory" ? rest.slice(1) : rest);
   switch (command) {
     case "setup": {
       const codexConfig = stringFlag(flags, "codex-config");
@@ -80,6 +80,29 @@ export function parseAgentRailCommand(
         name: "logout",
         root: stringFlag(flags, "root") ?? process.cwd(),
         ...(projectKey === undefined ? {} : { projectKey }),
+      };
+    }
+    case "memory": {
+      const [action] = rest;
+      if (action !== "list" && action !== "push" && action !== "expire") {
+        throw new Error("memory requires list, push, or expire");
+      }
+      ensureNoUnknownFlags(flags, ["id", "root", "api-url"]);
+      const memoryId = stringFlag(flags, "id");
+      if (
+        (action === "push" || action === "expire") &&
+        memoryId === undefined
+      ) {
+        throw new Error("--id is required");
+      }
+
+      const apiUrl = stringFlag(flags, "api-url");
+      return {
+        name: "memory",
+        action,
+        root: stringFlag(flags, "root") ?? process.cwd(),
+        ...(memoryId === undefined ? {} : { memoryId }),
+        ...(apiUrl === undefined ? {} : { apiUrl }),
       };
     }
     default:

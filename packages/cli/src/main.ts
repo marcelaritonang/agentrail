@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 import { join } from "node:path";
 
-import { createContextRelay } from "@agentrail-sdk/context";
+import {
+  createContextRelay,
+  createFileMemoryStore,
+  resolveWorkspaceRoot,
+} from "@agentrail-sdk/context";
 
 import { parseAgentRailCommand } from "./args.js";
 import {
@@ -17,9 +21,14 @@ import {
   runLoginCommand,
 } from "./commands/login.js";
 import { runLogoutCommand } from "./commands/logout.js";
+import {
+  pushMemoryToApi,
+  runMemoryExpireCommand,
+  runMemoryListCommand,
+  runMemoryPushCommand,
+} from "./commands/memory.js";
 import { selectCredentialStore } from "./credentials/platform-store.js";
 import type { CommandResult } from "./types.js";
-import { resolveWorkspaceRoot } from "@agentrail-sdk/context";
 
 const CLI_PACKAGE_VERSION = "0.1.2";
 
@@ -137,6 +146,52 @@ export async function runAgentRailCommand(
           projectKey: command.projectKey ?? credentialProjectKey(root),
         });
       }
+      case "memory": {
+        const root = await resolveWorkspaceRoot(command.root);
+        const memoryStore = await createFileMemoryStore({ root });
+        if (command.action === "list") {
+          return runMemoryListCommand({ store: memoryStore });
+        }
+        if (command.memoryId === undefined) {
+          return { exitCode: 2, stdout: "", stderr: "--id is required.\n" };
+        }
+        if (command.action === "expire") {
+          return runMemoryExpireCommand({
+            memoryId: command.memoryId,
+            store: memoryStore,
+          });
+        }
+        const memory = memoryStore
+          .list({ includeInactive: true })
+          .find((record) => record.memory_id === command.memoryId);
+        if (memory === undefined) {
+          return {
+            exitCode: 1,
+            stdout: "",
+            stderr: `Unknown memory: ${command.memoryId}\n`,
+          };
+        }
+        const credentialStore = await selectCredentialStore({
+          directory: join(root, ".agentrail", "credentials"),
+        });
+        const credential = await credentialStore.get(
+          credentialProjectKey(root),
+        );
+        return runMemoryPushCommand({
+          privacyMode: "metrics-only",
+          credential,
+          memory,
+          push: (record, activeCredential) =>
+            pushMemoryToApi({
+              apiUrl: command.apiUrl ?? "https://agentrail.id",
+              credential: activeCredential,
+              memory: record,
+            }),
+          markPushed: (memoryId) => memoryStore.markPushed(memoryId),
+          markReviewRequired: (memoryId) =>
+            memoryStore.markReviewRequired(memoryId),
+        });
+      }
     }
   } catch (error) {
     return { exitCode: 1, stdout: "", stderr: `${errorMessage(error)}\n` };
@@ -173,6 +228,9 @@ function usage(): string {
     "  agentrail doctor --root <workspace> --json",
     "  agentrail context --root <workspace> --task <task> --token-budget <n> --json",
     "  agentrail logout --root <workspace>",
+    "  agentrail memory list --root <workspace>",
+    "  agentrail memory push --id <memory-id> --root <workspace> --api-url https://agentrail.id",
+    "  agentrail memory expire --id <memory-id> --root <workspace>",
     "  agentrail uninstall --client codex --root <workspace>",
     "",
   ].join("\n");
