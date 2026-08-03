@@ -30,7 +30,7 @@ import {
 import { selectCredentialStore } from "./credentials/platform-store.js";
 import type { CommandResult } from "./types.js";
 
-const CLI_PACKAGE_VERSION = "0.1.2";
+const CLI_PACKAGE_VERSION = "0.1.3";
 
 export async function runAgentRailCommand(
   argv: readonly string[],

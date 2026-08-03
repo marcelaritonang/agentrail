@@ -72,7 +72,7 @@ function loginInput(overrides: Partial<LoginCommandInput> = {}): {
       api,
       apiUrl: "https://agentrail.id",
       client: "codex",
-      packageVersion: "0.1.2",
+      packageVersion: "0.1.3",
       projectKey: "project_a",
       store,
       openBrowser: async () => {

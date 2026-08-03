@@ -55,7 +55,7 @@ describe("AgentRail CLI commands", () => {
           "utf8",
         ),
       ) as { packageVersion?: string };
-      expect(receipt.packageVersion).toBe("0.1.2");
+      expect(receipt.packageVersion).toBe("0.1.3");
     } finally {
       await rm(root, { recursive: true, force: true });
     }
