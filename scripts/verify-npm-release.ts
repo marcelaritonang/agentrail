@@ -60,13 +60,13 @@ const releasePackages = [
   {
     directory: "contracts",
     name: "@agentrail-sdk/contracts",
-    version: "0.1.1",
+    version: "0.1.2",
   },
   { directory: "db", name: "@agentrail-sdk/db", version: "0.1.0" },
-  { directory: "context", name: "@agentrail-sdk/context", version: "0.1.1" },
+  { directory: "context", name: "@agentrail-sdk/context", version: "0.1.3" },
   { directory: "sdk", name: "@agentrail-sdk/sdk", version: "0.1.0" },
-  { directory: "mcp", name: "@agentrail-sdk/mcp", version: "0.1.2" },
-  { directory: "cli", name: "@agentrail-sdk/cli", version: "0.1.1" },
+  { directory: "mcp", name: "@agentrail-sdk/mcp", version: "0.1.4" },
+  { directory: "cli", name: "@agentrail-sdk/cli", version: "0.1.3" },
 ] as const;
 const commandTimeoutMs = 120_000;
 const mcpRequestTimeoutMs = 15_000;
