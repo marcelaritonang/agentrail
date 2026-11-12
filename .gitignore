@@ -21,3 +21,6 @@ artifacts/benchmarks/*.txt
 
 .vercel/
 .worktrees/
+.claude/
+CLAUDE.md
+AGENTS.md
